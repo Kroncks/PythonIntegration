@@ -5,11 +5,11 @@ import sys
 
 UDP_PORT = 5000
 TCP_PORT = 12345
-MAX_CLIENTS = 3
+MAX_CLIENTS = 4
 
 clients = []
 client_ids = {}
-available_ids = [1, 2, 3]
+available_ids = [0, 1, 2, 3]
 clients_lock = threading.Lock()
 
 def get_local_ip():
