@@ -7,7 +7,7 @@ void client(char *username) {
     char buffer[128];
     printf("[Client C] Lancement de la détection du serveur via client.py...\n");
 
-    FILE *fp = popen("python ../LAN/client.py", "r");
+    FILE *fp = popen("../.venv/bin/python3 ../LAN/client.py", "r");
     if (!fp) {
         perror("[Client C] Erreur appel script Python");
         return;
