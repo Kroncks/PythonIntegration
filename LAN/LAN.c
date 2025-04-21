@@ -1,5 +1,4 @@
 #include "LAN.h"
-#include "crossplatform.h"
 
 void client(char *username) {
     char buffer[128];

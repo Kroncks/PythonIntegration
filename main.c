@@ -2,6 +2,9 @@
 #include "LAN/LAN.h"
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
     char username[MAX_USERNAME];
     printf("\n");
     name(username);
@@ -23,6 +26,5 @@ int main() {
                 break;
         }
     }
-
     return 0;
 }

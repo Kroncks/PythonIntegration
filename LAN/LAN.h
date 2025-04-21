@@ -1,6 +1,7 @@
 #ifndef LAN_H
 #define LAN_H
 
+#include "crossplatform.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
