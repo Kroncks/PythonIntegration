@@ -1,8 +1,6 @@
 #include "LAN.h"
 #include "crossplatform.h"
 
-
-
 void client(char *username) {
     char buffer[128];
     printf("[Client C] Lancement de la détection du serveur via client.py...\n");
