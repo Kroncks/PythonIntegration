@@ -15,8 +15,6 @@ clients_lock = threading.Lock()
 
 STATUT_FILE = '../LAN/tmp/serveur_statut.txt'
 
-# Efface/crée le fichier de statut au démarrage
-open(STATUT_FILE, 'w').close()
 
 def get_local_ip():
     interfaces = netifaces.interfaces()

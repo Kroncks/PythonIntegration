@@ -85,6 +85,7 @@ void client(char *username) {
 }
 
 void serveur() { // lance le serveur en arrière plan e_e
+    remove(STATUT_FILE);
     printf("[Serveur] Lancement du serveur Python...\n");
 #ifdef _WIN32
     int result = system("start /B python.exe ../LAN/serveur.py");
@@ -94,4 +95,12 @@ void serveur() { // lance le serveur en arrière plan e_e
     if (result != 0) {
         printf("[Serveur] Erreur lors du lancement du serveur Python.\n");
     }
+}
+
+void attendre_serveur() {
+    FILE *file;
+    do {
+        file = fopen(STATUT_FILE, "r");
+    } while (!file);
+    fclose(file);
 }

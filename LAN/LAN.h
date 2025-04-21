@@ -13,5 +13,6 @@
 void client(char * username);
 void serveur();
 
+void attendre_serveur();
 
 #endif

@@ -18,6 +18,8 @@ int main() {
         switch (choix) {
             case 1:
                 serveur();
+                attendre_serveur();
+                client(username);
                 break;
             case 2:
                 client(username);
