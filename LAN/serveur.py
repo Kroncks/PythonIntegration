@@ -15,6 +15,7 @@ clients_lock = threading.Lock()
 
 STATUT_FILE = '../LAN/tmp/serveur_statut.txt'
 
+stop_event = threading.Event()
 
 def get_local_ip():
     interfaces = netifaces.interfaces()
@@ -36,11 +37,16 @@ def handle_client(conn, addr):
 
     try:
         conn.sendall(f"ID:{client_id}".encode())
-        while True:
+        while not stop_event.is_set():
             data = conn.recv(1024)
             if not data:
                 break
-            print(f"[TCP] Message du client {client_id} : {data.decode()}")
+            message = data.decode().strip()
+            print(f"[TCP] Message du client {client_id} : {message}")
+            if message.upper() == "STOP":
+                print("[TCP] Message STOP reçu. Arrêt du serveur demandé.")
+                stop_event.set()
+                break
     except Exception as e:
         print(f"[TCP] Erreur avec le client {client_id}: {e}")
     finally:
@@ -60,13 +66,17 @@ def start_udp_discovery():
     udp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     udp_sock.bind(("", UDP_PORT))
     print("[UDP] Serveur prêt à répondre aux PING...")
-    while True:
+    while not stop_event.is_set():
         try:
+            udp_sock.settimeout(1.0)
             data, addr = udp_sock.recvfrom(1024)
             if data.decode().strip() == "PING":
                 udp_sock.sendto(f"PONG {local_ip}".encode(), addr)
+        except socket.timeout:
+            continue
         except Exception as e:
             print(f"[UDP] Erreur : {e}")
+    udp_sock.close()
 
 def start_tcp_server():
     tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -77,10 +87,15 @@ def start_tcp_server():
 
     with open(STATUT_FILE, 'w') as f:
         f.write('ready')
-        print("[SERVEUR] ready dans ",STATUT_FILE)
+        print("[Serveur] ready dans ", STATUT_FILE)
 
-    while True:
-        conn, addr = tcp_sock.accept()
+    while not stop_event.is_set():
+        try:
+            tcp_sock.settimeout(1.0)
+            conn, addr = tcp_sock.accept()
+        except socket.timeout:
+            continue
+
         with clients_lock:
             if len(clients) >= MAX_CLIENTS or not available_ids:
                 print(f"[TCP] Connexion refusée (max {MAX_CLIENTS} atteint) : {addr}")
@@ -88,6 +103,19 @@ def start_tcp_server():
                 conn.close()
                 continue
         threading.Thread(target=handle_client, args=(conn, addr)).start()
+
+    print("[Serveur] Fermeture du serveur : déconnexion des clients...")
+    with clients_lock:
+        for conn in clients:
+            try:
+                conn.sendall(b"STOP")
+                conn.close()
+            except:
+                pass
+    clients.clear()
+    if os.path.exists(STATUT_FILE):
+        os.remove(STATUT_FILE)
+    print("[Serveur] Serveur arrêté proprement.")
 
 if __name__ == "__main__":
     print("[Serveur Python] Démarrage du serveur...")
