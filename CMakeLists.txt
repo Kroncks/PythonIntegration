@@ -10,3 +10,8 @@ add_executable(PythonIntegration main.c
         LAN/LAN.h
         LAN/crossplatform.h
 )
+
+
+if(WIN32)
+    target_link_libraries(PythonIntegration ws2_32)
+endif()
