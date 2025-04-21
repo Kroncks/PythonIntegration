@@ -78,11 +78,27 @@ void client(char *username) {
     printf("[Client C] Envoi du pseudo : %s\n", username);
     send(sock, username, strlen(username), 0);
 
-    printf("[Client C] Terminé. Appuyez sur Entrée pour quitter.\n");
-    getchar();
+    // Boucle pour recevoir les messages du serveur
+    while (1) {
+        received = recv(sock, server_response, sizeof(server_response) - 1, 0);
+        if (received <= 0) {
+            printf("[Client C] Déconnexion du serveur.\n");
+            break;
+        }
+
+        server_response[received] = '\0';
+        printf("[Client C] Message du serveur : %s\n", server_response);
+
+        if (strcmp(server_response, "STOP") == 0) {
+            printf("[Client C] Partie terminée. Fermeture du client.\n");
+            break;  // Quitte la boucle et ferme la connexion
+        }
+    }
+
     socket_close(sock);
     network_cleanup();
 }
+
 
 void serveur() { // lance le serveur en arrière plan e_e
     remove(STATUT_FILE);
