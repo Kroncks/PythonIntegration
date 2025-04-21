@@ -29,7 +29,7 @@ def get_local_ip():
     return "127.0.0.1"
 
 def handle_client(conn, addr):
-    print(f"[TCP] Nouveau client connecté depuis {addr}")
+    print(f" [TCP] Nouveau client connecté depuis {addr}")
     with clients_lock:
         client_id = available_ids.pop(0)
         clients.append(conn)
@@ -42,13 +42,13 @@ def handle_client(conn, addr):
             if not data:
                 break
             message = data.decode().strip()
-            print(f"[TCP] Message du client {client_id} : {message}")
+            print(f" [TCP] Message du client {client_id} : {message}")
             if message.upper() == "STOP":
-                print("[TCP] Message STOP reçu. Arrêt du serveur demandé.")
+                print(" [TCP] Message STOP reçu. Arrêt du serveur demandé.")
                 stop_event.set()
                 break
     except Exception as e:
-        print(f"[TCP] Erreur avec le client {client_id}: {e}")
+        print(f" [TCP] Erreur avec le client {client_id}: {e}")
     finally:
         with clients_lock:
             if conn in clients:
@@ -57,15 +57,15 @@ def handle_client(conn, addr):
                 available_ids.sort()
                 del client_ids[conn]
         conn.close()
-        print(f"[TCP] Client {client_id} déconnecté")
+        print(f" [TCP] Client {client_id} déconnecté")
 
 def start_udp_discovery():
     local_ip = get_local_ip()
-    print(f"[UDP] IP locale du serveur : {local_ip}")
+    print(f" [UDP] IP locale du serveur : {local_ip}")
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     udp_sock.bind(("", UDP_PORT))
-    print("[UDP] Serveur prêt à répondre aux PING...")
+    print(" [UDP] Serveur prêt à répondre aux PING...")
     while not stop_event.is_set():
         try:
             udp_sock.settimeout(1.0)
@@ -75,7 +75,7 @@ def start_udp_discovery():
         except socket.timeout:
             continue
         except Exception as e:
-            print(f"[UDP] Erreur : {e}")
+            print(f" [UDP] Erreur : {e}")
     udp_sock.close()
 
 def start_tcp_server():
@@ -83,11 +83,11 @@ def start_tcp_server():
     tcp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     tcp_sock.bind(("", TCP_PORT))
     tcp_sock.listen()
-    print(f"[TCP] Serveur TCP en écoute sur le port {TCP_PORT}...")
+    print(f" [TCP] Serveur TCP en écoute sur le port {TCP_PORT}...")
 
     with open(STATUT_FILE, 'w') as f:
         f.write('ready')
-        print("[Serveur] ready dans ", STATUT_FILE)
+        print(" [Serveur] ready dans ", STATUT_FILE)
 
     while not stop_event.is_set():
         try:
@@ -98,13 +98,13 @@ def start_tcp_server():
 
         with clients_lock:
             if len(clients) >= MAX_CLIENTS or not available_ids:
-                print(f"[TCP] Connexion refusée (max {MAX_CLIENTS} atteint) : {addr}")
+                print(f" [TCP] Connexion refusée (max {MAX_CLIENTS} atteint) : {addr}")
                 conn.sendall(b"FULL")
                 conn.close()
                 continue
         threading.Thread(target=handle_client, args=(conn, addr)).start()
 
-    print("[Serveur] Fermeture du serveur : déconnexion des clients...")
+    print(" [Serveur] Fermeture du serveur : déconnexion des clients...")
     with clients_lock:
         for conn in clients:
             try:
@@ -115,10 +115,10 @@ def start_tcp_server():
     clients.clear()
     if os.path.exists(STATUT_FILE):
         os.remove(STATUT_FILE)
-    print("[Serveur] Serveur arrêté proprement.")
+    print(" [Serveur] Serveur arrêté proprement.")
 
 if __name__ == "__main__":
-    print("[Serveur Python] Démarrage du serveur...")
+    print(" [Serveur Python] Démarrage du serveur...")
     udp_thread = threading.Thread(target=start_udp_discovery, daemon=True)
     udp_thread.start()
     start_tcp_server()
