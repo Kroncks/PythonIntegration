@@ -3,9 +3,13 @@
 
 void client(char *username) {
     char buffer[128];
-    printf("[Client C] Lancement de la détection du serveur via client.py...\n");
 
+    printf("[Client C] Lancement de la détection du serveur via client.py...\n");
+#ifdef _WIN32
+    FILE *fp = popen("python.exe ../LAN/client.py", "r");
+#else
     FILE *fp = popen("../.venv/bin/python3 ../LAN/client.py", "r");
+#endif
     if (!fp) {
         perror("[Client C] Erreur appel script Python");
         return;
@@ -63,7 +67,11 @@ void client(char *username) {
 
 void serveur() {
     printf("[Serveur] Lancement du serveur Python...\n");
+#ifdef _WIN32
+    int result = system("python.exe ../LAN/serveur.py");
+#else
     int result = system("../.venv/bin/python3 ../LAN/serveur.py");
+#endif
     if (result != 0) {
         printf("[Serveur] Erreur lors du lancement du serveur Python.\n");
     }
