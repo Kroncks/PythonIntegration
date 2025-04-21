@@ -84,12 +84,12 @@ void client(char *username) {
     network_cleanup();
 }
 
-void serveur() {
+void serveur() { // lance le serveur en arrière plan e_e
     printf("[Serveur] Lancement du serveur Python...\n");
 #ifdef _WIN32
-    int result = system("python.exe ../LAN/serveur.py");
+    int result = system("start /B python.exe ../LAN/serveur.py");
 #else
-    int result = system("../.venv/bin/python3 ../LAN/serveur.py");
+    int result = system("../.venv/bin/python3 ../LAN/serveur.py &");
 #endif
     if (result != 0) {
         printf("[Serveur] Erreur lors du lancement du serveur Python.\n");

@@ -1,3 +1,4 @@
+import os
 import socket
 import threading
 import netifaces
@@ -11,6 +12,11 @@ clients = []
 client_ids = {}
 available_ids = [0, 1, 2, 3]
 clients_lock = threading.Lock()
+
+STATUT_FILE = '../LAN/tmp/serveur_statut.txt'
+
+# Efface/crée le fichier de statut au démarrage
+open(STATUT_FILE, 'w').close()
 
 def get_local_ip():
     interfaces = netifaces.interfaces()
@@ -70,6 +76,10 @@ def start_tcp_server():
     tcp_sock.bind(("", TCP_PORT))
     tcp_sock.listen()
     print(f"[TCP] Serveur TCP en écoute sur le port {TCP_PORT}...")
+
+    with open(STATUT_FILE, 'w') as f:
+        f.write('ready')
+        print("[SERVEUR] ready dans ",STATUT_FILE)
 
     while True:
         conn, addr = tcp_sock.accept()

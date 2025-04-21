@@ -8,6 +8,8 @@
 
 #define TCP_PORT 12345
 
+#define STATUT_FILE "../LAN/tmp/serveur_statut.txt"
+
 void client(char * username);
 void serveur();
 
