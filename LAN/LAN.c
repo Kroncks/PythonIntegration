@@ -62,3 +62,11 @@ void client(char *username) {
     socket_close(sock);
     network_cleanup();
 }
+
+void serveur() {
+    printf("[Serveur] Lancement du serveur Python...\n");
+    int result = system("../.venv/bin/python3 ../LAN/serveur.py");
+    if (result != 0) {
+        printf("[Serveur] Erreur lors du lancement du serveur Python.\n");
+    }
+}
