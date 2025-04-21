@@ -55,10 +55,30 @@ void client(char *username) {
         return;
     }
 
-    printf("[Client C] Connecté. Envoi du pseudo : %s\n", username);
+    printf("[Client C] Connecté. En attente de l'attribution...\n");
+    char server_response[32] = {0};
+    int received = recv(sock, server_response, sizeof(server_response) - 1, 0);
+    if (received <= 0) {
+        printf("[Client C] Erreur lors de la réception du message du serveur.\n");
+        socket_close(sock);
+        network_cleanup();
+        return;
+    }
+
+    server_response[received] = '\0';
+
+    if (strcmp(server_response, "FULL") == 0) {
+        printf("[Client C] La partie est déjà complète. Déconnexion.\n");
+        socket_close(sock);
+        network_cleanup();
+        return;
+    }
+
+    printf("[Client C] Identifiant reçu : %s\n", server_response);
+    printf("[Client C] Envoi du pseudo : %s\n", username);
     send(sock, username, strlen(username), 0);
 
-    printf("[Client C] Terminé. Appuyez sur Entrée.\n");
+    printf("[Client C] Terminé. Appuyez sur Entrée pour quitter.\n");
     getchar();
     socket_close(sock);
     network_cleanup();

@@ -76,7 +76,7 @@ def start_tcp_server():
         with clients_lock:
             if len(clients) >= MAX_CLIENTS or not available_ids:
                 print(f"[TCP] Connexion refusée (max {MAX_CLIENTS} atteint) : {addr}")
-                conn.sendall(b"Serveur complet")
+                conn.sendall(b"FULL")
                 conn.close()
                 continue
         threading.Thread(target=handle_client, args=(conn, addr)).start()
