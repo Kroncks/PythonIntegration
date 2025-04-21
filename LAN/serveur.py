@@ -87,7 +87,7 @@ def start_tcp_server():
 
     with open(STATUT_FILE, 'w') as f:
         f.write('ready')
-        print(" [Serveur] ready dans ", STATUT_FILE)
+        print(" [Serveur Python] ready dans ", STATUT_FILE)
 
     while not stop_event.is_set():
         try:
@@ -104,7 +104,7 @@ def start_tcp_server():
                 continue
         threading.Thread(target=handle_client, args=(conn, addr)).start()
 
-    print(" [Serveur] Fermeture du serveur : déconnexion des clients...")
+    print(" [Serveur Python] Fermeture du serveur : déconnexion des clients...")
     with clients_lock:
         for conn in clients:
             try:
@@ -115,7 +115,7 @@ def start_tcp_server():
     clients.clear()
     if os.path.exists(STATUT_FILE):
         os.remove(STATUT_FILE)
-    print(" [Serveur] Serveur arrêté proprement.")
+    print(" [Serveur Python] Serveur arrêté proprement.")
 
 if __name__ == "__main__":
     print(" [Serveur Python] Démarrage du serveur...")
