@@ -56,7 +56,10 @@ def handle_client(conn, addr):
                 available_ids.append(client_ids[conn])
                 available_ids.sort()
                 del client_ids[conn]
-        conn.close()
+        try:
+            conn.close()
+        except Exception as e:
+            print(f" [TCP] Erreur lors de la fermeture de la connexion : {e}")
         print(f" [TCP] Client {client_id} déconnecté")
 
 def start_udp_discovery():
@@ -106,13 +109,17 @@ def start_tcp_server():
 
     print(" [Serveur Python] Fermeture du serveur : déconnexion des clients...")
     with clients_lock:
-        for conn in clients:
+        for conn in clients[:]:
             try:
                 conn.sendall(b"STOP")
+            except Exception as e:
+                print(f" [TCP] Impossible d'envoyer STOP : {e}")
+            try:
                 conn.close()
-            except:
-                pass
-    clients.clear()
+            except Exception as e:
+                print(f" [TCP] Erreur lors de la fermeture de la connexion : {e}")
+        clients.clear()
+
     if os.path.exists(STATUT_FILE):
         os.remove(STATUT_FILE)
     print(" [Serveur Python] Serveur arrêté proprement.")
