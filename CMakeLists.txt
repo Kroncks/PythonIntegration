@@ -8,4 +8,5 @@ add_executable(PythonIntegration main.c
         name.h
         LAN/LAN.c
         LAN/LAN.h
+        LAN/crossplatform.h
 )
