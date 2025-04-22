@@ -38,7 +38,6 @@ void wait_start(socket_t sock) {
             fprintf(stderr, "[Client C] Déconnexion du serveur (START)\n");
             return;
         }
-        printf("Reçu : '%s'\n", buffer);
         if (strstr(buffer, "START")) break;
     }
     printf("[Client C] Game Start !!! \n");

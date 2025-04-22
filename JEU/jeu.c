@@ -15,17 +15,23 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
     int quit = 0;
     for (int i=0; i<MAX_JOUEURS; i++) {
         if (num == i) {
+            strcpy(game->players[i].name, username);
             strcpy(buffer, username);
             send(sock, buffer, strlen(buffer), 0); // envoi du pseudo
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
             strcpy(game->players[i].name, buffer);
-            printf("[GAME] player %d saved : %s",i, game->players[i].name );
+            if (sscanf(buffer, "%*d : %19[^\n]", game->players[i].name) == 1)
+                printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
+            else
+                printf("[GAME] error saving player %d",i);
         }
     }
     if ( num==0 ) {
         for (int i=0; i<X; i++) { //init plato
-
+            for (int j=0; j<Y; j++) {
+                game->plateau[i][j] = 0;
+            }
         }
         // envoyer le plateau
     }else {
@@ -36,10 +42,12 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 
 void show(Game game, int num) {
     printf("==========[%d]==========\n", num);
-    printf(">%s\n", game.players[num].name);
+    for (int i=0; i<MAX_JOUEURS; i++) {
+        printf("%d) %s\n", i, game.players[i].name);
+    }
     for (int i = 0; i < X; i++) {
         for (int j = 0; j < Y; j++) {
-            printf("%d ", game.plateau[i][j]);
+            printf(" %d  ", game.plateau[i][j]);
         }
         printf("\n");
     }
