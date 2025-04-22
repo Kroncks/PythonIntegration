@@ -37,7 +37,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         // envoyer le plateau
         buffer[X*Y] = '\n';
         buffer[Y*X+1] = '\0';
-        send(sock, buffer, strlen(buffer), 0);
+        send(sock, buffer, strlen(buffer)+1, 0);
         printf("[GAME] buffer : %s\n",buffer);
         getchar();
     }else {
@@ -45,6 +45,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         //recevoir le plateau
         if (read_msg(sock, buffer, BUFFER_SIZE) == X*Y+1) { // taille de la map
             printf("[GAME] map recue");
+            strcpy(buffer, buffer+4);
             for (int i=0; i<X; i++) { //init plato
                 for (int j=0; j<Y; j++) {
                     game->plateau[i][j]= buffer[j+i*X]-48 ;
