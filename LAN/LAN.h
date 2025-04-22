@@ -20,5 +20,6 @@ void serveur();
 void attendre_serveur();
 
 void get_data(socket_t sock, long int * received, char * server_response,int num,  int * quit);
+size_t read_msg(socket_t sock, char *buffer, size_t size);
 
 #endif

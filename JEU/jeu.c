@@ -30,12 +30,27 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
     if ( num==0 ) {
         for (int i=0; i<X; i++) { //init plato
             for (int j=0; j<Y; j++) {
-                game->plateau[i][j] = 0;
+                game->plateau[i][j] = random() % 10;
+                buffer[j+i*X] =  game->plateau[i][j]+48;
             }
         }
         // envoyer le plateau
+        buffer[X*Y] = '\0';
+        send(sock, buffer, strlen(buffer), 0);
+        printf("[GAME] buffer : %s\n",buffer);
+        getchar();
     }else {
         //recevoir le plateau
+        if (read_msg(sock, buffer, BUFFER_SIZE)==X*Y) {
+            printf("[GAME] map recue");
+            for (int i=0; i<X; i++) { //init plato
+                for (int j=0; j<Y; j++) {
+                    game->plateau[i][j]= buffer[j+i*X]-48 ;
+                }
+            }
+        } else {
+            printf("[GAME] error receving map");
+        }
     }
 }
 
