@@ -38,15 +38,6 @@ def handle_client(conn, addr):
     try:
         conn.sendall(f"ID:{client_id}".encode())
 
-        with clients_lock:
-            if len(clients) == MAX_CLIENTS:
-                print(" [TCP] Serveur complet. Envoi de 'START' à tous les clients.")
-                for c in clients:
-                    try:
-                        c.sendall(b"START")
-                    except Exception as e:
-                        print(f" [TCP] Erreur lors de l'envoi de START : {e}")
-
         while not stop_event.is_set():
             data = conn.recv(1024)
             if not data:
@@ -54,20 +45,37 @@ def handle_client(conn, addr):
             message = data.decode().strip()
             print(f" [TCP] Message du client {client_id} : {message}")
 
+            # Si le client 0 demande à démarrer la partie
+            if message == "START?":
+                if client_id == 0:
+                    with clients_lock:
+                        if len(clients) == MAX_CLIENTS:
+                            print(" [TCP] Client 0 a demandé le démarrage. Envoi de 'START' à tous les clients.")
+                            for c in clients:
+                                try:
+                                    c.sendall(b"START")
+                                except Exception as e:
+                                    print(f" [TCP] Erreur lors de l'envoi de START : {e}")
+                        else:
+                            print(" [TCP] Démarrage refusé : tous les clients ne sont pas encore connectés.")
+                else:
+                    print(f" [TCP] Client {client_id} a tenté un START?, mais seul le client 0 est autorisé.")
+
             # Si le message est "STOP", arrêter le serveur
-            if message.upper() == "STOP":
+            elif message.upper() == "STOP":
                 print(" [TCP] Message STOP reçu. Arrêt du serveur demandé.")
                 stop_event.set()
                 break
 
-            # Diffuser le message à tous les autres clients
-            with clients_lock:
-                for other_conn in clients:
-                    if other_conn != conn:
-                        try:
-                            other_conn.sendall(f"{client_id}: {message}".encode())
-                        except Exception as e:
-                            print(f" [TCP] Erreur lors de l'envoi à un autre client : {e}")
+            # Sinon, diffusion aux autres clients
+            else:
+                with clients_lock:
+                    for other_conn in clients:
+                        if other_conn != conn:
+                            try:
+                                other_conn.sendall(f"{client_id}: {message}".encode())
+                            except Exception as e:
+                                print(f" [TCP] Erreur lors de l'envoi à un autre client : {e}")
 
     except Exception as e:
         print(f" [TCP] Erreur avec le client {client_id}: {e}")
