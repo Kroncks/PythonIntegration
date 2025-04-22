@@ -51,7 +51,7 @@ void show(Game game, int num) {
         }
         printf("\n");
     }
-    printf("========================\n");
+    printf("=======================\n");
 }
 
 
