@@ -1,22 +1,48 @@
 #include "LAN.h"
 
-void wait_start(socket_t sock) {
-    printf("[Client C] Waiting for START e_e\n");
-    char buffer[BUFFER_SIZE] = {0};
-    do {
-         recv(sock, buffer, BUFFER_SIZE - 1, 0);
-    } while (strcmp(buffer, "START") != 0);
-    printf("[Client C] Game Start !!! \n");
+// Lit depuis le socket jusqu'à trouver un '\n'
+size_t read_msg(socket_t sock, char *buffer, size_t size) {
+    char ch;
+    size_t i = 0;
+    while (i < size - 1) {
+        long int n = recv(sock, &ch, 1, 0);
+        if (n <= 0) break;
+        buffer[i++] = ch;
+        if (ch == '\n') break;
+    }
+    buffer[i] = '\0';
+    return i;
 }
 
 void wait_ready(socket_t sock) {
     printf("[Client C] Waiting for READY\n");
-    char buffer[BUFFER_SIZE] = {0};
-    do {
-        recv(sock, buffer, BUFFER_SIZE - 1, 0);
-    } while (strcmp(buffer, "READY") != 0);
+    char buffer[BUFFER_SIZE];
+    while (1) {
+        size_t n = read_msg(sock, buffer, BUFFER_SIZE);
+        if (n <= 0) {
+            fprintf(stderr, "[Client C] Déconnexion du serveur (READY)\n");
+            return;
+        }
+        printf("Reçu : '%s'\n", buffer);
+        if (strstr(buffer, "READY")) break;
+    }
     printf("[Client C] Serveur ready to launch game !\n[Launch]>");
-    getchar();
+    getchar();  // Attente de l'utilisateur pour START?
+}
+
+void wait_start(socket_t sock) {
+    printf("[Client C] Waiting for START e_e\n");
+    char buffer[BUFFER_SIZE];
+    while (1) {
+        size_t n = read_msg(sock, buffer, BUFFER_SIZE);
+        if (n <= 0) {
+            fprintf(stderr, "[Client C] Déconnexion du serveur (START)\n");
+            return;
+        }
+        printf("Reçu : '%s'\n", buffer);
+        if (strstr(buffer, "START")) break;
+    }
+    printf("[Client C] Game Start !!! \n");
 }
 
 void client(char *username) {
@@ -101,6 +127,7 @@ void client(char *username) {
     Game game;
     if (server_response[3]-48 == 0) {
         wait_ready(sock);
+        send(sock, "START?", 6, 0);
     }
     wait_start(sock);
     init_game(sock, game, server_response[3]-48, username);

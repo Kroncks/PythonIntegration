@@ -1,6 +1,8 @@
 import os
 import socket
 import threading
+from time import sleep
+
 import netifaces
 import sys
 
@@ -40,7 +42,7 @@ def handle_client(conn, addr):
             client_zero_conn = next((c for c in clients if client_ids[c] == 0), None)
             if client_zero_conn:
                 try:
-                    client_zero_conn.sendall(b"READY")
+                    client_zero_conn.sendall(b"READY\n")
                     print(" [TCP] READY envoyé au client 0.")
                 except Exception as e:
                     print(f" [TCP] Impossible d’envoyer READY au client 0 : {e}")
@@ -62,10 +64,12 @@ def handle_client(conn, addr):
                         if len(clients) == MAX_CLIENTS:
                             print(" [TCP] Client 0 a demandé le démarrage. Envoi de 'START' à tous les clients.")
                             for c in clients:
+                                target_id = client_ids.get(c, '?')
                                 try:
-                                    c.sendall(b"START")
+                                    c.sendall(b"START\n")
+                                    print(f" [TCP] START envoyé à client {target_id}")
                                 except Exception as e:
-                                    print(f" [TCP] Erreur lors de l'envoi de START : {e}")
+                                    print(f" [TCP] Erreur lors de l'envoi de START à client {target_id} : {e}")
                         else:
                             print(" [TCP] Démarrage refusé : tous les clients ne sont pas encore connectés.")
                 else:
@@ -142,7 +146,7 @@ def start_tcp_server():
         with clients_lock:
             if len(clients) >= MAX_CLIENTS or not available_ids:
                 print(f" [TCP] Connexion refusée (max {MAX_CLIENTS} atteint) : {addr}")
-                conn.sendall(b"FULL")
+                conn.sendall(b"FULL\n")
                 conn.close()
                 continue
         threading.Thread(target=handle_client, args=(conn, addr)).start()
@@ -151,7 +155,7 @@ def start_tcp_server():
     with clients_lock:
         for conn in clients[:]:
             try:
-                conn.sendall(b"STOP")
+                conn.sendall(b"STOP\n")
             except Exception as e:
                 print(f" [TCP] Impossible d'envoyer STOP : {e}")
             try:
