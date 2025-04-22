@@ -163,6 +163,7 @@ void get_data(socket_t sock, long int * received, char * server_response,int num
     if (*received <= 0) {
         printf("[Client C] Déconnexion du serveur.\n");
         *quit = 1;
+        return;
     }
 
     server_response[*received] = '\0';
@@ -171,6 +172,7 @@ void get_data(socket_t sock, long int * received, char * server_response,int num
     if (strcmp(server_response, "STOP") == 0) {
         printf("[Client C] Partie terminée. Fermeture du client.\n");
         *quit = 1;
+        return;
     }
 
     if (server_response[0]-48 != num) {
