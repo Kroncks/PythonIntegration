@@ -9,6 +9,16 @@ void wait_start(socket_t sock) {
     printf("[Client C] Game Start !!! \n");
 }
 
+void wait_ready(socket_t sock) {
+    printf("[Client C] Waiting for READY\n");
+    char buffer[BUFFER_SIZE] = {0};
+    do {
+        recv(sock, buffer, BUFFER_SIZE - 1, 0);
+    } while (strcmp(buffer, "READY") != 0);
+    printf("[Client C] Serveur ready to launch game !\n[Launch]>");
+    getchar();
+}
+
 void client(char *username) {
     char buffer[128];
 
@@ -89,6 +99,9 @@ void client(char *username) {
 
 
     Game game;
+    if (server_response[3]-48 == 0) {
+        wait_ready(sock);
+    }
     wait_start(sock);
     init_game(sock, game, server_response[3]-48, username);
     jouer(sock, game, server_response[3]-48);
