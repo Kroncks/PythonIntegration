@@ -1,15 +1,15 @@
 #include "jeu.h"
 
 
-void tour(Game game, int num, char * data) {
+void tour(Game * game, int num, char * data) {
 
 }
 
-void process_data(Game game, int num, char * data) {
+void process_data(Game * game, int num, char * data) {
 
 }
 
-void init_game(socket_t sock, Game game, int num, char * username) {
+void init_game(socket_t sock, Game * game, int num, char * username) {
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
@@ -19,7 +19,8 @@ void init_game(socket_t sock, Game game, int num, char * username) {
             send(sock, buffer, strlen(buffer), 0); // envoi du pseudo
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
-            strcpy(game.players[i].name, buffer);
+            strcpy(game->players[i].name, buffer);
+            printf("[GAME] player %d saved : %s",i, game->players[i].name );
         }
     }
     if ( num==0 ) {
@@ -46,8 +47,8 @@ void show(Game game, int num) {
 }
 
 
-void jouer(socket_t sock, Game game, int num) {
-    show(game, num);
+void jouer(socket_t sock, Game * game, int num) {
+    show(*game, num);
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
@@ -56,13 +57,13 @@ void jouer(socket_t sock, Game game, int num) {
         for (int i=0; i<MAX_JOUEURS; i++) {
             if (num == i) {
                 tour(game, i, buffer); // le joueur joue
-                show(game, i);
+                show(*game, i);
                 send(sock, buffer, strlen(buffer), 0); // les données sont envoyées
             } else {
                 get_data(sock, &received, buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, buffer); // on traite les données des autres joueurs
-                show(game, i);
+                show(*game, i);
             }
         }
     }
