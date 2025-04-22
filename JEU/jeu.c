@@ -10,6 +10,7 @@ void process_data(Game * game, int num, char * data) {
 }
 
 void init_game(socket_t sock, Game * game, int num, char * username) {
+    char buff_plateau[X*Y+1];
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
@@ -41,18 +42,16 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         printf("[GAME] buffer : %s\n",buffer);
         getchar();
     }else {
-        printf("[GAME] waiting for the map\n",buffer);
+        printf("[GAME] waiting for the map\n");
         //recevoir le plateau
-        if (read_msg(sock, buffer, BUFFER_SIZE) == X*Y+4) { // taille de la map
-            printf("[GAME] map recue : %s\n",buffer);
-            strcpy(buffer, buffer+3);
-            for (int i=0; i<X; i++) { //init plato
-                for (int j=0; j<Y; j++) {
-                    game->plateau[i][j]= buffer[j+i*X]-48 ;
-                }
+        get_data(sock, &received, buffer, 0, &quit);
+        strcpy(buff_plateau, buffer+3);
+        buffer[X*Y] = '\0';
+        printf("[GAME] received data : %s\n",buff_plateau);
+        for (int i=0; i<X; i++) {
+            for (int j=0; j<Y; j++) {
+                game->plateau[i][j] = buff_plateau[j+i*X]-48;
             }
-        } else {
-            printf("[GAME] error receving map : %s\n",buffer);
         }
     }
 }
