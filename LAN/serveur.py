@@ -6,7 +6,7 @@ import sys
 
 UDP_PORT = 5000
 TCP_PORT = 12345
-MAX_CLIENTS = 4
+MAX_CLIENTS = 2
 
 clients = []
 client_ids = {}

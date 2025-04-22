@@ -135,7 +135,9 @@ void get_data(socket_t sock, long int * received, char * server_response,int num
         *quit = 1;
     }
 
-    if (server_response[0] != num) {
-        printf("[Client C] Donnée inatendue xc");
+    if (server_response[0]-48 != num) {
+        printf("[Client C] Donnée inatendue : (%d , %d)\n",server_response[0]-48 , num);
+    } else {
+        printf("[Client C] Donnée ok\n");
     }
 }

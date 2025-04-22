@@ -13,12 +13,13 @@ void init_game(socket_t sock, Game game, int num, char * username) {
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<MAX_JOUEURS; i++) {
         if (num == i) {
             strcpy(buffer, username);
             send(sock, buffer, strlen(buffer), 0); // envoi du pseudo
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
+            strcpy(game.players[i].name, buffer);
         }
     }
     if ( num==0 ) {
@@ -37,8 +38,9 @@ void show(Game game, int num) {
     printf(">%s\n", game.players[num].name);
     for (int i = 0; i < X; i++) {
         for (int j = 0; j < Y; j++) {
-            printf("%d", game.plateau[i][j]);
+            printf("%d ", game.plateau[i][j]);
         }
+        printf("\n");
     }
     printf("========================\n");
 }
@@ -51,7 +53,7 @@ void jouer(socket_t sock, Game game, int num) {
     int quit = 0;
 
     while (!quit) {
-        for (int i=0; i<3; i++) {
+        for (int i=0; i<MAX_JOUEURS; i++) {
             if (num == i) {
                 tour(game, i, buffer); // le joueur joue
                 show(game, i);
