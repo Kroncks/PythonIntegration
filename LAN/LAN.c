@@ -129,8 +129,8 @@ void client(char *username) {
         send(sock, "START?", 6, 0);
     }
     wait_start(sock);
-    init_game(sock, game, server_response[3]-48, username);
-    jouer(sock, game, server_response[3]-48);
+    init_game(sock, &game, server_response[3]-48, username);
+    jouer(sock, &game, server_response[3]-48);
 
     socket_close(sock);
     network_cleanup();
