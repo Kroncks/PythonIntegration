@@ -35,6 +35,16 @@ def handle_client(conn, addr):
         clients.append(conn)
         client_ids[conn] = client_id
 
+        # Vérifie si le serveur est complet
+        if len(clients) == MAX_CLIENTS:
+            client_zero_conn = next((c for c in clients if client_ids[c] == 0), None)
+            if client_zero_conn:
+                try:
+                    client_zero_conn.sendall(b"READY")
+                    print(" [TCP] READY envoyé au client 0.")
+                except Exception as e:
+                    print(f" [TCP] Impossible d’envoyer READY au client 0 : {e}")
+
     try:
         conn.sendall(f"ID:{client_id}".encode())
 
