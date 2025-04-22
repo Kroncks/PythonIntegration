@@ -52,7 +52,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
                 }
             }
         } else {
-            printf("[GAME] error receving map\n");
+            printf("[GAME] error receving map : %s\n",buffer);
         }
     }
 }
