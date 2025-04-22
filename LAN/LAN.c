@@ -23,7 +23,6 @@ void wait_ready(socket_t sock) {
             fprintf(stderr, "[Client C] Déconnexion du serveur (READY)\n");
             return;
         }
-        printf("Reçu : '%s'\n", buffer);
         if (strstr(buffer, "READY")) break;
     }
     printf("[Client C] Serveur ready to launch game !\n[Launch]>");
