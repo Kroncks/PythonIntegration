@@ -35,16 +35,18 @@ def handle_client(conn, addr):
         clients.append(conn)
         client_ids[conn] = client_id
 
-        if len(clients) == MAX_CLIENTS:
-            print(" [TCP] Serveur complet. Envoi de 'START' à tous les clients.")
-            for c in clients:
-                try:
-                    c.sendall(b"START")
-                except Exception as e:
-                    print(f" [TCP] Erreur lors de l'envoi de START : {e}")
-
     try:
         conn.sendall(f"ID:{client_id}".encode())
+
+        with clients_lock:
+            if len(clients) == MAX_CLIENTS:
+                print(" [TCP] Serveur complet. Envoi de 'START' à tous les clients.")
+                for c in clients:
+                    try:
+                        c.sendall(b"START")
+                    except Exception as e:
+                        print(f" [TCP] Erreur lors de l'envoi de START : {e}")
+
         while not stop_event.is_set():
             data = conn.recv(1024)
             if not data:
