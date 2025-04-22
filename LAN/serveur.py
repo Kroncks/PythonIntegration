@@ -43,10 +43,22 @@ def handle_client(conn, addr):
                 break
             message = data.decode().strip()
             print(f" [TCP] Message du client {client_id} : {message}")
+
+            # Si le message est "STOP", arrêter le serveur
             if message.upper() == "STOP":
                 print(" [TCP] Message STOP reçu. Arrêt du serveur demandé.")
                 stop_event.set()
                 break
+
+            # Diffuser le message à tous les autres clients
+            with clients_lock:
+                for other_conn in clients:
+                    if other_conn != conn:
+                        try:
+                            other_conn.sendall(f"{client_id}: {message}".encode())
+                        except Exception as e:
+                            print(f" [TCP] Erreur lors de l'envoi à un autre client : {e}")
+
     except Exception as e:
         print(f" [TCP] Erreur avec le client {client_id}: {e}")
     finally:

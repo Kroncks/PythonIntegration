@@ -9,6 +9,9 @@ add_executable(PythonIntegration main.c
         LAN/LAN.c
         LAN/LAN.h
         LAN/crossplatform.h
+        JEU/jeu.c
+        JEU/jeu.h
+        JEU/structures.h
 )
 
 

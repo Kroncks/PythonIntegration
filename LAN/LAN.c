@@ -1,5 +1,14 @@
 #include "LAN.h"
 
+void wait_start(socket_t sock) {
+    printf("[Client C] Waiting for START e_e\n");
+    char buffer[BUFFER_SIZE] = {0};
+    do {
+         recv(sock, buffer, BUFFER_SIZE - 1, 0);
+    } while (strcmp(buffer, "START") != 0);
+    printf("[Client C] Game Start !!! \n");
+}
+
 void client(char *username) {
     char buffer[128];
 
@@ -56,8 +65,8 @@ void client(char *username) {
     }
 
     printf("[Client C] Connecté. En attente de l'attribution...\n");
-    char server_response[32] = {0};
-    int received = recv(sock, server_response, sizeof(server_response) - 1, 0);
+    char server_response[32] = {0}; // petit buffer pour les petites communications
+    long int received = recv(sock, server_response, sizeof(server_response) - 1, 0);
     if (received <= 0) {
         printf("[Client C] Erreur lors de la réception du message du serveur.\n");
         socket_close(sock);
@@ -78,29 +87,18 @@ void client(char *username) {
     printf("[Client C] Envoi du pseudo : %s\n", username);
     send(sock, username, strlen(username), 0);
 
-    // Boucle pour recevoir les messages du serveur
-    while (1) {
-        received = recv(sock, server_response, sizeof(server_response) - 1, 0);
-        if (received <= 0) {
-            printf("[Client C] Déconnexion du serveur.\n");
-            break;
-        }
 
-        server_response[received] = '\0';
-        printf("[Client C] Message du serveur : %s\n", server_response);
-
-        if (strcmp(server_response, "STOP") == 0) {
-            printf("[Client C] Partie terminée. Fermeture du client.\n");
-            break;  // Quitte la boucle et ferme la connexion
-        }
-    }
+    Game game;
+    wait_start(sock);
+    init_game(sock, game, server_response[3]-48, username);
+    jouer(sock, game, server_response[3]-48);
 
     socket_close(sock);
     network_cleanup();
 }
 
 
-void serveur() { // lance le serveur en arrière plan e_e
+void serveur() { // lance le serveur en arrière plan o-o
     remove(STATUT_FILE);
     printf("[Serveur] Lancement du serveur Python...\n");
 #ifdef _WIN32
@@ -119,4 +117,25 @@ void attendre_serveur() {
         file = fopen(STATUT_FILE, "r");
     } while (!file);
     fclose(file);
+}
+
+
+void get_data(socket_t sock, long int * received, char * server_response,int num,  int * quit) {
+    *received = recv(sock, server_response, BUFFER_SIZE - 1, 0);
+    if (*received <= 0) {
+        printf("[Client C] Déconnexion du serveur.\n");
+        *quit = 1;
+    }
+
+    server_response[*received] = '\0';
+    printf("[Client C] Message du serveur : %s\n", server_response);
+
+    if (strcmp(server_response, "STOP") == 0) {
+        printf("[Client C] Partie terminée. Fermeture du client.\n");
+        *quit = 1;
+    }
+
+    if (server_response[0] != num) {
+        printf("[Client C] Donnée inatendue xc");
+    }
 }
