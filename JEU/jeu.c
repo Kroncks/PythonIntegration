@@ -51,6 +51,9 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
             }
         }
     }
+    //coordonées de base des joueurs :
+    game->players[0].x = 0; game->players[0].y = Y/2;
+    game->players[1].x = X; game->players[1].y = Y/2;
 }
 
 
