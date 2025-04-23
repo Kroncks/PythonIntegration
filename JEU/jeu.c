@@ -53,7 +53,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
     }
     //coordonées de base des joueurs :
     game->players[0].x = 0; game->players[0].y = Y/2;
-    game->players[1].x = X; game->players[1].y = Y/2;
+    game->players[1].x = X-1; game->players[1].y = Y/2;
 }
 
 
@@ -90,6 +90,7 @@ void jouer(socket_t sock, Game * game, int num) {
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
     int n_turns = 0;
+    show(*game, 0, num);
     while (!quit) {
         for (int i=0; i<MAX_JOUEURS; i++) {
             n_turns++;
