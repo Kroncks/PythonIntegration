@@ -110,7 +110,7 @@ void client(char *username) {
 
     server_response[received] = '\0';
 
-    if (strcmp(server_response, "FULL") == 0) {
+    if (strcmp(server_response, "FULL\n") == 0) {
         printf("[Client C] La partie est déjà complète. Déconnexion.\n");
         socket_close(sock);
         network_cleanup();
