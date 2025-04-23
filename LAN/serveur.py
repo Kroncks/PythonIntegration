@@ -8,7 +8,16 @@ import sys
 
 UDP_PORT = 5000
 TCP_PORT = 12345
-MAX_CLIENTS = 2
+
+NB_PLAYERS_FILE = '../LAN/tmp/NB_PLAYERS.txt'
+try:
+    with open(NB_PLAYERS_FILE, 'r') as f:
+        MAX_CLIENTS = int(f.read().strip())
+        print(" [Serveur Python] MAX_CLIENTS =",MAX_CLIENTS)
+except Exception as e:
+    print(f" [Serveur Python] Erreur lors de la lecture du nombre de joueurs : {e}")
+    print(" [Serveur Python] Client max = 4 (défault)")
+    MAX_CLIENTS = 4
 
 clients = []
 client_ids = {}
