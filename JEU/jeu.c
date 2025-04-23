@@ -3,9 +3,9 @@
 
 void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir x\n[X]==>\n");
-    scanf("%d", game->players[num].x);
+    scanf("%d", &game->players[num].x);
     printf("[Game] Choisir y\n[Y]==>\n");
-    scanf("%d", game->players[num].y);
+    scanf("%d", &game->players[num].y);
 
     sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
 }
