@@ -36,9 +36,8 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
             }
         }
         // envoyer le plateau
-        buffer[X*Y] = '\n';
-        buffer[Y*X+1] = '\0';
-        send(sock, buffer, strlen(buffer)+1, 0);
+        buffer[X*Y] = '\0';
+        send(sock, buffer, strlen(buffer), 0);
         printf("[GAME] buffer : %s\n",buffer);
         getchar();
     }else {
