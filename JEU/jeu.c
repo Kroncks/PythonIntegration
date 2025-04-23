@@ -59,9 +59,22 @@ void show(Game game, int n_turns, int num) {
     for (int i=0; i<MAX_JOUEURS; i++) {
         printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
+    int flag = 0;
     for (int i = 0; i < X; i++) {
         for (int j = 0; j < Y; j++) {
-            printf(" %d  ", game.plateau[i][j]);
+            if (game.players[num].x == i || game.players[num].y == j) {
+                printf("[O] ");
+            }else {
+                for (int k=0; k<MAX_JOUEURS; k++) {
+                    if (game.players[k].x == i || game.players[k].y == j) {
+                        printf("[X] ");
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (!flag) printf(" %d  ", game.plateau[i][j]);
+                flag = 0;
+            }
         }
         printf("\n");
     }
