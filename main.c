@@ -1,4 +1,5 @@
 #include "name.h"
+#include "version.h"
 #include "LAN/LAN.h"
 
 int main() {
@@ -6,6 +7,8 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
 #endif
     char username[MAX_USERNAME];
+    printf("\n");
+    version();
     printf("\n");
     name(username);
 

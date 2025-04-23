@@ -12,6 +12,8 @@ add_executable(PythonIntegration main.c
         JEU/jeu.c
         JEU/jeu.h
         JEU/structures.h
+        version.c
+        version.h
 )
 
 
