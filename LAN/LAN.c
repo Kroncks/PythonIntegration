@@ -158,7 +158,8 @@ void attendre_serveur() {
 }
 
 
-void get_data(socket_t sock, long int * received, char * server_response,int num,  int * quit) {
+void get_data(socket_t sock, long int * received, char * buffer,int num,  int * quit) {
+    char server_response[BUFFER_SIZE];
     *received = recv(sock, server_response, BUFFER_SIZE - 1, 0);
     if (*received <= 0) {
         printf("[Client C] Déconnexion du serveur.\n");
@@ -180,4 +181,6 @@ void get_data(socket_t sock, long int * received, char * server_response,int num
     } else {
         printf("[Client C] Donnée ok\n");
     }
+
+    strcpy(buffer, server_response+3);
 }
