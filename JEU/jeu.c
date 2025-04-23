@@ -21,10 +21,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
             strcpy(game->players[i].name, buffer);
-            if (sscanf(buffer, "%*d : %19[^\n]", game->players[i].name) == 1)
-                printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
-            else
-                printf("[GAME] error saving player %d",i);
+            printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
         }
     }
     if ( num==0 ) {
