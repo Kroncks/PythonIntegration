@@ -14,11 +14,28 @@ void process_data(Game * game, int num, char * data) {
     sscanf(data, "%d %d", &game->players[num].x, &game->players[num].y);
 }
 
+void init_nb_players() {
+    FILE *f = fopen("../LAN/tmp/NB_PLAYERS.txt", "r");
+    if (!f) {
+        perror("[INIT] Erreur lors de l'ouverture du fichier NB_JOUEURS.txt");
+        printf("[INIT] NB_JOUEURS = 4 (défault)");
+        NB_JOUEURS=4;
+    }
+    if (fscanf(f, "%d", &NB_JOUEURS) != 1 || NB_JOUEURS <= 0) {
+        fprintf(stderr, "Erreur lecture\n");
+        printf("[INIT] NB_JOUEURS = 4 (défault)");
+    } else {
+        printf("[INIT] NB_JOUEURS = %d\n",NB_JOUEURS);
+    }
+    fclose(f);
+}
+
 void init_game(socket_t sock, Game * game, int num, char * username) {
+    init_nb_players();
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
-    for (int i=0; i<MAX_JOUEURS; i++) {
+    for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
             strcpy(game->players[i].name, username);
             strcpy(buffer, username);
@@ -59,7 +76,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 
 void show(Game game, int n_turns, int num) {
     printf("====================[%d]====================\n", n_turns);
-    for (int i=0; i<MAX_JOUEURS; i++) {
+    for (int i=0; i<NB_JOUEURS; i++) {
         printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
     printf("\n>[%s]\n\n",game.players[num].name);
@@ -69,7 +86,7 @@ void show(Game game, int n_turns, int num) {
             if (game.players[num].x == j && game.players[num].y == i) {
                 printf("[O] ");
             }else {
-                for (int k=0; k<MAX_JOUEURS; k++) {
+                for (int k=0; k<NB_JOUEURS; k++) {
                     if (game.players[k].x == j && game.players[k].y == i) {
                         printf("[X] ");
                         flag = 1;
@@ -93,7 +110,7 @@ void jouer(socket_t sock, Game * game, int num) {
     int n_turns = 0;
     show(*game, 0, num);
     while (!quit) {
-        for (int i=0; i<MAX_JOUEURS; i++) {
+        for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
             if (num == i) {
                 tour(game, i, buffer); // le joueur joue
