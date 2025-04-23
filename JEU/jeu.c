@@ -72,8 +72,8 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
     game->players[0].x = 0; game->players[0].y = Y/2;
     game->players[1].x = X-1; game->players[1].y = Y/2;
 
-    game->players[2].x = X/2; game->players[0].y = 0;
-    game->players[3].x = X/2; game->players[1].y = Y-1;
+    game->players[2].x = X/2; game->players[2].y = 0;
+    game->players[3].x = X/2; game->players[3].y = Y-1;
 }
 
 
