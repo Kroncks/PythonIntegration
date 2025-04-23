@@ -99,12 +99,12 @@ void jouer(socket_t sock, Game * game, int num) {
                 tour(game, i, buffer); // le joueur joue
                 send(sock, buffer, strlen(buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
-                show(*game,n_turns,i);
+                show(*game,n_turns,num);
             } else {
                 get_data(sock, &received, buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, buffer); // on traite les données des autres joueurs
-                show(*game,n_turns,i);
+                show(*game,n_turns,num);
             }
         }
     }
