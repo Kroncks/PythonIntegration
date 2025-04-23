@@ -58,18 +58,19 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 
 
 void show(Game game, int n_turns, int num) {
-    printf("==========[%d]==========\n", num);
+    printf("====================[%d]====================\n", n_turns);
     for (int i=0; i<MAX_JOUEURS; i++) {
         printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
+    printf("\n>[%s]\n\n",game.players[num].name);
     int flag = 0;
-    for (int i = 0; i < X; i++) {
-        for (int j = 0; j < Y; j++) {
-            if (game.players[num].x == i && game.players[num].y == j) {
+    for (int i = 0; i < Y; i++) {
+        for (int j = 0; j < X; j++) {
+            if (game.players[num].x == j && game.players[num].y == i) {
                 printf("[O] ");
             }else {
                 for (int k=0; k<MAX_JOUEURS; k++) {
-                    if (game.players[k].x == i && game.players[k].y == j) {
+                    if (game.players[k].x == j && game.players[k].y == i) {
                         printf("[X] ");
                         flag = 1;
                         break;
@@ -81,7 +82,7 @@ void show(Game game, int n_turns, int num) {
         }
         printf("\n");
     }
-    printf("=======================\n");
+    printf("===========================================\n");
 }
 
 
