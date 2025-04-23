@@ -2,11 +2,16 @@
 
 
 void tour(Game * game, int num, char * data) {
+    printf("[Game] Choisir x\n[X]==>\n");
+    scanf("%d", game->players[num].x);
+    printf("[Game] Choisir y\n[Y]==>\n");
+    scanf("%d", game->players[num].y);
 
+    sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
 }
 
 void process_data(Game * game, int num, char * data) {
-
+    sscanf(data, "%d %d", &game->players[num].x, &game->players[num].y);
 }
 
 void init_game(socket_t sock, Game * game, int num, char * username) {
@@ -35,7 +40,6 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         buffer[X*Y] = '\0';
         send(sock, buffer, strlen(buffer), 0);
         printf("[GAME] buffer : %s\n",buffer);
-        getchar();
     }else {
         printf("[GAME] waiting for the map\n");
         //recevoir le plateau
@@ -50,10 +54,10 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 }
 
 
-void show(Game game, int num) {
+void show(Game game, int n_turns, int num) {
     printf("==========[%d]==========\n", num);
     for (int i=0; i<MAX_JOUEURS; i++) {
-        printf("%d) %s\n", i, game.players[i].name);
+        printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
     for (int i = 0; i < X; i++) {
         for (int j = 0; j < Y; j++) {
@@ -66,22 +70,23 @@ void show(Game game, int num) {
 
 
 void jouer(socket_t sock, Game * game, int num) {
-    show(*game, num);
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
-
+    int n_turns = 0;
     while (!quit) {
         for (int i=0; i<MAX_JOUEURS; i++) {
+            n_turns++;
             if (num == i) {
                 tour(game, i, buffer); // le joueur joue
-                show(*game, i);
                 send(sock, buffer, strlen(buffer), 0); // les données sont envoyées
+                printf("[Game] Data sent\n");
+                show(*game,n_turns,i);
             } else {
                 get_data(sock, &received, buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, buffer); // on traite les données des autres joueurs
-                show(*game, i);
+                show(*game,n_turns,i);
             }
         }
     }
