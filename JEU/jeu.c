@@ -71,6 +71,9 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
     //coordonées de base des joueurs :
     game->players[0].x = 0; game->players[0].y = Y/2;
     game->players[1].x = X-1; game->players[1].y = Y/2;
+
+    game->players[0].x = X/2; game->players[0].y = 0;
+    game->players[1].x = X/2; game->players[1].y = Y-1;
 }
 
 
@@ -79,7 +82,7 @@ void show(Game game, int n_turns, int num) {
     for (int i=0; i<NB_JOUEURS; i++) {
         printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
-    printf("\n>[%s]\n\n",game.players[num].name);
+    printf("\n>[%d][%s]\n\n",num,game.players[num].name);
     int flag = 0;
     for (int i = 0; i < Y; i++) {
         for (int j = 0; j < X; j++) {
