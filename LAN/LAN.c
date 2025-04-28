@@ -49,7 +49,7 @@ void client(char *username) {
 
     printf("[Client C] Lancement de la détection du serveur via client.py...\n");
 #ifdef _WIN32
-    FILE *fp = popen("python.exe ../LAN/client.py", "r");
+    FILE *fp = popen("..\\venv\\Scripts\\python.exe ../LAN/client.py", "r");
 #else
     FILE *fp = popen("../.venv/bin/python3 ../LAN/client.py", "r");
 #endif
