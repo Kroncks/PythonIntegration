@@ -54,7 +54,11 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
             }
         }
         // envoyer le plateau
+#ifdef WIN32
+        _sleep(0.2); // version windows
+#else
         sleep(0.2);
+#endif
         buffer[X*Y] = '\0';
         send(sock, buffer, strlen(buffer), 0);
         printf("[GAME] buffer : %s\n",buffer);

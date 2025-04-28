@@ -23,7 +23,6 @@ int main() {
                 serveur();
                 attendre_serveur();
                 client(username);
-                sleep(1);
                 break;
             case 2:
                 client(username);
