@@ -26,7 +26,8 @@ void wait_ready(socket_t sock) {
         if (strstr(buffer, "READY")) break;
     }
     printf("[Client C] Serveur ready to launch game !\n[Launch]>");
-    getchar();  // Attente de l'utilisateur pour START?
+    fflush(stdin);
+    do {} while (getchar()!='a');  // Attente de l'utilisateur pour START?
 }
 
 void wait_start(socket_t sock) {
