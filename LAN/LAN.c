@@ -49,7 +49,7 @@ void client(char *username) {
 
     printf("[Client C] Lancement de la détection du serveur via client.py...\n");
 #ifdef _WIN32
-    FILE *fp = popen("..\\venv\\Scripts\\python.exe ../LAN/client.py", "r");
+    FILE *fp = popen("..\\.venv\\Scripts\\python.exe ../LAN/client.py", "r");
 #else
     FILE *fp = popen("../.venv/bin/python3 ../LAN/client.py", "r");
 #endif
@@ -141,7 +141,7 @@ void serveur() { // lance le serveur en arrière plan o-o
     remove(STATUT_FILE);
     printf("[Serveur] Lancement du serveur Python...\n");
 #ifdef _WIN32
-    int result = system("start /B python.exe ../LAN/serveur.py");
+    int result = system("start /B ../.venv/Scripts/python.exe ../LAN/serveur.py");
 #else
     int result = system("../.venv/bin/python3 ../LAN/serveur.py &");
 #endif
