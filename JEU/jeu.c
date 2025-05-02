@@ -9,19 +9,20 @@ void viderBuffer() {
 Perso init_player() {
     Perso self;
     self.x = self.y = -1;
+
     do {
-        viderBuffer();
         printf("Pseudo : ");
-        fgets(self.pseudo,20*sizeof(char),stdin);
-        self.pseudo[strlen(self.pseudo)-1] = '\0';
+        fgets(self.pseudo, sizeof(self.pseudo), stdin);
+        self.pseudo[strcspn(self.pseudo, "\r\n")] = '\0'; // retire \n ou \r\n
 
         printf("Avatar : ");
-        fgets(self.avatar,2*sizeof(char),stdin);
-        self.avatar[strlen(self.avatar)-1] = '\0';
+        fgets(self.avatar, sizeof(self.avatar), stdin);
+        self.avatar[strcspn(self.avatar, "\r\n")] = '\0';
 
-        viderBuffer();
-        printf("[VALIDER]");
+        printf("[VALIDER] (Entrée pour valider) ");
+        viderBuffer();  // vide ce qu'il reste
     } while (getchar() != '\n');
+
     return self;
 }
 

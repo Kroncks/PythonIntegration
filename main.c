@@ -20,12 +20,13 @@ int main() {
             scanf("%d", &choix);  printf("\n");fflush(stdin);
         } while (choix<1 || choix>3);
         switch (choix) {
-            case 0:
+            case 0: {
                 // il faudrait pouvoir connaitre le nombre de joueur en ammont
                 Perso liste[4];
                 for (int i = 0; i < 4; i++) {}
                 //locale();
                 break;
+            }
             case 1:
                 self = init_player();
                 serveur();
