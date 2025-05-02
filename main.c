@@ -26,7 +26,7 @@ int main() {
                 for (int i = 0; i < NB_JOUEURS; i++) {
                     liste[i]=init_player();
                 }
-                //locale();
+                local(liste);
                 break;
             }
             case 1:

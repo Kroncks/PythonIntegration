@@ -1,5 +1,15 @@
 #include "jeu.h"
 
+
+void init_coord(Game * game) {
+    game->players[0].x = 0; game->players[0].y = Y/2;
+    game->players[1].x = X-1; game->players[1].y = Y/2;
+
+    game->players[2].x = X/2; game->players[2].y = 0;
+    game->players[3].x = X/2; game->players[3].y = Y-1;
+}
+
+
 void viderBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -120,11 +130,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
     }
     //coordonées de base des joueurs :
-    game->players[0].x = 0; game->players[0].y = Y/2;
-    game->players[1].x = X-1; game->players[1].y = Y/2;
-
-    game->players[2].x = X/2; game->players[2].y = 0;
-    game->players[3].x = X/2; game->players[3].y = Y-1;
+    init_coord(game);
 }
 
 
@@ -179,4 +185,18 @@ void jouer(socket_t sock, Game * game, int num) {
             }
         }
     }
+}
+
+// ---- local
+
+
+void init_game_local(Game * game, Perso * liste) {
+    init_nb_players(); // sans doute changer d'endroit hein
+
+    for (int i=0; i<X; i++) { //init plato
+        for (int j=0; j<Y; j++) {
+            game->plateau[i][j] = rand() % 10;
+        }
+    }
+    init_coord(game);
 }
