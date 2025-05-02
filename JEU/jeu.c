@@ -1,5 +1,6 @@
 #include "jeu.h"
 
+//void selectPerso()
 
 void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir x\n[X]==>");
@@ -46,6 +47,18 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
             printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
         }
     }
+    for (int i=0; i<NB_JOUEURS; i++) {
+        if (num == i) {
+            strcpy(buffer, game->players[i].avatar);
+            send(sock, buffer, strlen(buffer), 0); // envoi de l'avatar
+        } else {
+            get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
+            strcpy(game->players[i].avatar, buffer);
+            printf("[GAME] player %d avatar : %s\n",i, game->players[i].name );
+        }
+    }
+
+
     if ( num==0 ) {
         for (int i=0; i<X; i++) { //init plato
             for (int j=0; j<Y; j++) {

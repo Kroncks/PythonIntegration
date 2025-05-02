@@ -7,7 +7,7 @@
 typedef struct {
     // partie imuable ( envoyée dans initGame )
     char name[20];
-
+    char avatar[2];
 
     // pertie changeante ( envoyée à chaque tour )
     int x,y;
