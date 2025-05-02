@@ -194,6 +194,6 @@ void get_data(socket_t sock, long int * received, char * buffer,int num,  int * 
 
 void local(Perso * liste) {
     Game game;
-    init_local_game(&game, liste );
+    init_local_game(&game, liste);
     jouer_local(&game);
 }

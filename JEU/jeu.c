@@ -49,7 +49,7 @@ void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir y\n[Y]==>");
     scanf("%d", &game->players[num].y);
 
-    sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
+    if (data != nullptr) sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
 }
 
 void process_data(Game * game, int num, char * data) {
@@ -197,7 +197,19 @@ void jouer(socket_t sock, Game * game, int num) {
 // ---- local
 
 
-void init_game_local(Game * game, Perso * liste) {
+void jouer_local(Game * game) {
+    int quit = 0;
+    int n_turns = 0;
+    while (!quit) {
+        for (int i=0; i<NB_JOUEURS; i++) {
+            n_turns++;
+            tour(game, i, nullptr ); // le joueur joue
+            show(*game,n_turns,i);
+        }
+    }
+}
+
+void init_local_game(Game * game, Perso * liste) {
     init_nb_players(); // sans doute changer d'endroit hein
     init_plato(game);
     init_coord(game);
