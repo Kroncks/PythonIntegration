@@ -15,8 +15,13 @@ typedef struct {
 }Perso;
 
 typedef struct {
+    char name[20];
+} Client;
+
+typedef struct {
     int plateau[X][Y];
     Perso players[4];
+    Client client;
 }Game;
 
 
