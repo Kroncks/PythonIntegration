@@ -31,12 +31,14 @@ int main() {
                 break;
             }
             case 1:
+                init_nb_players();
                 self = init_player();
                 serveur();
                 attendre_serveur();
                 client(username, self);
                 break;
             case 2:
+                init_nb_players();
                 self = init_player();
                 client(username, self);
                 break;

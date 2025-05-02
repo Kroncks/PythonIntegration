@@ -72,7 +72,6 @@ void init_nb_players() {
 }
 
 void init_game(socket_t sock, Game * game, int num, Perso self) {
-    init_nb_players();
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
