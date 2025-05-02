@@ -48,7 +48,7 @@ void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir y\n[Y]==>");
     scanf("%d", &game->players[num].y);
 
-    if (data != nullptr) sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
+    if (data != NULL) sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
 }
 
 void process_data(Game * game, int num, char * data) {
@@ -203,7 +203,7 @@ void jouer_local(Game * game) {
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
-            tour(game, i, nullptr ); // le joueur joue
+            tour(game, i, NULL ); // le joueur joue
             show(*game,n_turns,i);
         }
     }
