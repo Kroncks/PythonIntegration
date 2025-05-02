@@ -47,6 +47,13 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
             printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
         }
     }
+
+#ifdef WIN32
+    _sleep(0.2); // version windows
+#else
+    sleep(0.2);
+#endif
+
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
             strcpy(buffer, game->players[i].avatar);
