@@ -109,7 +109,7 @@ void show(Game game, int n_turns, int num) {
     for (int i=0; i<NB_JOUEURS; i++) {
         printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
     }
-    printf("\n>[%d][%s]\n\n",num,game.players[num].name);
+    printf("\n>[%d][%s]\navatar : %s\n\n",num,game.players[num].name, game.players[num].avatar);
     int flag = 0;
     for (int i = 0; i < Y; i++) {
         for (int j = 0; j < X; j++) {
