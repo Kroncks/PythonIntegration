@@ -11,6 +11,7 @@ Perso init_player() {
     self.x = self.y = -1;
 
     do {
+        viderBuffer();
         printf("Pseudo : ");
         fgets(self.pseudo, sizeof(self.pseudo), stdin);
         self.pseudo[strcspn(self.pseudo, "\r\n")] = '\0'; // retire \n ou \r\n
