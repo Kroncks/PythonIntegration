@@ -22,8 +22,10 @@ int main() {
         switch (choix) {
             case 0: {
                 // il faudrait pouvoir connaitre le nombre de joueur en ammont
-                Perso liste[4];
-                for (int i = 0; i < 4; i++) {}
+                Perso liste[NB_JOUEURS];
+                for (int i = 0; i < NB_JOUEURS; i++) {
+                    liste[i]=init_player();
+                }
                 //locale();
                 break;
             }
