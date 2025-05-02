@@ -53,7 +53,6 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 #else
     sleep(0.2);
 #endif
-
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
             game->players[i].avatar[0] = (char) ('0' + i);
