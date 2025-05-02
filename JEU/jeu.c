@@ -56,6 +56,8 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
+            game->players[i].avatar[0] = (char) ('0' + i);
+            game->players[i].avatar[1] = '\0';
             strcpy(buffer, game->players[i].avatar);
             send(sock, buffer, strlen(buffer), 0); // envoi de l'avatar
             printf("data sent");
