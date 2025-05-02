@@ -39,7 +39,7 @@ int main() {
                 self = init_player();
                 client(username, self);
                 break;
-            case 3:
+            default:
                 break;
         }
     }
