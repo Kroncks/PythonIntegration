@@ -63,7 +63,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
             strcpy(game->players[i].avatar, buffer);
-            printf("[GAME] player %d avatar : %s\n",i, game->players[i].name );
+            printf("[GAME] player %d avatar : %s\n",i, game->players[i].avatar );
         }
     }
 
