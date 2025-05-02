@@ -44,7 +44,7 @@ void wait_start(socket_t sock) {
     printf("[Client C] Game Start !!! \n");
 }
 
-void client(char *username) {
+void client(char *username, Perso self) {
     char buffer[128];
 
     printf("[Client C] Lancement de la détection du serveur via client.py...\n");
@@ -129,7 +129,7 @@ void client(char *username) {
         send(sock, "START?", 6, 0);
     }
     wait_start(sock);
-    init_game(sock, &game, server_response[3]-48, username);
+    init_game(sock, &game, server_response[3]-48, self);
     jouer(sock, &game, server_response[3]-48);
 
     socket_close(sock);

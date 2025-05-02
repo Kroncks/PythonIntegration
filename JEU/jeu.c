@@ -1,6 +1,29 @@
 #include "jeu.h"
 
-//void selectPerso()
+void viderBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+
+Perso init_player() {
+    Perso self;
+    self.x = self.y = -1;
+    do {
+        viderBuffer();
+        printf("Pseudo : ");
+        fgets(self.pseudo,20*sizeof(char),stdin);
+        self.pseudo[strlen(self.pseudo)-1] = '\0';
+
+        printf("Avatar : ");
+        fgets(self.avatar,2*sizeof(char),stdin);
+        self.avatar[strlen(self.avatar)-1] = '\0';
+
+        viderBuffer();
+        printf("[VALIDER]");
+    } while (getchar() != '\n');
+    return self;
+}
 
 void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir x\n[X]==>");
@@ -31,23 +54,22 @@ void init_nb_players() {
     fclose(f);
 }
 
-void init_game(socket_t sock, Game * game, int num, char * username) {
+void init_game(socket_t sock, Game * game, int num, Perso self) {
     init_nb_players();
     long int received;
     char buffer[BUFFER_SIZE] = {0};
     int quit = 0;
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
-            strcpy(game->players[i].name, username);
-            strcpy(buffer, username);
+            strcpy(game->players[i].pseudo, self.pseudo);
+            strcpy(buffer, game->players[i].pseudo);
             send(sock, buffer, strlen(buffer), 0); // envoi du pseudo
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
-            strcpy(game->players[i].name, buffer);
-            printf("[GAME] player %d saved : %s\n",i, game->players[i].name );
+            strcpy(game->players[i].pseudo, buffer);
+            printf("[GAME] player %d saved : %s\n",i, game->players[i].pseudo );
         }
     }
-
 #ifdef WIN32
     _sleep(0.2); // version windows
 #else
@@ -55,8 +77,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 #endif
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
-            game->players[i].avatar[0] = (char) ('0' + i);
-            game->players[i].avatar[1] = '\0';
+            strcpy(game->players[i].avatar, self.avatar);
             strcpy(buffer, game->players[i].avatar);
             send(sock, buffer, strlen(buffer), 0); // envoi de l'avatar
             printf("data sent");
@@ -107,9 +128,9 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
 void show(Game game, int n_turns, int num) {
     printf("====================[%d]====================\n", n_turns);
     for (int i=0; i<NB_JOUEURS; i++) {
-        printf("%d) %s (%d,%d)\n", i, game.players[i].name, game.players[i].x, game.players[i].y);
+        printf("%d) %s (%d,%d)\n", i, game.players[i].pseudo, game.players[i].x, game.players[i].y);
     }
-    printf("\n>[%d][%s]\navatar : %s\n\n",num,game.players[num].name, game.players[num].avatar);
+    printf("\n>[%d][%s]\navatar : %s\n\n",num,game.players[num].pseudo, game.players[num].avatar);
     int flag = 0;
     for (int i = 0; i < Y; i++) {
         for (int j = 0; j < X; j++) {

@@ -6,7 +6,8 @@
 
 int NB_JOUEURS;
 
-void init_game(socket_t sock, Game * game, int num, char * username);
+Perso init_player();
+void init_game(socket_t sock, Game * game, int num, Perso self);
 void jouer(socket_t sock, Game * game, int num);
 
 #endif //JEU_H

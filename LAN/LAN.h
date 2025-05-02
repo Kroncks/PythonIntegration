@@ -2,6 +2,7 @@
 #define LAN_H
 
 #include "crossplatform.h"
+#include "../JEU/structures.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,7 @@
 
 #define BUFFER_SIZE 1024
 
-void client(char * username);
+void client(char *username, Perso self);
 void serveur();
 
 void attendre_serveur();
