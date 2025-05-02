@@ -9,6 +9,13 @@ void init_coord(Game * game) {
     game->players[3].x = X/2; game->players[3].y = Y-1;
 }
 
+void init_plato(Game * game) {
+    for (int i=0; i<X; i++) { //init plato
+        for (int j=0; j<Y; j++) {
+            game->plateau[i][j] = rand() % 10;
+        }
+    }
+}
 
 void viderBuffer() {
     int c;
@@ -103,9 +110,9 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
 
 
     if ( num==0 ) {
-        for (int i=0; i<X; i++) { //init plato
+        init_plato(game);
+        for (int i=0; i<X; i++) { //load plato into buffer
             for (int j=0; j<Y; j++) {
-                game->plateau[i][j] = rand() % 10;
                 buffer[j+i*X] =  game->plateau[i][j]+48;
             }
         }
@@ -192,11 +199,6 @@ void jouer(socket_t sock, Game * game, int num) {
 
 void init_game_local(Game * game, Perso * liste) {
     init_nb_players(); // sans doute changer d'endroit hein
-
-    for (int i=0; i<X; i++) { //init plato
-        for (int j=0; j<Y; j++) {
-            game->plateau[i][j] = rand() % 10;
-        }
-    }
+    init_plato(game);
     init_coord(game);
 }
