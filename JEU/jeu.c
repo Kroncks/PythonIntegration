@@ -51,6 +51,7 @@ void init_game(socket_t sock, Game * game, int num, char * username) {
         if (num == i) {
             strcpy(buffer, game->players[i].avatar);
             send(sock, buffer, strlen(buffer), 0); // envoi de l'avatar
+            printf("data sent");
         } else {
             get_data(sock, &received, buffer, i,  &quit); // on attends de recevoir les données
             strcpy(game->players[i].avatar, buffer);
