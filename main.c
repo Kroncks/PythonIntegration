@@ -21,7 +21,8 @@ int main() {
         } while (choix<0 || choix>3);
         switch (choix) {
             case 0: {
-                // il faudrait pouvoir connaitre le nombre de joueur en ammont
+                init_nb_players();
+                printf("\nChoix des joueurs\n");
                 Perso liste[NB_JOUEURS];
                 for (int i = 0; i < NB_JOUEURS; i++) {
                     liste[i]=init_player();

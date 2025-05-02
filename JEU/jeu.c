@@ -26,8 +26,8 @@ void viderBuffer() {
 Perso init_player() {
     Perso self;
     self.x = self.y = -1;
+    viderBuffer();
     do {
-        viderBuffer();
         printf("Pseudo : ");
         fgets(self.pseudo, sizeof(self.pseudo), stdin);
         self.pseudo[strcspn(self.pseudo, "\r\n")] = '\0';
@@ -37,9 +37,8 @@ Perso init_player() {
         self.avatar[strcspn(self.avatar, "\r\n")] = '\0';
 
         printf("[VALIDER]");
-        viderBuffer();
     } while (getchar() != '\n');
-
+    printf("\n");
     return self;
 }
 
@@ -200,6 +199,7 @@ void jouer(socket_t sock, Game * game, int num) {
 void jouer_local(Game * game) {
     int quit = 0;
     int n_turns = 0;
+    show(*game, 0, 0);
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
@@ -210,7 +210,10 @@ void jouer_local(Game * game) {
 }
 
 void init_local_game(Game * game, Perso * liste) {
-    init_nb_players(); // sans doute changer d'endroit hein
+    for (int i=0; i<NB_JOUEURS; i++) {
+        game->players[i]=liste[i];
+    }
     init_plato(game);
     init_coord(game);
+
 }
