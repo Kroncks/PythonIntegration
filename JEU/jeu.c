@@ -77,9 +77,11 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
 #else
     sleep(0.2);
 #endif
+    printf("log\n");
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
             strcpy(game->players[i].avatar, self.avatar);
+            printf("sending avatar : %s\n", game->players[i].avatar);
             strcpy(buffer, game->players[i].avatar);
             send(sock, buffer, strlen(buffer), 0); // envoi de l'avatar
             printf("data sent");
