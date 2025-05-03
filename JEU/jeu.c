@@ -42,10 +42,6 @@ Perso init_player() {
     return self;
 }
 
-
-// bonsoir
-
-
 void tour(Game * game, int num, char * data) {
     printf("[Game] Choisir x\n[X]==>");
     scanf("%d", &game->players[num].x);
