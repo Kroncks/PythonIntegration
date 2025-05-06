@@ -15,7 +15,7 @@ int main() {
 
     printf("TEST DELAY 10s\n");
 #ifdef WIN32
-    _sleep(10); // version windows
+    Sleep(10000); // version windows
 #else
     sleep(10);
 #endif
