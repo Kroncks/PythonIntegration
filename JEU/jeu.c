@@ -1,5 +1,9 @@
 #include "jeu.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 
 void init_coord(Game * game) {
     game->players[0].x = 0; game->players[0].y = Y/2;
