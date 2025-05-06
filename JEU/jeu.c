@@ -78,7 +78,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
 #ifdef WIN32
-            _sleep(0.2); // version windows
+            Sleep(200); // version windows
 #else
             sleep(0.2);
 #endif
@@ -92,7 +92,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
     }
 #ifdef WIN32
-    _sleep(0.2); // version windows
+    Sleep(200); // version windows
 #else
     sleep(0.2);
 #endif
@@ -100,7 +100,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
     for (int i=0; i<NB_JOUEURS; i++) {
         if (num == i) {
 #ifdef WIN32
-            _sleep(0.2); // version windows
+            Sleep(200); // version windows
 #else
             sleep(0.2);
 #endif
@@ -125,7 +125,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
         // envoyer le plateau
 #ifdef WIN32
-        _sleep(0.2); // version windows
+        Sleep(200); // version windows
 #else
         sleep(0.2);
 #endif
