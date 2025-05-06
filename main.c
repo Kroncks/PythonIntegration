@@ -13,13 +13,13 @@ int main() {
     name(username);
     Perso self;
 
-    printf("TEST DELAY 10s");
+    printf("TEST DELAY 10s\n");
 #ifdef WIN32
     _sleep(10); // version windows
 #else
     sleep(10);
 #endif
-    printf("FIN TEST DELAY 10s");
+    printf("FIN TEST DELAY 10s\n");
 
 
     int choix=0;
