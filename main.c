@@ -13,6 +13,15 @@ int main() {
     name(username);
     Perso self;
 
+    printf("TEST DELAY 10s");
+#ifdef WIN32
+    _sleep(10); // version windows
+#else
+    sleep(10);
+#endif
+    printf("FIN TEST DELAY 10s");
+
+
     int choix=0;
     while (choix!=3) {
         do {
