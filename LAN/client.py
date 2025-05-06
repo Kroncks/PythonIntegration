@@ -18,9 +18,9 @@ def get_broadcast_ip():
 
 def detect():
     broadcast = get_broadcast_ip()
-    print("[VERSION DEBUG] ip broadcast fixed 192.168.4.255:5000 on Boby  ⚠️")
-    print("- ignored broadcast ip : ", broadcast)
-    broadcast = "192.168.4.255:5000"
+    print("[VERSION DEBUG] ip broadcast fixed 192.168.4.255:5000 on Boby  ⚠️", file=sys.stderr)
+    print("- ignored broadcast ip : ", broadcast, file=sys.stderr)
+    broadcast = "192.168.4.255"
     if not broadcast:
         print("[client.py] Erreur : impossible d'obtenir une IP de broadcast.", file=sys.stderr)
         sys.exit(1)
