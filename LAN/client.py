@@ -5,9 +5,6 @@ UDP_PORT = 5000
 
 def get_broadcast_ip():
     for iface in netifaces.interfaces():
-        if "Ethernet" in iface:  # On ignore les interfaces Ethernet
-            print("[client.py] Ignore Ethernet", file=sys.stderr)
-            continue
         addrs = netifaces.ifaddresses(iface)
         if netifaces.AF_INET in addrs:
             for info in addrs[netifaces.AF_INET]:
