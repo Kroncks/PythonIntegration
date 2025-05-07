@@ -5,6 +5,9 @@ UDP_PORT = 5000
 
 def get_broadcast_ip():
     for iface in netifaces.interfaces():
+        if "Ethernet" in iface:  # On ignore les interfaces Ethernet
+            print("[client.py] Ignore Ethernet", file=sys.stderr)
+            continue
         addrs = netifaces.ifaddresses(iface)
         if netifaces.AF_INET in addrs:
             for info in addrs[netifaces.AF_INET]:
@@ -18,9 +21,11 @@ def get_broadcast_ip():
 
 def detect():
     broadcast = get_broadcast_ip()
+    '''
     print("[VERSION DEBUG] ip broadcast fixed 192.168.4.255:5000 on Boby  ⚠️", file=sys.stderr)
     print("- ignored broadcast ip : ", broadcast, file=sys.stderr)
     broadcast = "192.168.4.255"
+    '''
     if not broadcast:
         print("[client.py] Erreur : impossible d'obtenir une IP de broadcast.", file=sys.stderr)
         sys.exit(1)
