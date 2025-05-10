@@ -21,6 +21,8 @@ add_executable(${PROJECT} main.c
         version.h
         GRAPHISMES/graphismes.c
         GRAPHISMES/graphismes.h
+        menu.c
+        menu.h
 )
 
 

@@ -1,3 +1,4 @@
+#include "menu.h"
 #include "name.h"
 #include "version.h"
 #include "LAN/LAN.h"
@@ -19,10 +20,7 @@ int main() {
 
     int choix=0;
     while (choix!=3) {
-        do {
-            printf("\n=======[ MENU ]=======\n 0) Partie locale\n 1) Creer une LAN\n 2) Rejoindre une LAN\n 3) Quitter\n======================\n[X]==>");
-            scanf("%d", &choix);  printf("\n");
-        } while (choix<0 || choix>3);
+        menu(&choix);
         switch (choix) {
             case 0: {
                 init_nb_players();
