@@ -55,19 +55,24 @@ void process_data(Game * game, int num, char * data) {
 }
 
 void init_nb_players() {
-    FILE *f = fopen("../LAN/tmp/NB_PLAYERS.txt", "r");
+    FILE *f;
+
+    do {
+        printf("Entrez le nombre de joueurs (2 ou 4) : ");
+        scanf("%d", &NB_JOUEURS);
+    } while (NB_JOUEURS != 2 && NB_JOUEURS != 4);
+
+
+    f = fopen("../LAN/tmp/NB_PLAYERS.txt", "w");
     if (!f) {
-        perror("[INIT] Erreur lors de l'ouverture du fichier NB_JOUEURS.txt");
-        printf("[INIT] NB_JOUEURS = 4 (défault)");
-        NB_JOUEURS=4;
+        perror("[INIT] Erreur ouverture NB_PLAYERS.txt");
+        exit(EXIT_FAILURE);
     }
-    if (fscanf(f, "%d", &NB_JOUEURS) != 1 || NB_JOUEURS <= 0) {
-        fprintf(stderr, "Erreur lecture\n");
-        printf("[INIT] NB_JOUEURS = 4 (défault)");
-    } else {
-        printf("[INIT] NB_JOUEURS = %d\n",NB_JOUEURS);
-    }
+
+    fprintf(f, "%d", NB_JOUEURS);
     fclose(f);
+
+    printf("[INIT] NB_JOUEURS = %d\n", NB_JOUEURS);
 }
 
 void init_game(socket_t sock, Game * game, int num, Perso self) {
