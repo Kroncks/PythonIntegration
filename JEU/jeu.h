@@ -1,6 +1,7 @@
 #ifndef JEU_H
 #define JEU_H
 
+#include "../GRAPHISMES/graphismes.h"
 #include "../LAN/LAN.h"
 #include "structures.h"
 

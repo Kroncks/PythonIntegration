@@ -1,6 +1,7 @@
 #ifndef LAN_H
 #define LAN_H
 
+#include "../GRAPHISMES/graphismes.h"
 #include "crossplatform.h"
 #include "../JEU/structures.h"
 #include <stdio.h>

@@ -1,8 +1,12 @@
 #include "name.h"
 #include "version.h"
 #include "LAN/LAN.h"
+#include "JEU/jeu.h"
+
+void initialisation_allegro();
 
 int main() {
+    initialisation_allegro();
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
 #endif
@@ -47,4 +51,18 @@ int main() {
         }
     }
     return 0;
+} END_OF_MAIN()
+
+void initialisation_allegro() {
+    allegro_init();
+    install_keyboard();
+    install_mouse();
+    set_color_depth(desktop_color_depth());
+
+    if(set_gfx_mode(GFX_AUTODETECT_WINDOWED,800,600,0,0)!=0)
+    {
+        allegro_message("probleme mode graphique");
+        allegro_exit();
+        exit(EXIT_FAILURE);
+    }
 }

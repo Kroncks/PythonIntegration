@@ -1,6 +1,5 @@
 #include "jeu.h"
 
-
 void init_coord(Game * game) {
     game->players[0].x = 0; game->players[0].y = Y/2;
     game->players[1].x = X-1; game->players[1].y = Y/2;
@@ -87,7 +86,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
     }
 #ifdef WIN32
-    _sleep(0.2); // version windows
+    Sleep(0.2); // version windows
 #else
     sleep(0.2);
 #endif
@@ -116,7 +115,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
         // envoyer le plateau
 #ifdef WIN32
-        _sleep(0.2); // version windows
+        Sleep(0.2); // version windows
 #else
         sleep(0.2);
 #endif
