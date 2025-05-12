@@ -4,4 +4,7 @@
 #include <allegro.h>
 
 
+void appliquer_transparence_curseur(BITMAP* curseur);
+int rose(int r, int g, int b);
+
 #endif //GRAPHISMES_H

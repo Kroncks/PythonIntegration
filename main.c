@@ -30,7 +30,7 @@ int main() {
         menu(&choix);
         switch (choix) {
             case 0: {
-                init_nb_players();
+                init_nb_players_graphique();
                 printf("\nChoix des joueurs\n");
                 Perso liste[NB_JOUEURS];
                 for (int i = 0; i < NB_JOUEURS; i++) {
@@ -40,14 +40,14 @@ int main() {
                 break;
             }
             case 1:
-                init_nb_players();
+                init_nb_players_graphique();
                 self = init_player();
                 serveur();
                 attendre_serveur();
                 client(username, self);
                 break;
             case 2:
-                init_nb_players();
+                init_nb_players_graphique();
                 self = init_player();
                 client(username, self);
                 break;
