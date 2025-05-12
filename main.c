@@ -61,6 +61,13 @@ int main() {
 END_OF_MAIN()
 
 
+void redimensionner_curseur(BITMAP* curseur, int target_width, int target_height) {
+    BITMAP* curseur_temp = create_bitmap(target_width, target_height);
+    stretch_blit(curseur, curseur_temp, 0, 0, curseur->w, curseur->h, 0, 0, target_width, target_height);
+    destroy_bitmap(curseur);
+    curseur = curseur_temp;  // On remplace l'ancien curseur redimensionné
+}
+
 void initialisation_allegro() {
     allegro_init();
     install_keyboard();
@@ -75,12 +82,13 @@ void initialisation_allegro() {
         exit(EXIT_FAILURE);
     }
 
-    // Charger l'image du curseur
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Erreur chargement du curseur !");
         exit(EXIT_FAILURE);
     }
 
-    show_mouse(NULL);  // Désactive le curseur système
+    redimensionner_curseur(curseur, 32, 32);
+
+    show_mouse(NULL);  // Désactive le curseur natif
 }
