@@ -2,8 +2,8 @@
 #define CROSSPLATFORM_H
 
 #ifdef _WIN32
+    #define NOGDI
     #include <windows.h>
-
     #include <winsock2.h>
     #include <ws2tcpip.h>
     #include <windows.h>
