@@ -23,6 +23,9 @@ add_executable(${PROJECT} main.c
         GRAPHISMES/graphismes.h
         menu.c
         menu.h
+        GRAPHISMES/bouttons.c
+        GRAPHISMES/bouttons.h
+        globals.h
 )
 
 

@@ -4,8 +4,12 @@
 #include "LAN/LAN.h"
 #include "JEU/jeu.h"
 
-extern int SCREEN_HEIGHT = 0;
-extern int SCREEN_WIDTH = 0;
+#include "globals.h"
+int SCREEN_WIDTH = 0;
+int SCREEN_HEIGHT = 0;
+
+BITMAP* curseur;
+
 
 void initialisation_allegro();
 
@@ -21,8 +25,8 @@ int main() {
     name(username);
     Perso self;
 
-    int choix=0;
-    while (choix!=3) {
+    int choix = 0;
+    while (choix != 3) {
         menu(&choix);
         switch (choix) {
             case 0: {
@@ -30,7 +34,7 @@ int main() {
                 printf("\nChoix des joueurs\n");
                 Perso liste[NB_JOUEURS];
                 for (int i = 0; i < NB_JOUEURS; i++) {
-                    liste[i]=init_player();
+                    liste[i] = init_player();
                 }
                 local(liste);
                 break;
@@ -51,8 +55,11 @@ int main() {
                 break;
         }
     }
+
     return 0;
-} END_OF_MAIN()
+}
+END_OF_MAIN()
+
 
 void initialisation_allegro() {
     allegro_init();
@@ -67,4 +74,13 @@ void initialisation_allegro() {
         allegro_exit();
         exit(EXIT_FAILURE);
     }
+
+    // Charger l'image du curseur
+    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    if (!curseur) {
+        allegro_message("Erreur chargement du curseur !");
+        exit(EXIT_FAILURE);
+    }
+
+    show_mouse(NULL);  // Désactive le curseur système
 }
