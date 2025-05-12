@@ -4,6 +4,9 @@
 #include "LAN/LAN.h"
 #include "JEU/jeu.h"
 
+extern int SCREEN_HEIGHT = 0;
+extern int SCREEN_WIDTH = 0;
+
 void initialisation_allegro();
 
 int main() {
@@ -57,9 +60,10 @@ void initialisation_allegro() {
     install_mouse();
     set_color_depth(desktop_color_depth());
 
-    if(set_gfx_mode(GFX_AUTODETECT_WINDOWED,800,600,0,0)!=0)
-    {
-        allegro_message("probleme mode graphique");
+    get_desktop_resolution(&SCREEN_WIDTH, &SCREEN_HEIGHT);
+    printf("resolution : %d, %d", SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
+        allegro_message("Problème de mode graphique !");
         allegro_exit();
         exit(EXIT_FAILURE);
     }
