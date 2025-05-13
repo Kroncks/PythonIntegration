@@ -68,6 +68,7 @@ void redimensionner_curseur(BITMAP* curseur, int target_width, int target_height
     curseur = curseur_temp;  // On remplace l'ancien curseur redimensionné
 }
 
+
 void initialisation_allegro() {
     allegro_init();
     install_keyboard();
@@ -76,7 +77,7 @@ void initialisation_allegro() {
 
     get_desktop_resolution(&SCREEN_WIDTH, &SCREEN_HEIGHT);
     printf("resolution : %d, %d", SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
+    if (set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
         allegro_message("Problème de mode graphique !");
         allegro_exit();
         exit(EXIT_FAILURE);
@@ -88,7 +89,15 @@ void initialisation_allegro() {
         exit(EXIT_FAILURE);
     }
 
-    redimensionner_curseur(curseur, 32, 32);
+    BITMAP* temp = create_bitmap(32, 32);
+    if (!temp) {
+        allegro_message("Erreur création du bitmap redimensionné !");
+        exit(EXIT_FAILURE);
+    }
+
+    stretch_blit(curseur, temp, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
+    destroy_bitmap(curseur);
+    curseur = temp;
 
     show_mouse(NULL);  // Désactive le curseur natif
 }
