@@ -4,6 +4,7 @@
 #include "../GRAPHISMES/graphismes.h"
 #include "../LAN/LAN.h"
 #include "structures.h"
+#include "../GRAPHISMES/bouttons.h"
 
 int NB_JOUEURS;
 
@@ -13,5 +14,6 @@ void jouer(socket_t sock, Game * game, int num);
 void init_local_game(Game * game, Perso * liste);
 void jouer_local(Game * game);
 void init_nb_players();
+Perso init_player_graphique();
 
 #endif //JEU_H

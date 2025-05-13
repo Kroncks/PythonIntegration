@@ -1,8 +1,8 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-#define X 10
-#define Y 10
+#define PLAT_X 10
+#define PLAT_Y 10
 
 typedef struct {
     // partie imuable ( envoyée dans initGame )
@@ -19,7 +19,7 @@ typedef struct {
 } Client;
 
 typedef struct {
-    int plateau[X][Y];
+    int plateau[PLAT_X][PLAT_Y];
     Perso players[4];
     Client client;
 }Game;
