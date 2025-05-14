@@ -109,7 +109,7 @@ void menu(int* choix) {
     clear_keybuf();
 }
 
-void init_player_graphique() {
+Perso init_player_graphique() {
     // Créer un buffer pour le double buffering
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
@@ -160,6 +160,14 @@ void init_player_graphique() {
     // Cacher le curseur natif et afficher le curseur personnalisé
     show_mouse(NULL);
 
+    // init le joueur :
+    Perso self;
+    self.x = self.y = -1;
+
+    // fausse init
+    strcpy(self.pseudo, "rien");
+    strcpy(self.avatar, "a\0");
+
     // Boucle principale pour init_player_graphique
     while (1) {
         // Effacer le buffer
@@ -195,4 +203,5 @@ void init_player_graphique() {
     destroy_bitmap(curseur_redimensionne);
     detruire_boutons(boutons, nb_boutons);
     clear_keybuf();
+    return self;
 }
