@@ -250,7 +250,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     int quit = 0;
     int n_turns = 0;
     int next = 0;
-    show(*game, 0, num);
+    show(*game, 0, num); // log
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
