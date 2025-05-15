@@ -224,8 +224,23 @@ void init_local_game(Game * game, Perso * liste) {
     init_coord(game);
 
 }
-/*
+
+void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond) {
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
 void jouer_local_graphique(Game * game) {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* fond = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    if (!fond) {
+        allegro_message("Erreur lors du chargement de l'arrière-plan !");
+        exit(EXIT_FAILURE);
+    }
     int quit = 0;
     int next = 0;
     int n_turns = 0;
@@ -233,14 +248,17 @@ void jouer_local_graphique(Game * game) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
             while (!next) {
-                show_graphique(*game,n_turns,i); // affiche l'ecrant de jeu
-                tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+                show_graphique(*game,n_turns,i, buffer, fond); // affiche l'ecrant de jeu
+                //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
             }
-            check_victory(game);
+            //check_victory(game);
         }
     }
+    destroy_bitmap(buffer);
+    destroy_bitmap(fond);
+    clear_keybuf();
 }
-*/
+
 
 // Initialisation et affichage du menu de sélection du nombre de joueurs
 void init_nb_players_graphique() {
