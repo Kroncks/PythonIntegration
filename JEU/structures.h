@@ -1,8 +1,8 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-#define PLAT_X 10
-#define PLAT_Y 10
+#define PLAT_X 20
+#define PLAT_Y 20
 
 typedef struct {
     // partie imuable ( envoyée dans initGame )
