@@ -164,7 +164,7 @@ Perso init_player_graphique(int num) {
     // Initialisation du joueur
     Perso self;
     self.x = self.y = -1;
-    strcpy(self.pseudo, "rien");
+    strcpy(self.pseudo, "");
     strcpy(self.avatar, "a\0");
 
     // Boucle d'affichage
@@ -176,7 +176,7 @@ Perso init_player_graphique(int num) {
         // Clic sur le bouton
         if (mouse_b & 1) {
             int index = bouton_clique(boutons, nb_boutons, mouse_x, mouse_y);
-            if (index != -1) break;
+            if (index != -1) if (strlen(self.pseudo)>0) break;
         }
 
         // Taille cible du texte (proportionnelle à l'écran)
@@ -203,6 +203,48 @@ Perso init_player_graphique(int num) {
         drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
         destroy_bitmap(texte);
 
+        // --- Affichage zone de pseudo ---
+        int zone_x = SCREEN_W / 10;
+        int zone_y = SCREEN_H / 5;
+        int zone_w = SCREEN_W / 2;
+        int zone_h = SCREEN_H / 12;
+
+        // Fond de la zone de texte
+        rectfill(buffer, zone_x, zone_y, zone_x + zone_w, zone_y + zone_h, makecol(50, 50, 50));
+        rect(buffer, zone_x, zone_y, zone_x + zone_w, zone_y + zone_h, makecol(255, 255, 255));
+
+        // Afficher le texte entré
+        char pseudo_affiche[20+ 2];
+        sprintf(pseudo_affiche, "%s", self.pseudo);
+
+        // Création d'un BITMAP temporaire pour dessiner le pseudo
+        BITMAP* texte_pseudo = create_bitmap(8 * 20, 16);  // Taille en fonction du texte brut
+        clear_to_color(texte_pseudo, makecol(255, 0, 255));  // fond transparent
+
+        textprintf_ex(texte_pseudo, font, 0, 0, makecol(255, 255, 255), -1, "%s", pseudo_affiche);
+
+        // Affichage redimensionné dans la zone (on laisse 5px de marge)
+        int texte_largeur = zone_w - 10;
+        int texte_hauteur = zone_h - 10;
+        stretch_sprite(buffer, texte_pseudo, zone_x + 20, zone_y + 20, texte_largeur, texte_hauteur);
+
+        destroy_bitmap(texte_pseudo);
+
+        if (keypressed()) {
+            int keycode = readkey();          // Lire une seule fois
+            int k = keycode >> 8;             // Code touche spéciale
+            char ch = keycode & 0xFF;         // Caractère ASCII
+
+            if (k == KEY_BACKSPACE && strlen(self.pseudo) > 0) {
+                self.pseudo[strlen(self.pseudo) - 1] = '\0';
+            } else if (k == KEY_DEL) {
+                self.pseudo[0] = '\0'; // Tout effacer
+            } else if (isprint(ch) && strlen(self.pseudo) < 20) {
+                int len = strlen(self.pseudo);
+                self.pseudo[len] = ch;
+                self.pseudo[len + 1] = '\0';
+            }
+        }
 
         // Curseur
         stretch_sprite(buffer, curseur_redimensionne, mouse_x, mouse_y, curseur_largeur, curseur_hauteur);
