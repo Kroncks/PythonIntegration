@@ -4,6 +4,17 @@
 #define PLAT_X 20
 #define PLAT_Y 20
 
+#include <allegro.h>
+
+#define TILE_COUNT 4
+
+
+typedef struct {
+    BITMAP* images[TILE_COUNT];
+    BITMAP* background;
+} Map;
+
+
 typedef struct {
     // partie imuable ( envoyée dans initGame )
     char pseudo[20];
@@ -22,6 +33,7 @@ typedef struct {
     int plateau[PLAT_X][PLAT_Y];
     Perso players[4];
     Client client;
+    Map map;
 }Game;
 
 

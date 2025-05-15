@@ -176,8 +176,40 @@ void show(Game game, int n_turns, int num) {
 }
 
 void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, BITMAP* curseur) {
-    clear_to_color(buffer, makecol(0, 0, 0));
-    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    // Affiche le fond
+    if (game.map.background) {
+        stretch_blit(game.map.background, buffer,
+                     0, 0, game.map.background->w, game.map.background->h,
+                     0, 0, SCREEN_W, SCREEN_H);
+    }
+    //====
+
+    int tile_width = 64;
+    int tile_height = 40;
+    int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
+    int offset_y = 150;
+
+    for (int y = 0; y < PLAT_Y; y++) {
+        for (int x = 0; x < PLAT_X; x++) {
+            int id = game.plateau[y][x];
+
+            if (id >= 0 && id) {
+                int iso_x = (x - y) * (tile_width / 2) + origin_x;
+                int iso_y = (x + y) * (tile_height / 2) + offset_y;
+
+                // Ne dessine que si les coordonnées sont dans l'écran
+                if (iso_x + tile_width > 0 && iso_x < SCREEN_W &&
+                    iso_y + tile_height > 0 && iso_y < SCREEN_H) {
+                    draw_sprite(buffer, game.map.images[id], iso_x, iso_y);
+                    }
+            }
+        }
+    }
+
+
+
+
+    //====
     stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
@@ -215,8 +247,8 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* fond = load_bitmap("../DATA/MENU/1.bmp", NULL);
-    if (!fond) {
+    game->map.background = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
