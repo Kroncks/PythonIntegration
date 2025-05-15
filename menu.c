@@ -154,7 +154,7 @@ Perso init_player_graphique(int num) {
     init_boutons(boutons, bouton_paths, nb_boutons);
 
     int marge = 30;
-    Bouton* b = &boutons[0]; // Ton unique bouton
+    Bouton* b = &boutons[0];
 
     b->rect.x = SCREEN_W - b->rect.w - marge;
     b->rect.y = SCREEN_H - b->rect.h - marge;
@@ -256,4 +256,23 @@ Perso init_player_graphique(int num) {
     detruire_boutons(boutons, nb_boutons);
     clear_keybuf();
     return self;
+}
+
+
+void menu_waiting() {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* fond = load_bitmap("../DATA/MENU/wait.bmp", NULL);
+    if (!fond) {
+        allegro_message("Erreur lors du chargement de l'arrière-plan !");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    destroy_bitmap(buffer);
+    destroy_bitmap(fond);
+    clear_keybuf();
 }

@@ -44,11 +44,13 @@ int main() {
                 self = init_player_graphique(-1);
                 serveur();
                 attendre_serveur();
+                menu_waiting();
                 client(username, self);
                 break;
             case 2:
                 init_nb_players_graphique();
                 self = init_player_graphique(-1);
+                menu_waiting();
                 client(username, self);
                 break;
             default:
