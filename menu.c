@@ -183,8 +183,6 @@ Perso init_player_graphique(int num) {
         int largeur = SCREEN_W / 4;   // 25% largeur écran
         int hauteur = SCREEN_H / 10;  // 10% hauteur écran
 
-
-
         // Afficher le numéro du joueur
         char texte_num[32];
 
@@ -224,8 +222,8 @@ Perso init_player_graphique(int num) {
         textprintf_ex(texte_pseudo, font, 0, 0, makecol(255, 255, 255), -1, "%s", pseudo_affiche);
 
         // Affichage redimensionné dans la zone (on laisse 5px de marge)
-        int texte_largeur = zone_w - 10;
-        int texte_hauteur = zone_h - 10;
+        int texte_largeur = zone_w - 5;
+        int texte_hauteur = zone_h - 15;
         stretch_sprite(buffer, texte_pseudo, zone_x + 20, zone_y + 20, texte_largeur, texte_hauteur);
 
         destroy_bitmap(texte_pseudo);
