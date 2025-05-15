@@ -8,12 +8,11 @@
 
 int NB_JOUEURS;
 
-Perso init_player();
+Perso init_player(int num);
 void init_game(socket_t sock, Game * game, int num, Perso self);
 void jouer(socket_t sock, Game * game, int num);
 void init_local_game(Game * game, Perso * liste);
 void jouer_local(Game * game);
 void init_nb_players();
-Perso init_player_graphique();
 
 #endif //JEU_H

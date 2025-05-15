@@ -109,7 +109,7 @@ void menu(int* choix) {
     clear_keybuf();
 }
 
-Perso init_player_graphique() {
+Perso init_player_graphique(int num) {
     // Créer un buffer pour le double buffering
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {

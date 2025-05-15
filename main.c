@@ -34,21 +34,21 @@ int main() {
                 printf("\nChoix des joueurs (%d)\n", NB_JOUEURS);
                 Perso liste[NB_JOUEURS];
                 for (int i = 0; i < NB_JOUEURS; i++) {
-                    liste[i] = init_player_graphique();
+                    liste[i] = init_player_graphique(i);
                 }
                 local(liste);
                 break;
             }
             case 1:
                 init_nb_players_graphique();
-                self = init_player_graphique();
+                self = init_player_graphique(-1);
                 serveur();
                 attendre_serveur();
                 client(username, self);
                 break;
             case 2:
                 init_nb_players_graphique();
-                self = init_player_graphique();
+                self = init_player_graphique(-1);
                 client(username, self);
                 break;
             default:

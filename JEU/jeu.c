@@ -4,11 +4,11 @@
 BITMAP* curseur;  // Déclaration du curseur global
 
 void init_coord(Game * game) {
-    game->players[0].x = 0; game->players[0].y = PLAT_Y/2;
-    game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y/2;
+    game->players[0].x = game->players[0].y = 0;
+    game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
 
-    game->players[2].x = PLAT_X/2; game->players[2].y = 0;
-    game->players[3].x = PLAT_X/2; game->players[3].y = PLAT_Y-1;
+    game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
+    game->players[3].x = PLAT_X-1; game->players[3].y = 0;
 }
 
 void init_plato(Game * game) {
@@ -25,10 +25,11 @@ void viderBuffer() {
 }
 
 
-Perso init_player() {
+Perso init_player(int num) {
     Perso self;
     self.x = self.y = -1;
     viderBuffer();
+    printf("%d\n", num);
     do {
         printf("Pseudo : ");
         fgets(self.pseudo, sizeof(self.pseudo), stdin);
@@ -223,6 +224,23 @@ void init_local_game(Game * game, Perso * liste) {
     init_coord(game);
 
 }
+/*
+void jouer_local_graphique(Game * game) {
+    int quit = 0;
+    int next = 0;
+    int n_turns = 0;
+    while (!quit) {
+        for (int i=0; i<NB_JOUEURS; i++) {
+            n_turns++;
+            while (!next) {
+                show_graphique(*game,n_turns,i); // affiche l'ecrant de jeu
+                tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+            }
+            check_victory(game);
+        }
+    }
+}
+*/
 
 // Initialisation et affichage du menu de sélection du nombre de joueurs
 void init_nb_players_graphique() {

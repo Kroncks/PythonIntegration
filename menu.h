@@ -5,7 +5,7 @@
 
 void menu(int * choix );
 void init_nb_players_graphique();
-
+Perso init_player_graphique(int num);
 
 
 #endif //MENU_H
