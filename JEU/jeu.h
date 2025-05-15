@@ -15,5 +15,6 @@ void init_local_game(Game * game, Perso * liste);
 void jouer_local(Game * game);
 void init_nb_players();
 void jouer_local_graphique(Game * game);
+void jouer_graphique(socket_t sock, Game * game, int num);
 
 #endif //JEU_H

@@ -130,7 +130,7 @@ void client(char *username, Perso self) {
     }
     wait_start(sock);
     init_game(sock, &game, server_response[3]-48, self);
-    jouer(sock, &game, server_response[3]-48);
+    jouer_graphique(sock, &game, server_response[3]-48);
 
     socket_close(sock);
     network_cleanup();

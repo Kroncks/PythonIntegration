@@ -175,6 +175,14 @@ void show(Game game, int n_turns, int num) {
     printf("===========================================\n");
 }
 
+void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, BITMAP* curseur) {
+    clear_to_color(buffer, makecol(0, 0, 0));
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+}
+
 
 void jouer(socket_t sock, Game * game, int num) {
     long int received;
@@ -195,6 +203,72 @@ void jouer(socket_t sock, Game * game, int num) {
                 if(quit) break;
                 process_data(game, i, buffer); // on traite les données des autres joueurs
                 show(*game,n_turns,num);
+            }
+        }
+    }
+}
+
+
+void jouer_graphique(socket_t sock, Game * game, int num) {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* fond = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    if (!fond) {
+        allegro_message("Erreur lors du chargement de l'arrière-plan !");
+        exit(EXIT_FAILURE);
+    }
+    // Charger l'image du curseur
+    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    if (!curseur) {
+        allegro_message("Impossible de charger l'image du curseur !");
+        exit(EXIT_FAILURE);
+    }
+
+    // Appliquer la transparence sur le curseur
+    appliquer_transparence_curseur(curseur);
+
+    // Dimensions désirées du curseur (ex : 32x32)
+
+
+    // Redimensionner le curseur
+    BITMAP* curseur_redimensionne = create_bitmap(32, 32);
+    if (!curseur_redimensionne) {
+        allegro_message("Erreur lors de la création du curseur redimensionné !");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(curseur, curseur_redimensionne, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
+    curseur = curseur_redimensionne;
+
+
+
+    // ===
+    long int received;
+    char LAN_buffer[BUFFER_SIZE] = {0};
+    int quit = 0;
+    int n_turns = 0;
+    int next = 0;
+    show(*game, 0, num);
+    while (!quit) {
+        for (int i=0; i<NB_JOUEURS; i++) {
+            n_turns++;
+            if (num == i) {
+                while (!next) {
+                    show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                    //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+                    rest(10);
+                }
+                tour(game, i, LAN_buffer); // le joueur joue
+                send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
+                printf("[Game] Data sent\n");
+            } else {
+                show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
+                if(quit) break;
+                process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
+                show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
             }
         }
     }
@@ -225,13 +299,7 @@ void init_local_game(Game * game, Perso * liste) {
 
 }
 
-void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, BITMAP* curseur) {
-    clear_to_color(buffer, makecol(0, 0, 0));
-    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
-    stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-}
 
 void jouer_local_graphique(Game * game) {
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
@@ -287,6 +355,7 @@ void jouer_local_graphique(Game * game) {
 
 // Initialisation et affichage du menu de sélection du nombre de joueurs
 void init_nb_players_graphique() {
+    Sleep(300);
     printf("log init\n");
     // Créer un buffer pour le double buffering
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
