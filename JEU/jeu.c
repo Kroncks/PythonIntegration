@@ -244,6 +244,7 @@ void jouer_local_graphique(Game * game) {
 
 // Initialisation et affichage du menu de sélection du nombre de joueurs
 void init_nb_players_graphique() {
+    printf("log init\n");
     // Créer un buffer pour le double buffering
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
