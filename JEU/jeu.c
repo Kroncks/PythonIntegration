@@ -14,7 +14,7 @@ void init_coord(Game * game) {
 void init_plato(Game * game) {
     for (int i=0; i<PLAT_X; i++) { //init plato
         for (int j=0; j<PLAT_Y; j++) {
-            game->plateau[i][j] = rand() % 10;
+            game->plateau[i][j] = rand() % TILE_COUNT;
         }
     }
 }
@@ -175,7 +175,7 @@ void show(Game game, int n_turns, int num) {
     printf("===========================================\n");
 }
 
-void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, BITMAP* curseur) {
+void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* curseur) {
     // Affiche le fond
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
@@ -246,8 +246,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* fond;
-    game->map.background = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
@@ -256,9 +255,9 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     for(int i = 0; i < TILE_COUNT; i++) {
         char path[100];
         if(i == 3) {
-            sprintf(path, "../DATA/GAME/MAP/2/1.bmp");
+            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
         } else {
-            sprintf(path, "../DATA/GAME/MAP/2/%d.bmp", i+1);
+            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
         }
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
     }
@@ -303,7 +302,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             n_turns++;
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
                 }
@@ -311,14 +310,17 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
             }
         }
     }
+    destroy_bitmap(buffer);
+    destroy_bitmap(game->map.background);
+    clear_keybuf();
 }
 
 // ---- local
@@ -354,11 +356,24 @@ void jouer_local_graphique(Game * game) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* fond = load_bitmap("../DATA/MENU/1.bmp", NULL);
-    if (!fond) {
+
+    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
+    if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
+
+    for(int i = 0; i < TILE_COUNT; i++) {
+        char path[100];
+        if(i == 3) {
+            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
+        } else {
+            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
+        }
+        game->map.images[i] = charger_et_traiter_image(path, 64, 64);
+    }
+
+
     // Charger l'image du curseur
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);
     if (!curseur) {
@@ -387,7 +402,7 @@ void jouer_local_graphique(Game * game) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, fond, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
                 //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                 rest(10);
             }
@@ -395,7 +410,7 @@ void jouer_local_graphique(Game * game) {
         }
     }
     destroy_bitmap(buffer);
-    destroy_bitmap(fond);
+    destroy_bitmap(game->map.background);
     clear_keybuf();
 }
 
