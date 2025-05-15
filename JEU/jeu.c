@@ -193,7 +193,7 @@ void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, B
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[y][x];
 
-            if (id >= 0 && id) {
+            if (id >= 0 && id < TILE_COUNT && game.map.images[id]) {
                 int iso_x = (x - y) * (tile_width / 2) + origin_x;
                 int iso_y = (x + y) * (tile_height / 2) + offset_y;
 
@@ -205,7 +205,6 @@ void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* fond, B
             }
         }
     }
-
 
 
 
@@ -247,11 +246,27 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
+    BITMAP* fond;
     game->map.background = load_bitmap("../DATA/MENU/1.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
+
+    for(int i = 0; i < TILE_COUNT; i++) {
+        char path[100];
+        if(i == 3) {
+            sprintf(path, "../DATA/GAME/MAP/2/1.bmp");
+        } else {
+            sprintf(path, "../DATA/GAME/MAP/2/%d.bmp", i+1);
+        }
+        game->map.images[i] = charger_et_traiter_image(path, 64, 64);
+    }
+
+
+
+
+
     // Charger l'image du curseur
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);
     if (!curseur) {
