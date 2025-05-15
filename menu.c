@@ -153,6 +153,12 @@ Perso init_player_graphique(int num) {
     Bouton boutons[nb_boutons];
     init_boutons(boutons, bouton_paths, nb_boutons);
 
+    int marge = 30;
+    Bouton* b = &boutons[0]; // Ton unique bouton
+
+    b->rect.x = SCREEN_W - b->rect.w - marge;
+    b->rect.y = SCREEN_H - b->rect.h - marge;
+
     show_mouse(NULL); // Curseur natif caché
 
     // Initialisation du joueur
