@@ -143,6 +143,15 @@ Perso init_player_graphique(int num) {
                 0, 0, 32, 32);
     curseur = curseur_redimensionne;
 
+    // Charger l'image du numéro de joueur (1 à 4)
+    char chemin_joueur[256];
+    sprintf(chemin_joueur, "../Projet/Graphismes/Menus/Joueurs/%d.bmp", num + 1);
+    BITMAP* img_joueur = charger_et_traiter_image(chemin_joueur, 256, 64);
+    if (!img_joueur) {
+        allegro_message("Erreur lors du chargement de l'image du numéro de joueur !");
+        exit(EXIT_FAILURE);
+    }
+
     // Charger l'image de la case de saisie du pseudo
     BITMAP* casePseudo = charger_et_traiter_image(
         "../Projet/Graphismes/Interface/Pseudo/casePseudo.bmp", 1235, 128);
@@ -169,31 +178,23 @@ Perso init_player_graphique(int num) {
 
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
+        // Fond
         stretch_blit(fond, buffer,
                     0, 0, fond->w, fond->h,
                     0, 0, SCREEN_W, SCREEN_H);
+        // Boutons
         afficher_boutons(buffer, boutons, nb_boutons);
 
-        // Clic sur le bouton Valider
+        // Afficher l'image du numéro de joueur en haut à gauche
+        draw_sprite(buffer, img_joueur,
+                    SCREEN_W / 100, SCREEN_H / 100);
+
+        // Clic sur Valider
         if (mouse_b & 1) {
             int index = bouton_clique(boutons, nb_boutons, mouse_x, mouse_y);
             if (index != -1 && strlen(self.pseudo) > 0)
                 break;
         }
-
-        // Afficher "Joueur N"
-        char texte_num[32];
-        BITMAP* texte = create_bitmap(100, 20);
-        clear_to_color(texte, makecol(255, 0, 255));
-        sprintf(texte_num, "Joueur %d", num+1);
-        textprintf_ex(texte, font, 0, 0, makecol(255, 255, 0), -1, texte_num);
-        set_trans_blender(0, 0, 0, 0);
-        drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
-        stretch_sprite(buffer, texte,
-                       SCREEN_W/100, SCREEN_H/100,
-                       SCREEN_W/4, SCREEN_H/10);
-        drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
-        destroy_bitmap(texte);
 
         // Définition de la zone de pseudo
         int zone_x = SCREEN_W / 10;
@@ -201,7 +202,7 @@ Perso init_player_graphique(int num) {
         int zone_w = SCREEN_W / 2;
         int zone_h = SCREEN_H / 12;
 
-        // Affichage de la case de pseudo sans mise à l'échelle
+        // Affichage de la case pseudo
         draw_sprite(buffer, casePseudo, zone_x, zone_y);
 
         // Afficher le pseudo entré légèrement décalé
@@ -212,13 +213,12 @@ Perso init_player_graphique(int num) {
         textprintf_ex(texte_pseudo, font, 0, 0,
                       makecol(0, 0, 0), -1,
                       "%s", pseudo_affiche);
-        // Décalage de +20 px à droite et en bas
         stretch_sprite(buffer, texte_pseudo,
                        zone_x + 130, zone_y + 47,
                        zone_w - 20, zone_h - 15);
         destroy_bitmap(texte_pseudo);
 
-        // Gestion de la saisie clavier
+        // Gestion clavier
         if (keypressed()) {
             int keycode = readkey();
             int k = keycode >> 8;
@@ -245,12 +245,14 @@ Perso init_player_graphique(int num) {
     destroy_bitmap(buffer);
     destroy_bitmap(fond);
     destroy_bitmap(curseur_redimensionne);
+    destroy_bitmap(img_joueur);
     destroy_bitmap(casePseudo);
     detruire_boutons(boutons, nb_boutons);
     clear_keybuf();
 
     return self;
 }
+
 
 
 
