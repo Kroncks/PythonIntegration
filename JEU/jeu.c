@@ -14,14 +14,16 @@ void init_coord(Game * game) {
 void init_plato(Game * game) {
     for (int i=0; i<PLAT_X; i++) { //init plato
         for (int j=0; j<PLAT_Y; j++) {
-            game->plateau[i][j] = (rand() % TILE_COUNT) * ( rand() % 2) ;
+            game->plateau[i][j] = ((rand() % TILE_COUNT-1) +1 ) * ( rand() % 2) ;
         }
     }
+    int rand_x = -(rand() % 2);
     for (int i=0; i<PLAT_X; i++) {
-        game->plateau[0][i] = game->plateau[PLAT_Y-1][i] = game->plateau[PLAT_Y/2][i] = game->plateau[PLAT_Y/2 -1][i] =0;
+        game->plateau[0][i] = game->plateau[PLAT_Y-1][i] = game->plateau[PLAT_Y/2 + rand_x][i] =0;
     }
-    for (int i=0; i<PLAT_X; i++) {
-        game->plateau[i][0] = game->plateau[i][PLAT_Y-1] = game->plateau[i][PLAT_Y/2] = game->plateau[i][PLAT_Y/2 -1] =0;
+    int rand_y = -(rand() % 2);
+    for (int i=0; i<PLAT_Y; i++) {
+        game->plateau[i][0] = game->plateau[i][PLAT_Y-1] = game->plateau[i][PLAT_Y/2 + rand_y] =0;
     }
 }
 
