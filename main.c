@@ -41,7 +41,7 @@ int main() {
             }
             case 1:
                 init_nb_players_graphique();
-                self = init_player_graphique(-1);
+                self = init_player_graphique(0); // local
                 serveur();
                 attendre_serveur();
                 menu_waiting();
@@ -49,7 +49,7 @@ int main() {
                 break;
             case 2:
                 init_nb_players_graphique();
-                self = init_player_graphique(-1);
+                self = init_player_graphique(0); // joueur 1 local
                 menu_waiting();
                 client(username, self);
                 break;

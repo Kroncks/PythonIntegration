@@ -187,7 +187,7 @@ Perso init_player_graphique(int num) {
 
         // Afficher l'image du numéro de joueur en haut à gauche
         draw_sprite(buffer, img_joueur,
-                    SCREEN_W / 100, SCREEN_H / 100);
+                    SCREEN_W / 100 + 450, SCREEN_H / 100 + 150);
 
         // Clic sur Valider
         if (mouse_b & 1) {
