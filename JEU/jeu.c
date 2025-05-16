@@ -14,9 +14,10 @@ void init_coord(Game * game) {
 void init_plato(Game * game) {
     for (int i=0; i<PLAT_X; i++) { //init plato
         for (int j=0; j<PLAT_Y; j++) {
-            game->plateau[i][j] = rand() % TILE_COUNT;
+            game->plateau[i][j] = (rand() % TILE_COUNT) * ( rand() % 2) ;
         }
     }
+    game->plateau[0][0] = game->plateau[PLAT_Y-1][PLAT_X-1] = game->plateau[PLAT_Y-1][0] = game->plateau[0][PLAT_X-1] = 0;
 }
 
 void viderBuffer() {
@@ -335,11 +336,23 @@ void jouer_local(Game * game) {
     }
 }
 
+
+
+
+int valide(int tiles[PLAT_X][PLAT_Y]) {
+    if () return 0;
+    if () return 0;
+    if () return 0;
+    return 1;
+}
+
 void init_local_game(Game * game, Perso * liste) {
     for (int i=0; i<NB_JOUEURS; i++) {
         game->players[i]=liste[i];
     }
-    init_plato(game);
+    do {
+        init_plato(game);
+    } while (valide(game->plateau) != 1);
     init_coord(game);
 
 }
