@@ -195,7 +195,7 @@ void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* curseur
     int tile_width = 64;
     int tile_height = 40;
     int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
-    int offset_y = SCREEN_H / 4;
+    int offset_y = SCREEN_H / 2 - tile_height  * 10;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
