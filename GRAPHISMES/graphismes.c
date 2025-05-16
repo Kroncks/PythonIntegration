@@ -54,7 +54,7 @@ BITMAP* traiter_image(BITMAP *source) {
             int g = getg(pixel);
             int b = getb(pixel);
 
-            if ((r >= 180 && r <= 255) && (g >= 0 && g <= 80) && (b >= 180 && b <= 255)) {
+            if ((r >= 160 && r <= 255) && (g >= 0 && g <= 100) && (b >= 160 && b <= 255)) {
                 putpixel(backless, i, j, makecol(255, 0, 255));
             } else {
                 putpixel(backless, i, j, pixel);
