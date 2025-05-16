@@ -27,6 +27,65 @@ void init_plato(Game * game) {
     }
 }
 
+void transfert_temp_resistance(int r_temp, float* r_resistance) {
+    if (r_temp==0) *r_resistance = 0.5;
+    else if (r_temp==1) *r_resistance = 1;
+    else if (r_temp==2) *r_resistance = 2;
+}
+void init_classe(t_classe classes_disponibles[12]) {
+    int lenght_nom [12][4];
+    char filename[50];
+    int temp;
+    FILE* p_fichier_classe = fopen("../Projet/Fichiers textes/DefClasses.txt", "r");
+
+    //chargement des tailles des noms competences des 12 classes
+    for (int i=0; i<12;i++) {
+        for (int j=0; j<4;j++) {
+            fscanf(p_fichier_classe,"%d", &lenght_nom[i][j]);
+        }
+    }
+
+    //Chargement des données des 12 classes
+    for (int j=0;j<12;j++) {
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].pv);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].mana);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].endurance);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].force);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].dexterite);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].intelligence);
+        fscanf(p_fichier_classe,"%d", &classes_disponibles[j].foi);
+
+
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_contandant);
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_tranchant);
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_percant);
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_eau);
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_feu);
+        fscanf(p_fichier_classe,"%d", &temp);
+        transfert_temp_resistance(temp, &classes_disponibles[j].r_terre);
+
+        for (int i=0; i<4;i++) {
+            char token;
+            fscanf(p_fichier_classe, "%c", &token); //Liberation espace
+            fgets(classes_disponibles[j].competences[i].nom_competence, lenght_nom[j][i]+1, p_fichier_classe);
+            fscanf(p_fichier_classe,"%d", &classes_disponibles[j].competences[i].ID_competence);
+            fscanf(p_fichier_classe,"%d", &classes_disponibles[j].competences[i].degat);
+            fscanf(p_fichier_classe,"%d", &classes_disponibles[j].competences[i].p_attaque);
+            fscanf(p_fichier_classe,"%d", &classes_disponibles[j].competences[i].portee);
+            fscanf(p_fichier_classe, "%c", &token); //Liberation espace
+            fscanf(p_fichier_classe,"%c", &classes_disponibles[j].competences[i].type_degat);
+            fscanf(p_fichier_classe, "%c", &token); //Liberation espace
+            fscanf(p_fichier_classe,"%c", &classes_disponibles[j].competences[i].type_stat);
+        }
+    }
+    fclose(p_fichier_classe);
+}
+
 void viderBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
