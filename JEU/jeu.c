@@ -246,7 +246,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
+    game->map.background = load_bitmap("../Projet/Graphismes/Map/Background/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
@@ -255,9 +255,9 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     for(int i = 0; i < TILE_COUNT; i++) {
         char path[100];
         if(i == 3) {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
+            sprintf(path, "../Projet/Graphismes/Map/Tuiles/2/1.bmp");
         } else {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
+            sprintf(path, "../Projet/Graphismes/Map/Tuiles/2/%d.bmp", i+1);
         }
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
     }
@@ -267,7 +267,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
 
 
     // Charger l'image du curseur
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
@@ -357,7 +357,7 @@ void jouer_local_graphique(Game * game) {
         exit(EXIT_FAILURE);
     }
 
-    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
+    game->map.background = load_bitmap("../Projet/Graphismes/Map/Background/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
@@ -366,16 +366,16 @@ void jouer_local_graphique(Game * game) {
     for(int i = 0; i < TILE_COUNT; i++) {
         char path[100];
         if(i == 3) {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
+            sprintf(path, "../Projet/Graphismes/Map/Tuiles/2/1.bmp");
         } else {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
+            sprintf(path, "../Projet/Graphismes/Map/Tuiles/2/%d.bmp", i+1);
         }
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
     }
 
 
     // Charger l'image du curseur
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
@@ -427,7 +427,7 @@ void init_nb_players_graphique() {
     }
 
     // Charger l'image de fond
-    BITMAP* background = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    BITMAP* background = load_bitmap("../Projet/Graphismes/Menus/Background/1.bmp", NULL);
     if (!background) {
         allegro_message("Impossible de charger l’image de fond !");
         exit(EXIT_FAILURE);
@@ -435,8 +435,8 @@ void init_nb_players_graphique() {
 
     // Charger les boutons pour 2 et 4 joueurs
     const char* paths[] = {
-        "../DATA/MENU/BOUTTONS/2_players.bmp",
-        "../DATA/MENU/BOUTTONS/4_players.bmp"
+        "../Projet/Graphismes/Menus/Boutons/2.bmp",
+        "../Projet/Graphismes/Menus/Boutons/4.bmp"
     };
     const int nb_boutons = 2;
     Bouton boutons[nb_boutons];
@@ -448,7 +448,7 @@ void init_nb_players_graphique() {
     show_mouse(NULL);
 
     // Charger l'image du curseur
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);

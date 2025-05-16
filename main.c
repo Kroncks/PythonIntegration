@@ -85,7 +85,7 @@ void initialisation_allegro() {
         exit(EXIT_FAILURE);
     }
 
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Erreur chargement du curseur !");
         exit(EXIT_FAILURE);

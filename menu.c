@@ -25,14 +25,14 @@ void menu(int* choix) {
     }
 
     // Charger l'image de fond
-    BITMAP* background = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    BITMAP* background = load_bitmap("../Projet/Graphismes/Menus/Background/1.bmp", NULL);
     if (!background) {
         allegro_message("Impossible de charger l’image de fond !");
         exit(EXIT_FAILURE);
     }
 
     // Charger l'image du curseur
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
@@ -58,10 +58,10 @@ void menu(int* choix) {
 
     // Charger les chemins des boutons
     const char* paths[] = {
-        "../DATA/MENU/BOUTTONS/1.bmp",
-        "../DATA/MENU/BOUTTONS/2.bmp",
-        "../DATA/MENU/BOUTTONS/3.bmp",
-        "../DATA/MENU/BOUTTONS/4.bmp"
+        "../Projet/Graphismes/Menus/Boutons/LOCAL.bmp",
+        "../Projet/Graphismes/Menus/Boutons/CREATELAN.bmp",
+        "../Projet/Graphismes/Menus/Boutons/JOINLAN.bmp",
+        "../Projet/Graphismes/Menus/Boutons/EXIT.bmp"
     };
     const int nb_boutons = 4;
     Bouton boutons[nb_boutons];
@@ -118,14 +118,14 @@ Perso init_player_graphique(int num) {
     }
 
     // Charger l'image de fond
-    BITMAP* fond = load_bitmap("../DATA/MENU/1.bmp", NULL);
+    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Background/1.bmp", NULL);
     if (!fond) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
 
     // Charger l'image du curseur
-    curseur = load_bitmap("../DATA/curseur.bmp", NULL);
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
@@ -148,7 +148,7 @@ Perso init_player_graphique(int num) {
     curseur = curseur_redimensionne;
 
     // Charger le bouton "Valider"
-    const char* bouton_paths[] = { "../DATA/MENU/BOUTTONS/valider.bmp" };
+    const char* bouton_paths[] = { "../Projet/Graphismes/Menus/Boutons/VALIDATE.bmp" };
     const int nb_boutons = 1;
     Bouton boutons[nb_boutons];
     init_boutons(boutons, bouton_paths, nb_boutons);
@@ -265,7 +265,7 @@ void menu_waiting() {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* fond = load_bitmap("../DATA/MENU/wait.bmp", NULL);
+    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Wait/waitPLS.bmp", NULL);
     if (!fond) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
