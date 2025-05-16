@@ -17,7 +17,12 @@ void init_plato(Game * game) {
             game->plateau[i][j] = (rand() % TILE_COUNT) * ( rand() % 2) ;
         }
     }
-    game->plateau[0][0] = game->plateau[PLAT_Y-1][PLAT_X-1] = game->plateau[PLAT_Y-1][0] = game->plateau[0][PLAT_X-1] = 0;
+    for (int i=0; i<PLAT_X; i++) {
+        game->plateau[0][i] = game->plateau[PLAT_Y-1][i] = game->plateau[PLAT_Y/2][i] = game->plateau[PLAT_Y/2 -1][i] =0;
+    }
+    for (int i=0; i<PLAT_X; i++) {
+        game->plateau[i][0] = game->plateau[i][PLAT_Y-1] = game->plateau[i][PLAT_Y/2] = game->plateau[i][PLAT_Y/2 -1] =0;
+    }
 }
 
 void viderBuffer() {
@@ -188,7 +193,7 @@ void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* curseur
     int tile_width = 64;
     int tile_height = 40;
     int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
-    int offset_y = 150;
+    int offset_y = SCREEN_H / 4;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
@@ -339,20 +344,12 @@ void jouer_local(Game * game) {
 
 
 
-int valide(int tiles[PLAT_X][PLAT_Y]) {
-    if () return 0;
-    if () return 0;
-    if () return 0;
-    return 1;
-}
 
 void init_local_game(Game * game, Perso * liste) {
     for (int i=0; i<NB_JOUEURS; i++) {
         game->players[i]=liste[i];
     }
-    do {
         init_plato(game);
-    } while (valide(game->plateau) != 1);
     init_coord(game);
 
 }
