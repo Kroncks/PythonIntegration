@@ -254,11 +254,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
 
     for(int i = 0; i < TILE_COUNT; i++) {
         char path[100];
-        if(i == 3) {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
-        } else {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
-        }
+        sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
     }
 
@@ -365,11 +361,7 @@ void jouer_local_graphique(Game * game) {
 
     for(int i = 0; i < TILE_COUNT; i++) {
         char path[100];
-        if(i == 3) {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/1.bmp");
-        } else {
-            sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
-        }
+        sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
     }
 

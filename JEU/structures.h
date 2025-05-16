@@ -6,7 +6,7 @@
 
 #include <allegro.h>
 
-#define TILE_COUNT 4
+#define TILE_COUNT 3
 
 
 typedef struct {
