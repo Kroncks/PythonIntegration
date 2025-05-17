@@ -400,13 +400,15 @@ void menu_selection_personnages(int num, Perso * self) {
                 }
             }
         }
+
+
+        // dessiner perso choisi
+        draw_sprite(buffer,liste_big_avatar[selection_case], SCREEN_W/4 - liste_big_avatar[selection_case]->w/2, SCREEN_H/2 - liste_big_avatar[selection_case]->h);
+
         //dessiner histoire centrée
         stretch_blit(liste_story[selection_case], buffer,
             0,0,liste_story[selection_case]->w, liste_story[selection_case]->h,
             SCREEN_W/4 - liste_story[selection_case]->w /4, SCREEN_H/2, liste_story[selection_case]->w/2 , liste_story[selection_case]->h/2 );
-
-        // dessiner perso choisi
-        draw_sprite(buffer,liste_big_avatar[selection_case], SCREEN_W/4 - liste_big_avatar[selection_case]->w/2, SCREEN_H/2 - liste_big_avatar[selection_case]->h);
 
 
         // Afficher bouton valider
