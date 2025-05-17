@@ -322,7 +322,7 @@ void menu_selection_personnages(int num, Perso * self) {
     // Image joueur actif (juste sous la pancarte "choisis ton personnage")
     char chemin_perso[256];
     sprintf(chemin_perso, "../Projet/Graphismes/Menus/Joueurs/%d.bmp", num + 1);
-    BITMAP* img_personnage = load_bitmap(chemin_perso, NULL);
+    BITMAP* img_personnage = charger_et_traiter_image(chemin_perso, 256*2, 64*2);
     if (!img_personnage) {
         allegro_message("Erreur lors du chargement de l'image personnage !");
         exit(EXIT_FAILURE);
@@ -344,8 +344,8 @@ void menu_selection_personnages(int num, Perso * self) {
     // Paramètres grille 3x4
     const int nb_col = 3;
     const int nb_lignes = 4;
-    const int case_w = 128;
-    const int case_h = 128;
+    const int case_h = SCREEN_H/8;
+    const int case_w = case_h;
     const int grid_start_x = 3*SCREEN_W/4 - (nb_col * case_w)/ 2;
     const int grid_start_y = (SCREEN_H - (nb_lignes * case_h)) / 2;
 
