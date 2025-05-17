@@ -13,9 +13,90 @@ SAMPLE* musique;
 
 void initialisation_allegro();
 
+static const int cinematic_frame_count = 239;
+
+// Format de chemin, %d donnera 0,1,…,239
+static const char cinematic_path_format[] =
+    "../Projet/Cinématique/895d8352-f2bd-4821-8cf1-83f861da11d5-%d.bmp";
+
+// Vérifie qu’un pointeur n’est pas NULL, quitte sinon
+static void checkPtrNull(void* ptr, const char* err)
+{
+    if (!ptr) {
+        allegro_message("%s", err);
+        exit(EXIT_FAILURE);
+    }
+}
+static SAMPLE* cinematic_music = NULL;
+
+static void cinematic(int delay_ms)
+{
+    char filename[256];
+
+    // 1) Charge la musique
+    cinematic_music = load_sample(
+        "../Projet/Musiques/cinematicAudio.wav"
+    );
+    if (!cinematic_music) {
+        allegro_message("Erreur chargement musique cinématique !");
+        return;
+    }
+
+    // 2) Lance la musique (non-bouclée ici)
+    play_sample(cinematic_music,
+                255,   // volume max
+                128,   // pan central
+                1000,  // vitesse normale
+                0      // 0 = une seule fois
+    );
+
+    // Vide le buffer clavier pour ne pas hériter d’appuis précédents
+    clear_keybuf();
+
+    // 3) Affichage des frames avec possibilité de skip
+    for (int i = 0; i <= cinematic_frame_count; i++) {
+        // Génère le nom de fichier
+        snprintf(filename, sizeof(filename),
+                 cinematic_path_format, i);
+
+        BITMAP* bmp24 = load_bitmap(filename, NULL);
+        if (!bmp24) {
+            allegro_message("Erreur chargement frame %d !", i);
+            break;
+        }
+
+        // Conversion 24→32 bits
+        BITMAP* bmp32 = create_bitmap_ex(32, bmp24->w, bmp24->h);
+        blit(bmp24, bmp32, 0, 0, 0, 0, bmp24->w, bmp24->h);
+        destroy_bitmap(bmp24);
+
+        // Affiche plein-écran
+        stretch_blit(bmp32, screen,
+                     0, 0, bmp32->w, bmp32->h,
+                     0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        destroy_bitmap(bmp32);
+
+        // Si on appuie sur 'S' (skip), on sort de la boucle
+        if (key[KEY_S]) {
+            break;
+        }
+
+        rest(delay_ms);
+    }
+
+    // 4) Arrêt et libération de la musique
+    stop_sample(cinematic_music);
+    destroy_sample(cinematic_music);
+    cinematic_music = NULL;
+
+    // Vide une dernière fois le buffer clavier pour éviter de propager le 'S'
+    clear_keybuf();
+}
+
 int main() {
     srand(time(NULL));
     initialisation_allegro();
+    cinematic(50);
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
 #endif
