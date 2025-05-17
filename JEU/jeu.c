@@ -4,6 +4,10 @@
 
 BITMAP* curseur;  // Déclaration du curseur global
 SAMPLE* musique;
+BITMAP* liste_avatar[12];
+BITMAP* liste_big_avatar[12];
+BITMAP* liste_story[12];
+
 
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
@@ -11,7 +15,7 @@ void init_coord(Game * game) {
 
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
-    game->theme = rand() % NB_THEMES;
+    game->theme = 3; //rand() % NB_THEMES;
 }
 
 void init_plato(Game * game) {
@@ -762,8 +766,6 @@ void jouer_local_graphique(Game * game) {
 
 // Initialisation et affichage du menu de sélection du nombre de joueurs
 void init_nb_players_graphique() {
-    Sleep(300);
-    printf("log init\n");
     // Créer un buffer pour le double buffering
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
@@ -871,4 +873,28 @@ void init_nb_players_graphique() {
     destroy_bitmap(curseur_redimensionne);
     detruire_boutons(boutons, nb_boutons);
     clear_keybuf();
+
+    char * message = "[ INIT ]";
+    BITMAP* texte = create_bitmap(8 * 8, 16);
+    clear_to_color(texte, makecol(255, 0, 255));
+    textprintf_ex(texte, font, 0, 0,
+                  makecol(0, 0, 0), -1,
+                  "%s", message);
+    stretch_sprite(screen, texte,
+                   SCREEN_W/2- texte->w*5 /2, 3*SCREEN_H/4,
+                    texte->w*5, texte->h*5);
+    destroy_bitmap(texte);
+
+    //grille persos
+    char chemin_perso[256];
+    char chemin_avatar[256];
+    for (int i = 0; i < 12; i++) {
+        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Select/%d.bmp", i + 1);
+        liste_avatar[i] = charger_et_traiter_image(chemin_perso, SCREEN_H/8, SCREEN_H/8);
+        liste_big_avatar[i] = charger_et_traiter_image(chemin_perso, SCREEN_H/8*3, SCREEN_H/8*3);
+        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Story/%d.bmp", i + 1);
+        liste_story[i] = load_bitmap(chemin_perso, NULL);
+    }
+    // revoir parametres grille 3*4 dans menu_selection_personnages, dans menu.c pour taille
+
 }

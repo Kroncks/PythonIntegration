@@ -3,8 +3,11 @@
 #include "GRAPHISMES/graphismes.h"
 #include <ctype.h>
 
-extern BITMAP* curseur;
-extern void afficher_curseur(BITMAP* buffer);
+BITMAP* curseur;
+void afficher_curseur(BITMAP* buffer);
+BITMAP* liste_avatar[12];
+BITMAP* liste_big_avatar[12];
+BITMAP* liste_story[12];
 
 // Fonction pour afficher le curseur à la position de la souris
 void afficher_curseur(BITMAP* buffer) {
@@ -277,16 +280,6 @@ Perso init_player_graphique(int num) {
 
         rest(10);
     }
-    char * message = "[ INIT ]";
-    BITMAP* texte = create_bitmap(8 * 8, 16);
-    clear_to_color(texte, makecol(255, 0, 255));
-    textprintf_ex(texte, font, 0, 0,
-                  makecol(0, 0, 0), -1,
-                  "%s", message);
-    stretch_sprite(screen, texte,
-                   SCREEN_W/2- texte->w*5 /2, 3*SCREEN_H/4,
-                    texte->w*5, texte->h*5);
-    destroy_bitmap(texte);
 
     // --- Libération des ressources ---
     destroy_bitmap(buffer);
@@ -362,18 +355,6 @@ void menu_selection_personnages(int num, Perso * self) {
     const int grid_start_x = 3*SCREEN_W/4 - (nb_col * case_w)/ 2;
     const int grid_start_y = (SCREEN_H - (nb_lignes * case_h)) / 2;
 
-    //grille persos
-    char chemin_avatar[256];
-    BITMAP* liste_avatar[12];
-    BITMAP* liste_big_avatar[12];
-    BITMAP* liste_story[12];
-    for (int i = 0; i < 12; i++) {
-        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Select/%d.bmp", i + 1);
-        liste_avatar[i] = charger_et_traiter_image(chemin_perso, case_w, case_h);
-        liste_big_avatar[i] = charger_et_traiter_image(chemin_perso, case_w*3, case_h*3);
-        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Story/%d.bmp", i + 1);
-        liste_story[i] = load_bitmap(chemin_perso, NULL);
-    }
 
 
     int selection_case = 0;
