@@ -225,16 +225,22 @@ int found_player(Game game, int x, int y) {
     }
     return -1;
 }
-bool Can_move(Game* game, Perso* self, int x_dest, int y_dest) {
+
+bool verif_bfs(int plateau[PLAT_X][PLAT_Y], const int origin_x, const int origin_y, const int dest_x, const int dest_y) {
+
+    return true;
+}
+
+bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest) {
+    //La case cliquée se trouve-t-elle dans le plateau ?
+    if (x_dest < 0 || y_dest < 0) return false;
     //La case cliquée est-elle sur un obstacle ?
-    if (game->plateau[x_dest][y_dest] !=0) return false;
+    if (game.plateau[x_dest][y_dest] !=0) return false;
     //La case cliquée est-elle sur un joueur ?
-    if (found_player(*game, x_dest, y_dest)==-1) return false;
-    //Origine du déplacement
-    int x_initial = self->x;
-    int y_initial = self->y;
-
-
+    if (found_player(game, x_dest, y_dest)==-1) return false;
+    //Verification du déplacement avec un BFS
+    if (!verif_bfs(game.plateau,self.x, self.y,x_dest,y_dest)) return false;
+    //Toutes les vérifications sont validées
     return true;
 }
 void deplacement(Perso* self,const int x_dest,const int y_dest) {
@@ -244,7 +250,7 @@ void deplacement(Perso* self,const int x_dest,const int y_dest) {
 void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y) {
     if (num_competence == 5) {
         //Appel Can_move
-        if (Can_move(game, self, action_x, action_y)) {
+        if (Can_move(*game, *self, action_x, action_y)) {
             //Appel fct déplacement
             deplacement(self, action_x, action_y);
             //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
