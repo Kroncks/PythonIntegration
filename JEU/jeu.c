@@ -12,7 +12,6 @@ void init_coord(Game * game) {
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
     game->theme = rand() % NB_THEMES;
-
 }
 
 void init_plato(Game * game) {

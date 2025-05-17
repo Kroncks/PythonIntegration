@@ -352,8 +352,16 @@ void menu_selection_personnages(int num, Perso * self) {
     const int grid_start_x = 3*SCREEN_W/4 - (nb_col * case_w)/ 2;
     const int grid_start_y = (SCREEN_H - (nb_lignes * case_h)) / 2;
 
-    int selection_case = -1;
+    //grille persos
+    char chemin_avatar[256];
+    BITMAP* liste_avatar[12];
+    for (int i = 0; i < 12; i++) {
+        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Select/%d.bmp", i + 1);
+        liste_avatar[i] = charger_et_traiter_image(chemin_perso, case_w, case_h);
+    }
 
+
+    int selection_case = -1;
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
 
@@ -370,6 +378,7 @@ void menu_selection_personnages(int num, Perso * self) {
             for (int col = 0; col < nb_col; col++) {
                 int x = grid_start_x + col * case_w;
                 int y = grid_start_y + ligne * case_h;
+                draw_sprite(buffer,liste_avatar[ligne * nb_col + col], x, y);
                 rect(buffer, x, y, x + case_w, y + case_h, makecol(255, 255, 255));
                 if (selection_case == ligne * nb_col + col) {
                     rect(buffer, x + 2, y + 2, x + case_w - 2, y + case_h - 2, makecol(255, 0, 0));
