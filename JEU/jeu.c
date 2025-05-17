@@ -170,11 +170,11 @@ void import_terrainJeu_Via_Fichier_texte(Game* game){
     switch (game->theme) {
         case 0:
             //Changement de musique
-            change_music("../Projet/Musiques/MapNature.wav");
+            change_music("../Projet/Musiques/Electric-Breeze-1.wav");
             break;
         case 1:
             //Changement de musique
-            change_music("../Projet/Musiques/MapVolcan.wav");
+            change_music("../Projet/Musiques/Volcanic-Arcade1.wav");
             break;
         case 2:
             //Changement de musique
