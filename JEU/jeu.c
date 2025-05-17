@@ -160,26 +160,27 @@ void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
         if (distance_x+distance_y > attaquant->classe.competences[num_competence].portee) return;
         //Calcul des dégats
         //Initialisation
-        int degat_tot = 0;
+        float degat_tot = 0;
+        int degat_tot_int=0;
 
         if (defenseur->protection) {
             degat_tot = 0;
         }else {
             //dégats de base
-            degat_tot = attaquant->classe.competences[num_competence].degat;
+            degat_tot = (float)attaquant->classe.competences[num_competence].degat;
             //Ajout de la statistique associée
             switch (attaquant->classe.competences[num_competence].type_stat) {
                 case 'F':
-                    degat_tot += attaquant->classe.foi;
+                    degat_tot += (float)attaquant->classe.foi;
                     break;
                 case 'S':
-                    degat_tot += attaquant->classe.force;
+                    degat_tot += (float)attaquant->classe.force;
                     break;
                 case 'I':
-                    degat_tot += attaquant->classe.intelligence;
+                    degat_tot += (float)attaquant->classe.intelligence;
                     break;
                 case 'D':
-                    degat_tot += attaquant->classe.dexterite;
+                    degat_tot += (float)attaquant->classe.dexterite;
                     break;
             }
             //Ajout de la résistance/faiblesse de l'adversaire
@@ -204,12 +205,13 @@ void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
                     break;
             }
             degat_tot = degat_tot * attaquant->boost_modifier;
+            degat_tot_int = (int)degat_tot;
         }
 
         //On retire les points d'attaques à l'attaquant
         attaquant->p_attaque -= attaquant->classe.competences[num_competence].p_attaque;
         //On retire les pv à l'adversaire
-        defenseur->pv_actuels -= degat_tot;
+        defenseur->pv_actuels -= degat_tot_int;
 
         //Animation possible
     }
@@ -223,9 +225,36 @@ int found_player(Game game, int x, int y) {
     }
     return -1;
 }
-void action(Game* game, Perso* self, int num_competence, int action_x, int action_y) {
+
+bool verif_bfs(int plateau[PLAT_X][PLAT_Y], const int origin_x, const int origin_y, const int dest_x, const int dest_y) {
+
+    return true;
+}
+
+bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest) {
+    //La case cliquée se trouve-t-elle dans le plateau ?
+    if (x_dest < 0 || y_dest < 0) return false;
+    //La case cliquée est-elle sur un obstacle ?
+    if (game.plateau[x_dest][y_dest] !=0) return false;
+    //La case cliquée est-elle sur un joueur ?
+    if (found_player(game, x_dest, y_dest)==-1) return false;
+    //Verification du déplacement avec un BFS
+    if (!verif_bfs(game.plateau,self.x, self.y,x_dest,y_dest)) return false;
+    //Toutes les vérifications sont validées
+    return true;
+}
+void deplacement(Perso* self,const int x_dest,const int y_dest) {
+    self->x = x_dest;
+    self->y = y_dest;
+}
+void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y) {
     if (num_competence == 5) {
-        //Appel fct déplacement
+        //Appel Can_move
+        if (Can_move(*game, *self, action_x, action_y)) {
+            //Appel fct déplacement
+            deplacement(self, action_x, action_y);
+            //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
+        }
     }
     else {
         attack(self,&game->players[found_player(*game,action_x,action_y)],num_competence);
