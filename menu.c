@@ -355,13 +355,18 @@ void menu_selection_personnages(int num, Perso * self) {
     //grille persos
     char chemin_avatar[256];
     BITMAP* liste_avatar[12];
+    BITMAP* liste_big_avatar[12];
+    BITMAP* liste_story[12];
     for (int i = 0; i < 12; i++) {
         sprintf(chemin_perso, "../Projet/Graphismes/Menus/Select/%d.bmp", i + 1);
         liste_avatar[i] = charger_et_traiter_image(chemin_perso, case_w, case_h);
+        liste_big_avatar[i] = charger_et_traiter_image(chemin_perso, case_w*3, case_h*3);
+        sprintf(chemin_perso, "../Projet/Graphismes/Menus/Story/%d.bmp", i + 1);
+        liste_story[i] = load_bitmap(chemin_perso, NULL);
     }
 
 
-    int selection_case = -1;
+    int selection_case = 0;
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
 
@@ -385,6 +390,14 @@ void menu_selection_personnages(int num, Perso * self) {
                 }
             }
         }
+        //dessiner histoire centrée
+        stretch_blit(liste_story[selection_case], buffer,
+            0,0,liste_story[selection_case]->w, liste_story[selection_case]->h,
+            SCREEN_W/4 - liste_story[selection_case]->w /4, SCREEN_H/2, liste_story[selection_case]->w/2 , liste_story[selection_case]->h/2 );
+
+        // dessiner perso choisi
+        draw_sprite(buffer,liste_big_avatar[selection_case], SCREEN_W/4 - liste_big_avatar[selection_case]->w/2, SCREEN_H/2 - liste_big_avatar[selection_case]->h);
+
 
         // Afficher bouton valider
         afficher_boutons(buffer, boutons, nb_boutons);
