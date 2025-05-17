@@ -149,7 +149,7 @@ Perso init_player_graphique(int num) {
             "../Projet/Graphismes/Menus/Joueurs/%d.bmp",
             num + 1);
     BITMAP* img_joueur = charger_et_traiter_image(
-        chemin_joueur, 256, 64);
+        chemin_joueur, 256*3, 64*3);
     if (!img_joueur) {
         allegro_message("Erreur lors du chargement de l'image du numéro de joueur !");
         exit(EXIT_FAILURE);
@@ -208,7 +208,7 @@ Perso init_player_graphique(int num) {
 
         // Afficher l'image du numéro de joueur
         draw_sprite(buffer, img_joueur,
-                    SCREEN_W/100 + 450,
+                    SCREEN_W/2 - img_joueur->w/2,
                     SCREEN_H/100 + 150);
 
         // Détecter clic sur « Valider »
@@ -219,8 +219,8 @@ Perso init_player_graphique(int num) {
         }
 
         // Définition de la zone de pseudo
-        int zone_x = SCREEN_W / 10;
-        int zone_y = SCREEN_H / 5;
+        int zone_x = SCREEN_W / 2 - casePseudo->w / 2;
+        int zone_y = SCREEN_H / 2 - casePseudo->h / 2;
         int zone_w = SCREEN_W / 2;
         int zone_h = SCREEN_H / 12;
 
@@ -277,6 +277,16 @@ Perso init_player_graphique(int num) {
 
         rest(10);
     }
+    char * message = "[ INIT ]";
+    BITMAP* texte = create_bitmap(8 * 8, 16);
+    clear_to_color(texte, makecol(255, 0, 255));
+    textprintf_ex(texte, font, 0, 0,
+                  makecol(0, 0, 0), -1,
+                  "%s", message);
+    stretch_sprite(screen, texte,
+                   SCREEN_W/2- texte->w*5 /2, 3*SCREEN_H/4,
+                    texte->w*5, texte->h*5);
+    destroy_bitmap(texte);
 
     // --- Libération des ressources ---
     destroy_bitmap(buffer);
