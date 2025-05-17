@@ -1,5 +1,6 @@
 #include "jeu.h"
 
+#define NB_THEMES 4
 
 BITMAP* curseur;  // Déclaration du curseur global
 
@@ -9,6 +10,8 @@ void init_coord(Game * game) {
 
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
+    game->theme = rand() % NB_THEMES;
+
 }
 
 void init_plato(Game * game) {
@@ -448,6 +451,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
+
     game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
