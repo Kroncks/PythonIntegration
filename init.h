@@ -10,6 +10,6 @@
 
 
 void init_player_classe( Perso * self);
-
+void import_animations();
 
 #endif //INIT_H

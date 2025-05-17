@@ -107,6 +107,7 @@ int main() {
     version();
     printf("\n");
     name(username);
+    import_animations();
     Perso self;
 
     //Lancement de la musique des menus

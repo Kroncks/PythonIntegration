@@ -34,4 +34,5 @@ void import_animations() {
             }
         }
     }
+    printf("all data loaded\n");
 }
