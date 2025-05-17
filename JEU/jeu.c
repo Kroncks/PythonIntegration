@@ -294,7 +294,7 @@ void import_terrainJeu_Via_Fichier_texte(Game* game){
             break;
         case 3:
             //Changement de musique
-            change_music("../Projet/Musiques/MapNuage.wav");
+            change_music("../Projet/Musiques/Cloud-Tornado.wav");
             break;
     }
 
