@@ -288,6 +288,140 @@ Perso init_player_graphique(int num) {
     return self;
 }
 
+void menu_selection_personnages(int num, Perso * self) {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+
+    // Charge ici l'image de fond de la sélection de personnages
+    BITMAP* fond_selection = load_bitmap("../Projet/Graphismes/Menus/Screen/Selection.bmp", NULL);
+    if (!fond_selection) {
+        allegro_message("Erreur lors du chargement de l'image de sélection des personnages !");
+        exit(EXIT_FAILURE);
+    }
+
+    curseur = load_bitmap("../Projet/Graphismes/Interface/Curseur/curseur.bmp", NULL);
+    if (!curseur) {
+        allegro_message("Impossible de charger l'image du curseur !");
+        exit(EXIT_FAILURE);
+    }
+    appliquer_transparence_curseur(curseur);
+
+    BITMAP* curseur_redimensionne = create_bitmap(32, 32);
+    if (!curseur_redimensionne) {
+        allegro_message("Erreur lors de la création du curseur redimensionné !");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(curseur, curseur_redimensionne,
+                 0, 0, curseur->w, curseur->h,
+                 0, 0, 32, 32);
+    curseur = curseur_redimensionne;
+
+    // Image joueur actif (juste sous la pancarte "choisis ton personnage")
+    char chemin_perso[256];
+    sprintf(chemin_perso, "../Projet/Graphismes/Menus/Joueurs/%d.bmp", num + 1);
+    BITMAP* img_personnage = load_bitmap(chemin_perso, NULL);
+    if (!img_personnage) {
+        allegro_message("Erreur lors du chargement de l'image personnage !");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialisation bouton valider
+    const char* bouton_paths[] = {
+        "../Projet/Graphismes/Menus/Boutons/VALIDATE.bmp"
+    };
+    const int nb_boutons = 1;
+    Bouton boutons[nb_boutons];
+    init_boutons(boutons, bouton_paths, nb_boutons);
+    int marge = 30;
+    boutons[0].rect.x = SCREEN_W - boutons[0].rect.w - marge;
+    boutons[0].rect.y = SCREEN_H - boutons[0].rect.h - marge;
+
+    show_mouse(NULL);
+
+    // Paramètres grille 3x4
+    const int nb_col = 3;
+    const int nb_lignes = 4;
+    const int case_w = 128;
+    const int case_h = 128;
+    const int grid_start_x = (SCREEN_W - (nb_col * case_w)) / 2;
+    const int grid_start_y = 150;
+
+    int selection_case = -1;
+
+    while (1) {
+        clear_to_color(buffer, makecol(0, 0, 0));
+
+        // AFFICHER l'image de fond de sélection des personnages
+        stretch_blit(fond_selection, buffer, 0, 0, fond_selection->w, fond_selection->h, 0, 0, SCREEN_W, SCREEN_H);
+
+        // Image joueur actif (juste sous la pancarte)
+        int img_x = (SCREEN_W - img_personnage->w) / 2;
+        int img_y = 50;
+        draw_sprite(buffer, img_personnage, img_x, img_y);
+
+        // Dessiner la grille 3x4
+        for (int ligne = 0; ligne < nb_lignes; ligne++) {
+            for (int col = 0; col < nb_col; col++) {
+                int x = grid_start_x + col * case_w;
+                int y = grid_start_y + ligne * case_h;
+                rect(buffer, x, y, x + case_w, y + case_h, makecol(255, 255, 255));
+                if (selection_case == ligne * nb_col + col) {
+                    rect(buffer, x + 2, y + 2, x + case_w - 2, y + case_h - 2, makecol(255, 0, 0));
+                }
+            }
+        }
+
+        // Afficher bouton valider
+        afficher_boutons(buffer, boutons, nb_boutons);
+
+        // Gestion clic souris
+        if (mouse_b & 1) {
+            // Sélection dans grille
+            for (int ligne = 0; ligne < nb_lignes; ligne++) {
+                for (int col = 0; col < nb_col; col++) {
+                    int x = grid_start_x + col * case_w;
+                    int y = grid_start_y + ligne * case_h;
+                    if (mouse_x >= x && mouse_x <= x + case_w &&
+                        mouse_y >= y && mouse_y <= y + case_h) {
+                        selection_case = ligne * nb_col + col;
+                        self->avatar[0]= selection_case + 'a';
+                        printf("Selection case %d\nPerso : %c\n", selection_case, self->avatar[0]);
+                    }
+                }
+            }
+
+            // Clic bouton valider uniquement si un perso est sélectionné
+            int index = bouton_clique(boutons, nb_boutons, mouse_x, mouse_y);
+            if (index != -1 && selection_case != -1) {
+                break;  // Valide et sort de la boucle
+            }
+        }
+
+        // Affichage curseur perso
+        stretch_sprite(buffer, curseur_redimensionne, mouse_x, mouse_y, 32, 32);
+
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(10);
+    }
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(fond_selection);
+    destroy_bitmap(curseur_redimensionne);
+    destroy_bitmap(img_personnage);
+    detruire_boutons(boutons, nb_boutons);
+    clear_keybuf();
+}
+
+
+
+
+
+
+
+
 
 void menu_waiting() {
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);

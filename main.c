@@ -45,6 +45,7 @@ int main() {
                 Perso liste[NB_JOUEURS];
                 for (int i = 0; i < NB_JOUEURS; i++) {
                     liste[i] = init_player_graphique(i);
+                    menu_selection_personnages(i, liste + i);
                 }
                 local(liste);
                 break;
@@ -52,6 +53,7 @@ int main() {
             case 1:
                 init_nb_players_graphique();
                 self = init_player_graphique(0); // joueur 1 local
+                menu_selection_personnages(0, &self);
                 serveur();
                 attendre_serveur();
                 menu_waiting();
@@ -60,6 +62,7 @@ int main() {
             case 2:
                 init_nb_players_graphique();
                 self = init_player_graphique(0); // joueur 1 local
+                menu_selection_personnages(0, &self);
                 menu_waiting();
                 client(username, self);
                 break;
