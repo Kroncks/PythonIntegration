@@ -116,6 +116,119 @@ void viderBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+void attack_statut(Perso* self, int num_competence) {
+    //Competences de protection
+    if (strcmp(self->classe.competences[num_competence].nom_competence, "Mur de lianes")==0 ||
+        strcmp(self->classe.competences[num_competence].nom_competence, "Bulle d'eau")==0)
+        {
+        self->protection = true;
+    }
+    //Competences de soin
+    if (strcmp(self->classe.competences[num_competence].nom_competence, "Aromatherapie")==0 ||
+        strcmp(self->classe.competences[num_competence].nom_competence, "Recolte")==0 ||
+        strcmp(self->classe.competences[num_competence].nom_competence, "Eau de vie")==0)
+        {
+        int soin=0;
+        soin = self->classe.competences[num_competence].degat*self->classe.foi;
+        self->pv_actuels += soin;
+        if (self->pv_actuels > self->pv_actuels) self->pv_actuels = self->pv_actuels;
+    }
+    //Compétence de boost
+    if (strcmp(self->classe.competences[num_competence].nom_competence, "Rage")==0) {
+        self->boost_modifier = 1.5;
+    }
+}
+
+
+
+void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
+    //Vérification du nombre de points d'attaques/mana
+    if (attaquant->p_attaque < attaquant->classe.competences[num_competence].p_attaque) return;
+
+    if (attaquant->classe.competences[num_competence].type_stat == 'N') {
+        attack_statut(attaquant, num_competence);
+    }else {
+        //Vérification de la portée
+        int distance_x = attaquant->x - defenseur->x;
+        int distance_y = attaquant->y - defenseur->y;
+        if (distance_x < 0) distance_x = -distance_x;
+        if (distance_y < 0) distance_y = -distance_y;
+        if (distance_x+distance_y > attaquant->classe.competences[num_competence].portee) return;
+        //Calcul des dégats
+        //Initialisation
+        int degat_tot = 0;
+
+        if (defenseur->protection) {
+            degat_tot = 0;
+        }else {
+            //dégats de base
+            degat_tot = attaquant->classe.competences[num_competence].degat;
+            //Ajout de la statistique associée
+            switch (attaquant->classe.competences[num_competence].type_stat) {
+                case 'F':
+                    degat_tot += attaquant->classe.foi;
+                    break;
+                case 'S':
+                    degat_tot += attaquant->classe.force;
+                    break;
+                case 'I':
+                    degat_tot += attaquant->classe.intelligence;
+                    break;
+                case 'D':
+                    degat_tot += attaquant->classe.dexterite;
+                    break;
+            }
+            //Ajout de la résistance/faiblesse de l'adversaire
+            switch (attaquant->classe.competences->type_degat) {
+                case 'C':
+                    degat_tot = degat_tot * defenseur->classe.r_contandant;
+                    break;
+                case 'T':
+                    degat_tot = degat_tot * defenseur->classe.r_tranchant;
+                    break;
+                case 'P':
+                    degat_tot = degat_tot * defenseur->classe.r_percant;
+                    break;
+                case 'E':
+                    degat_tot = degat_tot * defenseur->classe.r_eau;
+                    break;
+                case 'F':
+                    degat_tot = degat_tot * defenseur->classe.r_feu;
+                    break;
+                case 'S':
+                    degat_tot = degat_tot * defenseur->classe.r_terre;
+                    break;
+            }
+            degat_tot = degat_tot * attaquant->boost_modifier;
+        }
+
+        //On retire les points d'attaques à l'attaquant
+        attaquant->p_attaque -= attaquant->classe.competences[num_competence].p_attaque;
+        //On retire les pv à l'adversaire
+        defenseur->pv_actuels -= degat_tot;
+
+        //Animation possible
+    }
+}
+
+int found_player(Game game, int x, int y) {
+    for (int i=0; i<NB_JOUEURS; i++) {
+        if (x == game.players[i].x && y == game.players[i].y) {
+            return i;
+        }
+    }
+    return -1;
+}
+void action(Game* game, Perso* self, int num_competence, int action_x, int action_y) {
+    if (num_competence == 5) {
+        //Appel fct déplacement
+    }
+    else {
+        attack(self,&game->players[found_player(*game,action_x,action_y)],num_competence);
+    }
+}
+
+
 int change_music(const char *filename)
 {
     static SAMPLE *current = NULL;

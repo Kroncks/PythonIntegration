@@ -5,6 +5,7 @@
 #define PLAT_Y 20
 
 #include <allegro.h>
+#include <string.h>
 
 #define TILE_COUNT 3
 
@@ -57,6 +58,8 @@ typedef struct {
     int pm_restant;
     int p_attaque;
     int pv_actuels;
+    float boost_modifier; //à initialiser à 1.0
+    bool protection;
 
 }Perso;
 
