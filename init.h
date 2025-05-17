@@ -6,6 +6,8 @@
 #define INIT_H
 
 #include "JEU/structures.h"
+#include <stdio.h>
+
 
 void init_player_classe( Perso * self);
 

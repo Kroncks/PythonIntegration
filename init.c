@@ -23,9 +23,15 @@ void init_player_classe( Perso * self) {
 
 
 void import_animations() {
+    char filename[256];
     for (int i; i<12; i++) {
         for (int j; j<8; j++) {
-            avatars[i][j] = load_bitmap("../Projet/Sprites/avatar/avatar" + (char)(i + 'a') + ".bmp", NULL);
+            sprintf(filename, "../Projet/Graphismes/Animations/Persos%c.bmp", (char) (i + 'a'));
+            avatars[i][j] = load_bitmap(filename, NULL);
+            if (!avatars[i][j]) {
+                printf("erreur chargement animation\n");
+                return;
+            }
         }
     }
 }
