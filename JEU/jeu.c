@@ -3,6 +3,7 @@
 #define NB_THEMES 4
 
 BITMAP* curseur;  // Déclaration du curseur global
+SAMPLE* musique;
 
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
@@ -126,13 +127,13 @@ int change_music(const char *filename)
         return -1;
     }
 
-    if (current) {
-        stop_sample(current);
-        destroy_sample(current);
+    if (musique) {
+        stop_sample(musique);
+        destroy_sample(musique);
     }
 
-    current = next;
-    if (play_sample(current, 255, 128, 1000, 1) < 0) {
+    musique = next;
+    if (play_sample(musique, 255, 128, 1000, 1) < 0) {
         allegro_message("Erreur : impossible de jouer '%s'\n", filename);
         return -1;
     }
@@ -151,25 +152,22 @@ void save_map_to_txt (int plateau[PLAT_X][PLAT_Y]) {
     }
     fclose(p_map);
 }
-
-void import_terrainJeu_Via_Fichier_texte(int theme, Map* map, int carte_carthesien[PLAT_X][PLAT_Y]) {
-    if (!map) return;
-    FILE* p_fichier_map = NULL;
+//void import_terrainJeu_Via_Fichier_texte(int theme, Map* map, int carte_carthesien[PLAT_X][PLAT_Y]) {
+void import_terrainJeu_Via_Fichier_texte(Game* game){
     char filename[100];
 
     //Chargement des tuiles du theme choisi
     for (int i=0; i<3; i++){
-        snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Tuiles/%d/%d.bmp",theme, i);
-        map->images[i] = charger_et_traiter_image(filename, 64, 64);
+        snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Tuiles/%d/%d.bmp",(game->theme)+1, i+1);
+        printf("%s\n",filename);
+        game->map.images[i] = charger_et_traiter_image(filename, 64, 64);
+        printf("Tuile %d chargé\n",i+1);
     }
     //Chargement de l'arriere plan du theme choisi
-    snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Background/%d.bmp",theme);
-    map->background = charger_et_traiter_image("../Projet/Graphismes/Map/Background/.bmp", SCREEN_W, SCREEN_H);
+    snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Background/%d.bmp",game->theme+1);
+    game->map.background = charger_et_traiter_image(filename, SCREEN_W, SCREEN_H);
 
-    //Chargement de la map du fichier txt
-    p_fichier_map = fopen("../Projet/Graphismes/Map/Fichiers textes/MapAleatoire.txt", "r");
-
-    switch (theme) {
+    switch (game->theme) {
         case 0:
             //Changement de musique
             change_music("../Projet/Musiques/MapNature.wav");
@@ -186,33 +184,35 @@ void import_terrainJeu_Via_Fichier_texte(int theme, Map* map, int carte_carthesi
             //Changement de musique
             change_music("../Projet/Musiques/MapNuage.wav");
             break;
-
     }
 
     //Vérification tuiles chargée correctement
     for (int i = 0; i < TILE_COUNT; i++) {
-        if (!map->images[i]) {
+        if (!game->map.images[i]) {
             allegro_message("Erreur : Tuile %d introuvable !", i);
             exit(EXIT_FAILURE);
         }
     }
 
     //Vérification de l'arriere plan chargée correctement
-    if (!map->background) {
+    if (!game->map.background) {
         allegro_message("Erreur : Impossible de charger le fond d'écran !");
         exit(EXIT_FAILURE);
     }
-    printf("Background Width: %d, Height: %d\n", map->background->w, map->background->h);
-
+    printf("Background Width: %d, Height: %d\n", game->map.background->w, game->map.background->h);
+    /*
+    FILE* p_fichier_map = NULL;
+    //Chargement de la map du fichier txt
+    p_fichier_map = fopen("../Projet/Graphismes/Map/Fichiers textes/MapAleatoire.txt", "r");
     //transfert entre fichier texte et la structure map
     for (int x = 0; x < PLAT_Y; x++) {
         for (int y = 0; y < PLAT_X; y++) {
-            fscanf(p_fichier_map, "%d ", carte_carthesien[x][y]);
+            fscanf(p_fichier_map, "%d ", game->plateau[x][y]);
         }
         fscanf(p_fichier_map, "\n");
     }
 
-    fclose(p_fichier_map);
+    fclose(p_fichier_map);*/
 }
 
 Perso init_player(int num) {
@@ -562,7 +562,7 @@ void jouer_local_graphique(Game * game) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-
+    /*
     game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
@@ -573,8 +573,8 @@ void jouer_local_graphique(Game * game) {
         char path[100];
         sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
-    }
-
+    }*/
+    import_terrainJeu_Via_Fichier_texte(game);
 
     // Charger l'image du curseur
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);

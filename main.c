@@ -9,11 +9,12 @@ int SCREEN_WIDTH = 0;
 int SCREEN_HEIGHT = 0;
 
 BITMAP* curseur;
-
+SAMPLE* musique;
 
 void initialisation_allegro();
 
 int main() {
+    srand(time(NULL));
     initialisation_allegro();
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
@@ -24,6 +25,15 @@ int main() {
     printf("\n");
     name(username);
     Perso self;
+
+    //Lancement de la musique des menus
+    musique = load_sample("../Projet/Musiques/Menus.wav");
+    if (!musique) {
+        allegro_message("Erreur de chargement de la musique !");
+        allegro_exit();
+        exit(EXIT_FAILURE);
+    }
+    play_sample(musique, 255, 128, 1000, 1);
 
     int choix = 0;
     while (choix != 3) {
@@ -75,6 +85,7 @@ void initialisation_allegro() {
     allegro_init();
     install_keyboard();
     install_mouse();
+    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
     set_color_depth(desktop_color_depth());
 
     get_desktop_resolution(&SCREEN_WIDTH, &SCREEN_HEIGHT);
