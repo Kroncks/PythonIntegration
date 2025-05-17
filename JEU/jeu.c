@@ -9,7 +9,7 @@ SAMPLE* musique;
 BITMAP* liste_avatar[12];
 BITMAP* liste_big_avatar[12];
 BITMAP* liste_story[12];
-
+t_classe classes_disponibles[12];
 
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
@@ -41,7 +41,7 @@ void transfert_temp_resistance(int r_temp, float* r_resistance) {
     else if (r_temp==2) *r_resistance = 2;
 }
 
-void init_classe(t_classe classes_disponibles[12]) {
+void init_classe() {
     int lenght_nom [12][4];
     char filename[100];
     int temp;
