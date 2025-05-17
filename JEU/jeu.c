@@ -451,7 +451,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-
+    /*
     game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
     if (!game->map.background) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
@@ -462,8 +462,8 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         char path[100];
         sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
         game->map.images[i] = charger_et_traiter_image(path, 64, 64);
-    }
-
+    }*/
+    import_terrainJeu_Via_Fichier_texte(game);
 
 
 
