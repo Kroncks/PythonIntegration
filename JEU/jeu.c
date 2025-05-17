@@ -219,6 +219,16 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         buffer[PLAT_X*PLAT_Y] = '\0';
         send(sock, buffer, strlen(buffer), 0);
         printf("[GAME] buffer : %s\n",buffer);
+        // envoyer le theme
+#ifdef WIN32
+        Sleep(0.2); // version windows
+#else
+        sleep(0.2);
+#endif
+        buffer[0] = game->theme + 'a';
+        buffer[1] = '\0';
+        send(sock, buffer, strlen(buffer), 0);
+        printf("[GAME] buffer : %s\n",buffer);
     }else {
         printf("[GAME] waiting for the map\n");
         //recevoir le plateau
@@ -229,6 +239,11 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
                 game->plateau[i][j] = buffer[j+i*PLAT_X]-48;
             }
         }
+        printf("[GAME] waiting for the theme\n");
+        //recevoir le theme
+        get_data(sock, &received, buffer, 0, &quit);
+        printf("[GAME] received data : %s\n",buffer);
+        game->theme = buffer[0] - 'a';
     }
     //coordonées de base des joueurs :
     init_coord(game);

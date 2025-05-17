@@ -63,6 +63,7 @@ typedef struct {
     Perso players[4];
     Client client;
     Map map;
+    int theme;
 }Game;
 
 
