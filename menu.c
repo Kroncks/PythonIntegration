@@ -346,8 +346,8 @@ void menu_selection_personnages(int num, Perso * self) {
     const int nb_lignes = 4;
     const int case_w = 128;
     const int case_h = 128;
-    const int grid_start_x = (SCREEN_W - (nb_col * case_w)) / 2;
-    const int grid_start_y = 150;
+    const int grid_start_x = 3*SCREEN_W/4 - (nb_col * case_w)/ 2;
+    const int grid_start_y = (SCREEN_H - (nb_lignes * case_h)) / 2;
 
     int selection_case = -1;
 
