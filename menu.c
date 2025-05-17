@@ -104,6 +104,7 @@ void menu(int* choix) {
         rest(10);
     }
 
+    rest(200);
     // Libérer les ressources
     destroy_bitmap(buffer);
     destroy_bitmap(background);
