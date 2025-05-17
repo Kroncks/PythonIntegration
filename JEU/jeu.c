@@ -555,13 +555,19 @@ void show_graphique(Game game, int n_turns, int i,
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[y][x];
-            if (id >= 0 && id < TILE_COUNT && game.map.images[id]) {
+            if ( id < TILE_COUNT && game.map.images[id]) { // case vide
                 int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
-                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W &&
-                   iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
-                    draw_sprite(buffer, game.map.images[id],
-                                iso_x, iso_y);
+                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
+                    draw_sprite(buffer, game.map.images[id],iso_x, iso_y);
+                }
+            } else {
+                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
+                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
+                    draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
+                    // afficher le joueur
+
                 }
             }
         }

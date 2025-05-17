@@ -1,6 +1,8 @@
 #include "init.h"
 
 t_classe classes_disponibles[12];
+BITMAP* avatars[12][8];
+
 
 void init_player_classe( Perso * self) {
 
@@ -17,4 +19,13 @@ void init_player_classe( Perso * self) {
 
 
 
+}
+
+
+void import_animations() {
+    for (int i; i<12; i++) {
+        for (int j; j<8; j++) {
+            avatars[i][j] = load_bitmap("../Projet/Sprites/avatar/avatar" + (char)(i + 'a') + ".bmp", NULL);
+        }
+    }
 }
