@@ -112,6 +112,105 @@ void viderBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+int change_music(const char *filename)
+{
+    static SAMPLE *current = NULL;
+    SAMPLE *next;
+
+    next = load_sample(filename);
+    if (!next) {
+        allegro_message("Erreur : impossible de charger '%s'\n", filename);
+        return -1;
+    }
+
+    if (current) {
+        stop_sample(current);
+        destroy_sample(current);
+    }
+
+    current = next;
+    if (play_sample(current, 255, 128, 1000, 1) < 0) {
+        allegro_message("Erreur : impossible de jouer '%s'\n", filename);
+        return -1;
+    }
+
+    return 0;
+}
+
+void save_map_to_txt (int plateau[PLAT_X][PLAT_Y]) {
+    FILE* p_map = fopen("../Projet/Graphismes/Map/Fichiers textes/MapAleatoire.txt", "w");
+    for (int x = 0; x < PLAT_X; x++) {
+        for (int y = 0; y < PLAT_Y; y++) {
+
+            fprintf(p_map, "%d ", plateau[x][y]);
+        }
+        fprintf(p_map, "\n");
+    }
+    fclose(p_map);
+}
+
+void import_terrainJeu_Via_Fichier_texte(int theme, Map* map, int carte_carthesien[PLAT_X][PLAT_Y]) {
+    if (!map) return;
+    FILE* p_fichier_map = NULL;
+    char filename[100];
+
+    //Chargement des tuiles du theme choisi
+    for (int i=0; i<3; i++){
+        snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Tuiles/%d/%d.bmp",theme, i);
+        map->images[i] = charger_et_traiter_image(filename, 64, 64);
+    }
+    //Chargement de l'arriere plan du theme choisi
+    snprintf(filename, sizeof(filename),"../Projet/Graphismes/Map/Background/%d.bmp",theme);
+    map->background = charger_et_traiter_image("../Projet/Graphismes/Map/Background/.bmp", SCREEN_W, SCREEN_H);
+
+    //Chargement de la map du fichier txt
+    p_fichier_map = fopen("../Projet/Graphismes/Map/Fichiers textes/MapAleatoire.txt", "r");
+
+    switch (theme) {
+        case 0:
+            //Changement de musique
+            change_music("../Projet/Musiques/MapNature.wav");
+            break;
+        case 1:
+            //Changement de musique
+            change_music("../Projet/Musiques/MapVolcan.wav");
+            break;
+        case 2:
+            //Changement de musique
+            change_music("../Projet/Musiques/MapSand.wav");
+            break;
+        case 3:
+            //Changement de musique
+            change_music("../Projet/Musiques/MapNuage.wav");
+            break;
+
+    }
+
+    //Vérification tuiles chargée correctement
+    for (int i = 0; i < TILE_COUNT; i++) {
+        if (!map->images[i]) {
+            allegro_message("Erreur : Tuile %d introuvable !", i);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    //Vérification de l'arriere plan chargée correctement
+    if (!map->background) {
+        allegro_message("Erreur : Impossible de charger le fond d'écran !");
+        exit(EXIT_FAILURE);
+    }
+    printf("Background Width: %d, Height: %d\n", map->background->w, map->background->h);
+
+    //transfert entre fichier texte et la structure map
+    for (int x = 0; x < PLAT_Y; x++) {
+        for (int y = 0; y < PLAT_X; y++) {
+            fscanf(p_fichier_map, "%d ", carte_carthesien[x][y]);
+        }
+        fscanf(p_fichier_map, "\n");
+    }
+
+    fclose(p_fichier_map);
+}
 
 Perso init_player(int num) {
     Perso self;
