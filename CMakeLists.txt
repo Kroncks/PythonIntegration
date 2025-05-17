@@ -26,6 +26,8 @@ add_executable(${PROJECT} main.c
         GRAPHISMES/bouttons.c
         GRAPHISMES/bouttons.h
         globals.h
+        init.c
+        init.h
 )
 
 

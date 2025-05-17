@@ -3,8 +3,10 @@
 #include "version.h"
 #include "LAN/LAN.h"
 #include "JEU/jeu.h"
-
+#include "init.h"
 #include "globals.h"
+
+
 int SCREEN_WIDTH = 0;
 int SCREEN_HEIGHT = 0;
 
@@ -127,6 +129,7 @@ int main() {
                 for (int i = 0; i < NB_JOUEURS; i++) {
                     liste[i] = init_player_graphique(i);
                     menu_selection_personnages(i, liste + i);
+                    init_player_classe(i, liste +i );
                 }
                 local(liste);
                 break;
@@ -135,6 +138,7 @@ int main() {
                 init_nb_players_graphique();
                 self = init_player_graphique(0); // joueur 1 local
                 menu_selection_personnages(0, &self);
+                init_player_classe(0, &self);
                 serveur();
                 attendre_serveur();
                 menu_waiting();
@@ -144,6 +148,7 @@ int main() {
                 init_nb_players_graphique();
                 self = init_player_graphique(0); // joueur 1 local
                 menu_selection_personnages(0, &self);
+                init_player_classe(0, &self);
                 menu_waiting();
                 client(username, self);
                 break;
