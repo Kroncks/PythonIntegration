@@ -32,9 +32,10 @@ void transfert_temp_resistance(int r_temp, float* r_resistance) {
     else if (r_temp==1) *r_resistance = 1;
     else if (r_temp==2) *r_resistance = 2;
 }
+
 void init_classe(t_classe classes_disponibles[12]) {
     int lenght_nom [12][4];
-    char filename[50];
+    char filename[100];
     int temp;
     FILE* p_fichier_classe = fopen("../Projet/Fichiers textes/DefClasses.txt", "r");
 
@@ -84,6 +85,26 @@ void init_classe(t_classe classes_disponibles[12]) {
         }
     }
     fclose(p_fichier_classe);
+
+    //Chargement des sprites des 12 classes
+    for (int j=0;j<12;j++) {
+        for (int i=0; i<8; i++) {
+            snprintf(filename, sizeof(filename),"../Projet/Graphismes/Animations/Persos/%d/%d.bmp", j+1,i+1);
+            classes_disponibles[j].sprite[i] = charger_et_traiter_image(filename, 64,64);
+            if (classes_disponibles[j].sprite[i]==NULL) {
+                printf("\nPerso %d sprite %d introuvable", j+1,i+1);
+            }
+            else {
+                printf("\nPerso %d sprite %d chargee", j+1,i+1);
+            }
+        }
+        for (int i=0; i<4;i++) {
+            for (int k=0;k<3;k++) {
+                snprintf(filename, sizeof(filename),"../Projet/Graphismes/Animations/Competences/%d/%d/%d.bmp", j+1,i+1,k+1);
+                classes_disponibles[j].competences[i].sprite[k] = charger_et_traiter_image(filename, 64,64);
+            }
+        }
+    }
 }
 
 void viderBuffer() {
