@@ -4,6 +4,7 @@
 #define PLAT_X 20
 #define PLAT_Y 20
 
+#include <math.h>
 #include <allegro.h>
 #include <string.h>
 #include <stdbool.h>
