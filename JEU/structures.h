@@ -6,7 +6,7 @@
 
 #include <allegro.h>
 #include <string.h>
-
+#include <stdbool.h>
 #define TILE_COUNT 3
 
 typedef struct {
