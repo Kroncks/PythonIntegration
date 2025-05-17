@@ -491,46 +491,77 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
+static void barre_jeu(BITMAP* buffer, BITMAP* icon)
+{
+    if (!icon) return;
+    const int pad = 10;
+    int x = pad;
+    int y = SCREEN_H - icon->h - pad;
+    draw_sprite(buffer, icon, x, y);
+}
 
-void show_graphique(Game game,int n_turns,int i, BITMAP* buffer, BITMAP* curseur) {
-    // Affiche le fond
+void show_graphique(Game game, int n_turns, int i,
+                    BITMAP* buffer, BITMAP* curseur)
+{
+    // --- IMPORT de l'image (chargée une seule fois) ---
+    static BITMAP* panneau_bas_gauche = NULL;
+    if (!panneau_bas_gauche) {
+        panneau_bas_gauche = charger_et_traiter_image(
+            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+            512,384
+        );
+        if (!panneau_bas_gauche) {
+            allegro_message(
+              "Erreur : impossible de charger "
+              "1.bmp"
+            );
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // --- Fond isométrique ---
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
-                     0, 0, game.map.background->w, game.map.background->h,
-                     0, 0, SCREEN_W, SCREEN_H);
+                     0, 0,
+                     game.map.background->w, game.map.background->h,
+                     0, 0,
+                     SCREEN_W, SCREEN_H);
     }
-    //====
 
-    int tile_width = 64;
-    int tile_height = 40;
-    int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
-    int offset_y = SCREEN_H / 2 - tile_height  * 10;
+    // --- Tuiles isométriques ---
+    int tile_w = 64, tile_h = 40;
+    int origin_x = SCREEN_W/2;
+    int offset_y = SCREEN_H/2 - tile_h*10;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[y][x];
-
             if (id >= 0 && id < TILE_COUNT && game.map.images[id]) {
-                int iso_x = (x - y) * (tile_width / 2) + origin_x;
-                int iso_y = (x + y) * (tile_height / 2) + offset_y;
-
-                // Ne dessine que si les coordonnées sont dans l'écran
-                if (iso_x + tile_width > 0 && iso_x < SCREEN_W &&
-                    iso_y + tile_height > 0 && iso_y < SCREEN_H) {
-                    draw_sprite(buffer, game.map.images[id], iso_x, iso_y);
-                    }
+                int iso_x = (x - y)*(tile_w/2) + origin_x;
+                int iso_y = (x + y)*(tile_h/2) + offset_y;
+                if (iso_x + tile_w > 0 && iso_x < SCREEN_W &&
+                    iso_y + tile_h > 0 && iso_y < SCREEN_H) {
+                    draw_sprite(buffer, game.map.images[id],
+                                iso_x, iso_y);
+                }
             }
         }
     }
 
+    // --- Curseur ---
+    stretch_sprite(buffer, curseur,
+                   mouse_x, mouse_y,
+                   32, 32);
 
+    // --- Affichage bas-gauche via notre helper ---
+    barre_jeu(buffer, panneau_bas_gauche);
 
-    //====
-    stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
+    // --- Envoi à l'écran ---
+    blit(buffer, screen,
+         0, 0,   // src x,y
+         0, 0,   // dst x,y
+         SCREEN_W, SCREEN_H);
 }
-
 
 void jouer(socket_t sock, Game * game, int num) {
     long int received;
