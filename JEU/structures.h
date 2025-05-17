@@ -45,12 +45,18 @@ typedef struct {
 
 
 typedef struct {
+    //Partie imuable statique (on reste sur le meme pc)
+    t_classe classe;
     // partie imuable ( envoyée dans initGame )
     char pseudo[20];
     char avatar[2];
 
     // partie changeante ( envoyée à chaque tour )
     int x,y;
+    //Partie changeante (non envoyée à chaque tour)
+    int pm_restant;
+    int p_attaque;
+    int pv_actuels;
 
 }Perso;
 
