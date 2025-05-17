@@ -252,6 +252,7 @@ Perso init_player_graphique(int num) {
             char ch = keycode & 0xFF;
             if (k == KEY_BACKSPACE && strlen(self.pseudo) > 0) {
                 self.pseudo[strlen(self.pseudo) - 1] = '\0';
+                break;
             } else if (k == KEY_DEL) {
                 self.pseudo[0] = '\0';
             } else if (isprint(ch) && strlen(self.pseudo) < 20) {
