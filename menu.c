@@ -395,6 +395,15 @@ void menu_selection_personnages(int num, Perso * self) {
                     }
                 }
             }
+            // Gestion de la saisie clavier
+            if (keypressed()) {
+                int keycode = readkey();
+                int k = keycode >> 8;
+                char ch = keycode & 0xFF;
+                if (k == KEY_ENTER) {
+                    break;
+                }
+            }
 
             // Clic bouton valider uniquement si un perso est sélectionné
             int index = bouton_clique(boutons, nb_boutons, mouse_x, mouse_y);
