@@ -1,5 +1,7 @@
 #include "jeu.h"
 
+#define TILE_HEIGHT 40
+#define TILE_WIDTH 64
 #define NB_THEMES 4
 
 BITMAP* curseur;  // Déclaration du curseur global
@@ -12,7 +14,6 @@ BITMAP* liste_story[12];
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
     game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
-
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
     game->theme = 3; //rand() % NB_THEMES;
@@ -231,6 +232,20 @@ void action(Game* game, Perso* self, int num_competence, int action_x, int actio
     }
 }
 
+void translation_to_iso(int mouse_x, int mouse_y) {
+    int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
+    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
+    float x_fix =mouse_x-origin_x;
+    float y_fix =mouse_y-offset_y;
+    float hw=TILE_WIDTH/2.0f;
+    float hh=TILE_HEIGHT/2.0f;
+    float fx=(x_fix/hw+y_fix/hh) / 2.0f;
+    float fy =(y_fix/hh-x_fix/hw) / 2.0f;
+    int x =(int)(fx-0.5f);
+    int y =(int)(fy-0.5f);
+    if (y>5) y+=1;
+    if(x>=0 && x<PLAT_X && y>=0 && y<PLAT_Y) printf("x : %d\ny : %d\n", x,y);
+}
 
 int change_music(const char *filename)
 {
@@ -533,18 +548,18 @@ void show_graphique(Game game, int n_turns, int i,
     }
 
     // --- Tuiles isométriques ---
-    int tile_w = 64, tile_h = 40;
+
     int origin_x = SCREEN_W/2;
-    int offset_y = SCREEN_H/2 - tile_h*10;
+    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[y][x];
             if (id >= 0 && id < TILE_COUNT && game.map.images[id]) {
-                int iso_x = (x - y)*(tile_w/2) + origin_x;
-                int iso_y = (x + y)*(tile_h/2) + offset_y;
-                if (iso_x + tile_w > 0 && iso_x < SCREEN_W &&
-                    iso_y + tile_h > 0 && iso_y < SCREEN_H) {
+                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
+                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W &&
+                   iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[id],
                                 iso_x, iso_y);
                 }
@@ -754,6 +769,7 @@ void jouer_local_graphique(Game * game) {
                 show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
                 //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                 rest(10);
+                translation_to_iso(mouse_x, mouse_y);
             }
             //check_victory(game, &quit);
         }
