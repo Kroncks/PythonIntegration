@@ -530,13 +530,14 @@ void show_graphique(Game game, int n_turns, int i,
         }
     }
 
+    // --- Affichage bas-gauche via notre helper ---
+    barre_jeu(buffer, panneau_bas_gauche);
+
+
     // --- Curseur ---
     stretch_sprite(buffer, curseur,
                    mouse_x, mouse_y,
                    32, 32);
-
-    // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche);
 
     // --- Envoi à l'écran ---
     blit(buffer, screen,
