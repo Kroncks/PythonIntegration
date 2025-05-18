@@ -422,7 +422,8 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
                 map_path[i][j].y = -1;
             }
         }
-        printf("Debut can_move\n");
+        int len_path=0;
+        printf("\nDebut can_move\n");
         if (can_move(*game, *self, action_x, action_y,map_path,len_path)) {
             //Appel fct déplacement
             printf("debut deplacement\n");
