@@ -756,7 +756,7 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
     // clic sur la grille
     int x,y;
     if (mouse_b & 1) {
-        next(next);
+        next_cliqued(next);
         translation_to_iso(mouse_x, mouse_y, &x, &y);
         if (x != -1 && y != -1) {
             action(game, &game->players[i], *competence, x, y);
