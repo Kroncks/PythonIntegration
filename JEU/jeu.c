@@ -12,6 +12,8 @@ BITMAP* liste_avatar[12];
 BITMAP* liste_big_avatar[12];
 BITMAP* liste_story[12];
 
+int ANIMATION =0;
+
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
     game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
@@ -792,37 +794,67 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
+Coord prev[PLAT_Y][PLAT_X]; // pour reconstruire le chemin
 
-void dishtra(Game * game, int x, int y, int portee, int pas) {
-    pas += 1;
-    game->portee[y][x]=1;
-    if (pas > portee) return;
 
-    // haut
-    if (y-1 >= 0) {
-        if (game->plateau[y-1][x] == 0 && game->portee[y-1][x] == 0) {
-            dishtra(game, x, y-1, portee, pas);
-        }
-    }
-    // droite
-    if (x+1 < PLAT_X) {
-        if (game->plateau[y][x+1] == 0 && game->portee[y][x+1] == 0) {
-            dishtra(game, x+1, y, portee, pas);
-        }
-    }
-    // bas
-    if (y+1 < PLAT_Y) {
-        if (game->plateau[y+1][x] == 0 && game->portee[y+1][x] == 0) {
-            dishtra(game, x, y+1, portee, pas );
-        }
-    }
-    // gauche
-    if (x-1 >= 0) {
-        if (game->plateau[y][x-1] == 0 && game->portee[y][x-1] == 0) {
-            dishtra(game, x-1, y, portee, pas);
+void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
+    typedef struct {
+        int x, y, dist;
+    } Node;
+
+    Node queue[PLAT_X * PLAT_Y];
+    int front = 0, rear = 0;
+
+    game->portee[start_y][start_x] = 1;
+    game->prev[start_y][start_x].x = -1;
+    game->prev[start_y][start_x].y = -1;
+
+    queue[rear++] = (Node){start_x, start_y, 0};
+
+    while (front < rear) {
+        Node curr = queue[front++];
+        if (curr.dist >= portee) continue;
+
+        int dx[4] = {1, -1, 0, 0};
+        int dy[4] = {0, 0, 1, -1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = curr.x + dx[i];
+            int ny = curr.y + dy[i];
+
+            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
+            if (game->plateau[ny][nx] != 0) continue;
+            if (game->portee[ny][nx]) continue;
+
+            game->portee[ny][nx] = 1;
+            game->prev[ny][nx].x = curr.x;
+            game->prev[ny][nx].y = curr.y;
+
+            queue[rear++] = (Node){nx, ny, curr.dist + 1};
         }
     }
 }
+
+// Stocke le chemin de (x, y) jusqu'au joueur dans path[], retourne sa taille
+int get_path(Game *game, int x, int y, Coord path[], int max_len) {
+    int len = 0;
+    while (x != -1 && y != -1 && len < max_len) {
+        path[len++] = (Coord){x, y};
+        Coord p = game->prev[y][x];
+        x = p.x;
+        y = p.y;
+    }
+
+    // Inverser le chemin pour aller du joueur vers la destination
+    for (int i = 0; i < len / 2; i++) {
+        Coord tmp = path[i];
+        path[i] = path[len - 1 - i];
+        path[len - 1 - i] = tmp;
+    }
+
+    return len;
+}
+
 
 void update_portee(Game * game, Perso player, int num_competence) {
     init_portee(game);

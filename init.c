@@ -105,10 +105,12 @@ void init_player_classe( Perso * self) {
     self->p_attaque = self->classe.mana*10;
 }
 
-void init_portee(Game * game) {
-    for (int i=0;i<PLAT_X;i++) {
-        for (int j=0;j<PLAT_Y;j++) {
+void init_portee(Game *game) {
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
             game->portee[i][j] = 0;
+            game->prev[i][j].x = -1;
+            game->prev[i][j].y = -1;
         }
     }
 }

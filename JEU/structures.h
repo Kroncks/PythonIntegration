@@ -76,8 +76,15 @@ typedef struct {
 } Client;
 
 typedef struct {
+    int x, y;
+} Coord;
+
+
+
+typedef struct {
     int plateau[PLAT_X][PLAT_Y];
     int portee[PLAT_X][PLAT_Y];
+    Coord prev[PLAT_X][PLAT_Y];
     Perso players[4];
     Client client;
     Map map;
