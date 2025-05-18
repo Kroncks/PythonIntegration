@@ -444,13 +444,32 @@ void menu_selection_personnages(int num, Perso * self) {
     clear_keybuf();
 }
 
-
-
-
-
-
-
-
+void menu_fin() {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Background/2.bmp", NULL);
+    if (!fond) {
+        allegro_message("Erreur lors du chargement de l'arrière-plan !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* next_button = charger_et_traiter_image(
+        "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
+        651*0.5, 342*0.5
+    );
+    int next = 0;
+    while (next = 0) {
+        bouton_next(buffer, next_button);
+        next_cliqued(&next);
+    }
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    destroy_bitmap(buffer);
+    destroy_bitmap(fond);
+    clear_keybuf();
+}
 
 void menu_waiting() {
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
