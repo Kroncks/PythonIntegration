@@ -18,5 +18,7 @@ void init_nb_players();
 void jouer_local_graphique(Game * game);
 void jouer_graphique(socket_t sock, Game * game, int num);
 static void barre_joueur(BITMAP* buffer, BITMAP* icon);
+int get_path(Game *game, int x, int y, Coord path[], int max_len) ;
+void dishtra(Game *game, int start_x, int start_y, int portee, int pas);
 
 #endif //JEU_H
