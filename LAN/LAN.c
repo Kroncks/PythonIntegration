@@ -131,7 +131,7 @@ void client(char *username, Perso self) {
     wait_start(sock);
     init_game(sock, &game, server_response[3]-48, self);
     jouer_graphique(sock, &game, server_response[3]-48);
-
+    menu_fin(&game);
     socket_close(sock);
     network_cleanup();
 }
@@ -196,4 +196,5 @@ void local(Perso * liste) {
     Game game;
     init_local_game(&game, liste);
     jouer_local_graphique(&game);
+    menu_fin(&game);
 }

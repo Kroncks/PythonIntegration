@@ -1380,7 +1380,6 @@ void jouer_local_graphique(Game * game) {
             if (quit) break;
         }
     }
-    menu_fin();
     destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);

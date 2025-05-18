@@ -444,20 +444,29 @@ void menu_selection_personnages(int num, Perso * self) {
     clear_keybuf();
 }
 
-void menu_fin() {
+void menu_fin(Game * game) {
+    if (game->nb_morts != NB_JOUEURS) return;
     change_music("../Projet/Musiques/The-Champion_s-Glow1.wav");
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Background/2.bmp", NULL);
+    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Background/22.bmp", NULL);
     if (!fond) {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
 
     stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+
+    draw_sprite(buffer, liste_big_avatar[game->poduim[game->nb_morts-1].avatar[0]-'a'], SCREEN_W/2 - liste_big_avatar[game->poduim[game->nb_morts-1].avatar[0]-'a']->w/2, 9*SCREEN_H/20 - liste_big_avatar[game->poduim[game->nb_morts-1].avatar[0]-'a']->h/2);
+    draw_sprite(buffer, game->poduim[game->nb_morts-2].classe.sprite[8], 7*SCREEN_W/20 - game->poduim[game->nb_morts-2].classe.sprite[8]->w/2, 57*SCREEN_H/80 - game->poduim[game->nb_morts-2].classe.sprite[8]->h);
+
+    if (NB_JOUEURS == 4 )
+        draw_sprite(buffer, game->poduim[game->nb_morts-3].classe.sprite[8], 13*SCREEN_W/20 - game->poduim[game->nb_morts-3].classe.sprite[8]->w/2, 119*SCREEN_H/160 - game->poduim[game->nb_morts-3].classe.sprite[8]->h);
+
+
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     int next = 0;
