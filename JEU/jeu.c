@@ -373,10 +373,17 @@ void translation_to_iso(int mouse_x, int mouse_y, int*x,int* y) {
     float hh=TILE_HEIGHT/2.0f;
     float fx=(x_fix/hw+y_fix/hh) / 2.0f;
     float fy =(y_fix/hh-x_fix/hw) / 2.0f;
-    *x =(int)(fx-0.5f);
-    *y =(int)(fy-0.5f);
-    if (*y>5) y+=1;
-    if(*x>=0 && *x<PLAT_X && *y>=0 && *y<PLAT_Y) printf("x : %d\ny : %d\n", *x,*y);
+    int x_temp =(int)(fx-0.5f);
+    int y_temp =(int)(fy-0.5f);
+    if (y_temp>5) y+=1;
+    if(x_temp>=0 && x_temp<PLAT_X && y_temp>=0 && y_temp<PLAT_Y) {
+        *x = x_temp;
+        *y = y_temp;
+        printf("x : %d\ny : %d\n", *x,*y);
+    }else {
+        *y=-1;
+        *x=-1;
+    }
 }
 
 int change_music(const char *filename)
