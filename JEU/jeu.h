@@ -5,6 +5,7 @@
 #include "../LAN/LAN.h"
 #include "structures.h"
 #include "../GRAPHISMES/bouttons.h"
+#include "../init.h"
 
 int NB_JOUEURS;
 

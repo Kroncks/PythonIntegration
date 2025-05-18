@@ -720,14 +720,7 @@ void dessiner_losange(BITMAP* buffer, int cx, int cy, int w, int h, int fill_col
 }
 
 void afficher_portee(BITMAP * buffer,Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
-    Node map_path[PLAT_Y][PLAT_X];
-    for (int i = 0; i < PLAT_Y; i++) {
-        for (int j = 0; j < PLAT_X; j++) {
-            map_path[i][j].x = -1;
-            map_path[i][j].y = -1;
-        }
-    }
-    if (can_move(game, joueur, x,y,map_path, joueur.pm_restant)) {
+    if (game.portee[x][y]==1) {
         dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
     }
 }
@@ -759,20 +752,21 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-int detection_competence () {
-
+void detection_competence (Game * game,int * num_competence) {
     const int pad = 10;
     int x = mouse_x-pad;
     int y = mouse_y-pad-SCREEN_H-(int)(442*0.7);
-    int num_competence = 0;
-    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return 0;
-    if (x < 400*0.7 && x > 280*0.7) num_competence = 1;
-    if (x < 530*0.7 && x > 410*0.7) num_competence = 2;
-    if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
-    if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
-    if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
-    printf("num_competence = %d\n", num_competence);
-    return num_competence;
+    int buff = *num_competence;
+    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return;
+    if (x < 400*0.7 && x > 280*0.7) *num_competence = 1;
+    if (x < 530*0.7 && x > 410*0.7) *num_competence = 2;
+    if (x < 660*0.7 && x > 545*0.7) *num_competence = 3;
+    if (x < 800*0.7 && x > 675*0.7) *num_competence = 4;
+    if (x < 985*0.7 && x > 810*0.7) *num_competence = 5;
+
+    if (*num_competence != buff) { // nouvelle competence
+        // update portee
+    }
 }
 void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
 {
@@ -877,7 +871,7 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
             action(game, &game->players[i], *competence, x, y, i);
         } else {
 
-        *competence = detection_competence();
+        detection_competence(game, competence);
         }
     }
 
@@ -992,6 +986,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
             selected_competence=-1;
+            init_portee(game);
             if (num == i) {
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence); // affiche l'ecrant de jeu
@@ -1106,6 +1101,7 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             selected_competence=-1;
             next = 0;
+            init_portee(game);
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
                 tour_graphique(game, i,&selected_competence, &next, &quit); // verifie les actions du joueur et joue joue

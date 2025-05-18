@@ -11,5 +11,6 @@
 
 
 void init_player_classe( Perso * self);
+void init_portee(Game * game);
 
 #endif //INIT_H
