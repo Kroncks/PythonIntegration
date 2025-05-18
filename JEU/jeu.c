@@ -830,21 +830,21 @@ void update_portee(Game * game, Perso player, int num_competence) {
 
     printf("portee : %d\n", portee);
 
-    int x = player.x;
-    int y = player.y;
+    int x = player.y;
+    int y = player.x;
     int pas =0;
     dishtra(game, x, y, portee, pas);
 
 
-    for (int i = 0; i < PLAT_Y; i++) {
-        for (int j = 0; j < PLAT_X; j++) {
+    for (int i = 0; i < PLAT_X; i++) {
+        for (int j = 0; j < PLAT_Y; j++) {
             printf("%d  ", game->portee[i][j]);
         }
         printf("\n");
     }
     printf("\n");
-    for (int i = 0; i < PLAT_Y; i++) {
-        for (int j = 0; j < PLAT_X; j++) {
+    for (int i = 0; i < PLAT_X; i++) {
+        for (int j = 0; j < PLAT_Y; j++) {
             printf("%d  ", game->plateau[i][j]);
         }
         printf("\n");
