@@ -1372,8 +1372,11 @@ void jouer_local_graphique(Game * game) {
 
                 rest(10);
             }
-            // ----- Fin du chronométrage du tour -----
-            if (game->nb_morts==NB_JOUEURS-1) quit =1;
+            if (game->nb_morts==NB_JOUEURS-1) {
+                quit =1;
+                game->poduim[game->nb_morts]= game->players[i];
+                game->nb_morts++;
+            }
             if (quit) break;
         }
     }
