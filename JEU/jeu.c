@@ -958,7 +958,7 @@ void jouer_local_graphique(Game * game) {
             selected_competence=-1;
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
-                tour_graphique(game, i,selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
+                tour_graphique(game, i,&selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
             //check_victory(game, &quit);
