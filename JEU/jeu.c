@@ -475,8 +475,7 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon)
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i,
-                    BITMAP* buffer, BITMAP* curseur)
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur)
 {
     // --- IMPORT de l'image (chargée une seule fois) ---
     static BITMAP* panneau_bas_gauche = NULL;
@@ -494,7 +493,7 @@ void show_graphique(Game game, int n_turns, int i,
         }
     }
 
-    // --- Fond isométrique ---
+    // --- Fond ---
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
                      0, 0,
@@ -544,6 +543,20 @@ void show_graphique(Game game, int n_turns, int i,
          0, 0,   // src x,y
          0, 0,   // dst x,y
          SCREEN_W, SCREEN_H);
+}
+
+void tour_graphique(Game * game, int i, int * next, int * quit ) {
+    if (keypressed()) {
+        int keycode = readkey();
+        int k = keycode >> 8;
+        char ch = keycode & 0xFF;
+        if (k == KEY_ESC) {
+            *next = 1;
+            *quit = 1;
+            change_music("../Projet/Musiques/Menus.wav");
+            return;
+        }
+    }
 }
 
 void jouer(socket_t sock, Game * game, int num) {
@@ -730,11 +743,12 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
-                //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+                tour_graphique(game, i, &next, &quit ); // verifie les actions du joueur et joue joue
                 rest(10);
                 translation_to_iso(mouse_x, mouse_y);
             }
             //check_victory(game, &quit);
+            if (quit) break;
         }
     }
     destroy_bitmap(buffer);
