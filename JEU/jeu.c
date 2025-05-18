@@ -592,24 +592,8 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon)
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur, int selected_competence)
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
 {
-    // --- IMPORT de l'image (chargée une seule fois) ---
-    static BITMAP* panneau_bas_gauche = NULL;
-    if (!panneau_bas_gauche) {
-        panneau_bas_gauche = charger_et_traiter_image(
-            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1024*0.7,459*0.7
-        );
-        if (!panneau_bas_gauche) {
-            allegro_message(
-              "Erreur : impossible de charger "
-              "1.bmp"
-            );
-            exit(EXIT_FAILURE);
-        }
-    }
-
     // --- Fond ---
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
@@ -638,8 +622,6 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    printf("case (%d,%d) : %d \n", x, y, id-TILE_COUNT);
-                    if (game.players[id-TILE_COUNT].classe.sprite[0]==NULL) printf("classe : NULL\n");
                     draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
                 }
             }
@@ -751,6 +733,10 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     stretch_blit(curseur, curseur_redimensionne, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
     curseur = curseur_redimensionne;
 
+    BITMAP* panneau_bas_gauche = charger_et_traiter_image(
+            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+            1024*0.7,459*0.7
+        );
 
 
     // ===
@@ -767,7 +753,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             selected_competence=-1;
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
                 }
@@ -775,14 +761,15 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
             }
         }
     }
+    destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);
     clear_keybuf();
@@ -850,6 +837,11 @@ void jouer_local_graphique(Game * game) {
 
     // Dimensions désirées du curseur (ex : 32x32)
 
+    BITMAP* panneau_bas_gauche = charger_et_traiter_image(
+            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+            1024*0.7,459*0.7
+        );
+
 
     // Redimensionner le curseur
     BITMAP* curseur_redimensionne = create_bitmap(32, 32);
@@ -868,7 +860,7 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             selected_competence=-1;
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
                 tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
@@ -876,6 +868,7 @@ void jouer_local_graphique(Game * game) {
             if (quit) break;
         }
     }
+    destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);
     clear_keybuf();
