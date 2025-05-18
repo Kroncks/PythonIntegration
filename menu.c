@@ -445,6 +445,7 @@ void menu_selection_personnages(int num, Perso * self) {
 }
 
 void menu_fin() {
+    change_music("../Projet/Musiques/The-Champion_s-Glow1.wav");
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
@@ -460,11 +461,18 @@ void menu_fin() {
         651*0.5, 342*0.5
     );
 
-
     int next = 0;
     while (next == 0) {
-        bouton_next(buffer, next_button);
-        next_cliqued(&next);
+        // clavier
+        if (keypressed()) {
+            int keycode = readkey();
+            int k = keycode >> 8;
+            char ch = keycode & 0xFF;
+            if (k == KEY_ESC) {
+                next = 1;
+                change_music("../Projet/Musiques/Menus.wav");
+            }
+        }
     }
     stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);

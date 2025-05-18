@@ -23,5 +23,6 @@ int get_path(Game *game, int x, int y, Coord path[], int max_len) ;
 void dishtra(Game *game, int start_x, int start_y, int portee, int pas);
 void bouton_next(BITMAP* buffer, BITMAP* icon);
 void next_cliqued(int * next);
+int change_music(const char *filename);
 
 #endif //JEU_H
