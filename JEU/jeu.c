@@ -399,6 +399,7 @@ void deplacement(Game* game, Perso* self,
 }
 
 void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y, int num_joueur) {
+    if (num_competence<=0 || num_competence>5) return;
     printf("log action: %d, (%d,%d)", num_competence, action_x, action_y);
     if (num_competence == 5) {
         //Appel Can_move
@@ -411,7 +412,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
             }
         }
     }
-    printf("log action: %d, (%d,%d)", num_competence, action_x, action_y);
+
     if (num_competence == 5) {
         //Appel Can_move
         int len_path;
