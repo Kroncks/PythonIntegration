@@ -168,8 +168,8 @@ void attack(Perso* attaquant, Perso* defenseur, int idx) {
     // 5) Sinon on vérifie la portée et on calcule les dégâts
     int dx = abs(attaquant->x - defenseur->x);
     int dy = abs(attaquant->y - defenseur->y);
-    if (dx + dy > spell->portee)
-        return;
+    //if (dx + dy > spell->portee)
+        //return;
 
     // Dégâts de base + stat
     float total = (float)spell->degat;
@@ -473,6 +473,10 @@ void action(Game* game,
         int cible = found_player(*game, action_x, action_y);
         if (cible >= 0 && cible < NB_JOUEURS) {
             attack(self, &game->players[cible], idx);
+            printf("DEBUG: PV du joueur %d (cible) = %d\n",
+               cible,
+               game->players[cible].pv_actuels);
+            // **Nouvel appel** : vérifier et afficher la mort si PV ≤ 0
             // TODO : envoyer attaque over network
         }
     }
@@ -785,63 +789,35 @@ void show(Game game, int n_turns, int num) {
     printf("===========================================\n");
 }
 
-Coord prev[PLAT_Y][PLAT_X];
+void dishtra(Game * game, int x, int y, int portee, int pas) {
+    pas += 1;
+    game->portee[y][x]=1;
+    if (pas > portee) return;
 
-void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
-    typedef struct {
-        int x, y, dist;
-    } Node;
-
-    Node queue[PLAT_X * PLAT_Y];
-    int front = 0, rear = 0;
-
-    game->portee[start_y][start_x] = 1;
-    game->prev[start_y][start_x].x = -1;
-    game->prev[start_y][start_x].y = -1;
-
-    queue[rear++] = (Node){start_x, start_y, 0};
-
-    while (front < rear) {
-        Node curr = queue[front++];
-        if (curr.dist >= portee) continue;
-
-        int dx[4] = {1, -1, 0, 0};
-        int dy[4] = {0, 0, 1, -1};
-
-        for (int i = 0; i < 4; i++) {
-            int nx = curr.x + dx[i];
-            int ny = curr.y + dy[i];
-
-            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
-            if (game->plateau[ny][nx] != 0) continue;
-            if (game->portee[ny][nx]) continue;
-
-            game->portee[ny][nx] = 1;
-            game->prev[ny][nx].x = curr.x;
-            game->prev[ny][nx].y = curr.y;
-
-            queue[rear++] = (Node){nx, ny, curr.dist + 1};
+    // haut
+    if (y-1 >= 0) {
+        if (game->plateau[y-1][x] == 0 && game->portee[y-1][x] == 0) {
+            dishtra(game, x, y-1, portee, pas);
         }
     }
-}
-
-int get_path(Game *game, int x, int y, Coord path[], int max_len) {
-    int len = 0;
-    while (x != -1 && y != -1 && len < max_len) {
-        path[len++] = (Coord){x, y};
-        Coord p = game->prev[y][x];
-        x = p.x;
-        y = p.y;
+    // droite
+    if (x+1 < PLAT_X) {
+        if (game->plateau[y][x+1] == 0 && game->portee[y][x+1] == 0) {
+            dishtra(game, x+1, y, portee, pas);
+        }
     }
-
-    // Inverser le chemin pour aller du joueur vers la destination
-    for (int i = 0; i < len / 2; i++) {
-        Coord tmp = path[i];
-        path[i] = path[len - 1 - i];
-        path[len - 1 - i] = tmp;
+    // bas
+    if (y+1 < PLAT_Y) {
+        if (game->plateau[y+1][x] == 0 && game->portee[y+1][x] == 0) {
+            dishtra(game, x, y+1, portee, pas );
+        }
     }
-
-    return len;
+    // gauche
+    if (x-1 >= 0) {
+        if (game->plateau[y][x-1] == 0 && game->portee[y][x-1] == 0) {
+            dishtra(game, x-1, y, portee, pas);
+        }
+    }
 }
 
 void update_portee(Game * game, Perso player, int num_competence) {
@@ -916,9 +892,18 @@ void bouton_next(BITMAP* buffer, BITMAP* icon) {
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche,BITMAP* next_button,  int selected_competence)
+static BITMAP* sprite_mort = NULL;
+
+void show_graphique(Game game,
+                    int n_turns,
+                    int p_idx,             // index du joueur courant (pour l'UI)
+                    BITMAP* buffer,
+                    BITMAP* curseur,
+                    BITMAP* panneau_bas_gauche,
+                    BITMAP* next_button,
+                    int selected_competence)
 {
-    // --- Fond ---
+    // 1) Fond
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
                      0, 0,
@@ -927,48 +912,78 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
                      SCREEN_W, SCREEN_H);
     }
 
-    // --- Tuiles isométriques ---
-
-    int origin_x = SCREEN_W/2;
-    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
+    // 2) Tuiles isométriques & personnages
+    const int origin_x = SCREEN_W/2;
+    const int offset_y = SCREEN_H/2 - TILE_HEIGHT * PLAT_Y / 2;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[x][y];
-            if ( id < TILE_COUNT && game.map.images[id]) { // case vide
-                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
-                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
-                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
-                    draw_sprite(buffer, game.map.images[id],iso_x, iso_y);
-                    afficher_portee(buffer,game, game.players[i], x, y, iso_x,iso_y);
-                }
+            int iso_x = (x - y) * (TILE_WIDTH/2) + origin_x;
+            int iso_y = (x + y) * (TILE_HEIGHT/2) + offset_y;
+
+            // Si hors écran, on skip
+            if (iso_x + TILE_WIDTH <= 0 || iso_x >= SCREEN_W
+             || iso_y + TILE_HEIGHT <= 0 || iso_y >= SCREEN_H) {
+                continue;
+            }
+
+            if (id < TILE_COUNT) {
+                // Case vide
+                draw_sprite(buffer,
+                            game.map.images[id],
+                            iso_x,
+                            iso_y);
+                afficher_portee(buffer, game,
+                                game.players[p_idx],
+                                x, y,
+                                iso_x, iso_y);
             } else {
                 int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    afficher_portee(buffer,game, game.players[i], x, y, iso_x,iso_y);
+                    afficher_portee(buffer,game, game.players[p_idx], x, y, iso_x,iso_y);
                     draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
+                    }
+            }
+
+                for (int i=0; i<NB_JOUEURS;i++)
+                {
+                    Perso *pl = &game.players[i];
+
+                    if (pl->pv_actuels <= 0) {
+                        game.plateau[pl->x][pl->y] -= TILE_COUNT - i+1;
+
+                        draw_sprite(buffer,
+                                    sprite_mort,
+                                    iso_x,
+                                    iso_y - sprite_mort->h/2);
+                    }
                 }
+
             }
         }
-    }
 
-    // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
+
+    // 3) UI en bas à gauche
+    barre_jeu(buffer,
+              panneau_bas_gauche,
+              game.players[p_idx].classe,
+              selected_competence);
     show_selected_comp(buffer, selected_competence);
-    bouton_next(buffer,next_button);
+    bouton_next(buffer, next_button);
 
-
-    // --- Curseur ---
-    stretch_sprite(buffer, curseur,
+    // 4) Curseur
+    stretch_sprite(buffer,
+                   curseur,
                    mouse_x, mouse_y,
                    32, 32);
 
-    // --- Envoi à l'écran ---
+    // 5) Envoi à l'écran
     blit(buffer, screen,
-         0, 0,   // src x,y
-         0, 0,   // dst x,y
+         0, 0,
+         0, 0,
          SCREEN_W, SCREEN_H);
 }
 
@@ -1096,6 +1111,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
             1024*0.7,459*0.7
         );
+
+    if (!sprite_mort) {
+        sprite_mort = load_bitmap("../Projet/Graphismes/Animations/Mort/1.bmp", NULL);
+        if (!sprite_mort) {
+            allegro_message("Erreur : impossible de charger le sprite de mort !");
+            exit(EXIT_FAILURE);
+        }
+    }
 
 
     // ===
