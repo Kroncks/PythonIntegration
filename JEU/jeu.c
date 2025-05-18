@@ -1,5 +1,7 @@
 #include "jeu.h"
 
+#include "../globals.h"
+
 #define TILE_HEIGHT 40
 #define TILE_WIDTH 64
 #define NB_THEMES 4
@@ -17,6 +19,12 @@ void init_coord(Game * game) {
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
     game->theme = rand() % NB_THEMES;
+    game->plateau[0][0]= TILE_COUNT;
+    game->plateau[PLAT_Y-1][PLAT_X-1]= TILE_COUNT+1;
+    if (NB_JOUEURS == 4) {
+        game->plateau[PLAT_Y-1][0]= TILE_COUNT+2;
+        game->plateau[0][PLAT_X-1]= TILE_COUNT+3;
+    }
 }
 
 void init_plato(Game * game) {
@@ -595,8 +603,9 @@ void show_graphique(Game game, int n_turns, int i,
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    // afficher le joueur
-
+                    printf("case (%d,%d) : %d \n", x, y, id-TILE_COUNT);
+                    if (game.players[id-TILE_COUNT].classe.sprite[0]==NULL) printf("classe : NULL\n");
+                    draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y);
                 }
             }
         }

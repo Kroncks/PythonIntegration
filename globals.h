@@ -12,6 +12,4 @@ extern BITMAP* liste_story[12];
 extern t_classe classes_disponibles[12];
 extern int NB_JOUEURS;
 
-extern BITMAP* avatars[12][8];
-
 #endif
