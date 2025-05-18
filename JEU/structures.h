@@ -43,7 +43,7 @@ typedef struct {
     float r_eau;
     float r_feu;
     float r_terre;
-    BITMAP* sprite[8]; //4 sprites de déplacement et un de menu
+    BITMAP* sprite[9]; //4 sprites de déplacement et un de menu
 }t_classe;
 
 
