@@ -410,7 +410,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         printf("[GAME] buffer : %s\n",buffer);
         // envoyer le theme
 #ifdef WIN32
-        Sleep(0.2); // version windows
+        Sleep(200); // version windows
 #else
         sleep(0.2);
 #endif
