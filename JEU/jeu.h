@@ -6,6 +6,7 @@
 #include "structures.h"
 #include "../GRAPHISMES/bouttons.h"
 #include "../init.h"
+#include "../menu.h"
 
 int NB_JOUEURS;
 
