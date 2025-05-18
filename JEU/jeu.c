@@ -695,7 +695,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     }
 
     // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe.competences, selected_competence);
+    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
 
 
     // --- Curseur ---
