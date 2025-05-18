@@ -399,6 +399,12 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
         //Appel Can_move
         int len_path;
         Node map_path[PLAT_Y][PLAT_X];
+        for (int i = 0; i < PLAT_Y; i++) {
+            for (int j = 0; j < PLAT_X; j++) {
+                map_path[i][j].x = -1;
+                map_path[i][j].y = -1;
+            }
+        }
         printf("Debut can_move\n");
         if (Can_move(*game, *self, action_x, action_y,map_path,&len_path)) {
             //Appel fct déplacement
