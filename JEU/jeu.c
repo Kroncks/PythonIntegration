@@ -15,7 +15,7 @@ static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
 
 
-void init_tour(Game game) {
+void init_tour(Game * game) {
 
 }
 
