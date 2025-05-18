@@ -583,13 +583,15 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-static void barre_jeu(BITMAP* buffer, BITMAP* icon)
+static void barre_jeu(BITMAP* buffer, BITMAP* icon, t_competence competences[4], int selected_competence)
 {
     if (!icon) return;
     const int pad = 10;
     int x = pad;
     int y = SCREEN_H - icon->h - pad;
     draw_sprite(buffer, icon, x, y);
+
+    draw_sprite(buffer, competences[0].sprite[2] , x+210, y+80);
 }
 
 void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
@@ -629,7 +631,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     }
 
     // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche);
+    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe.competences, selected_competence);
 
 
     // --- Curseur ---
