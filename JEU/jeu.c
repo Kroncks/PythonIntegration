@@ -121,7 +121,7 @@ void attack_statut(Perso* self, int idx) {
 }
 
 
-void attack(Perso* attaquant, Perso* defenseur, int idx) {
+void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     // 0) Sécurité d'indice
     if (idx < 0 || idx >= 4) return;
 
@@ -199,6 +199,8 @@ void attack(Perso* attaquant, Perso* defenseur, int idx) {
     defenseur->pv_actuels -= dmg;
     if (defenseur->pv_actuels <= 0) {
         defenseur->pv_actuels = 0;
+        game->poduim[game->nb_morts] = defenseur;
+        game->nb_morts+=1;
     }
 }
 
@@ -522,7 +524,7 @@ void action(Game* game,
         // trouver l’indice du joueur ciblé
         int cible = found_player(*game, action_x, action_y);
         if (cible >= 0 && cible < NB_JOUEURS) {
-            attack(self, &game->players[cible], idx);
+            attack(game, self, &game->players[cible], idx);
             printf("DEBUG: PV du joueur %d (cible) = %d\n",
                cible,
                game->players[cible].pv_actuels);

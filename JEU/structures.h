@@ -86,7 +86,7 @@ typedef struct {
     int portee[PLAT_X][PLAT_Y];
     Coord prev[PLAT_X][PLAT_Y];
     Perso players[4];
-    int poduim[4];
+    Perso poduim[4];
     int nb_morts;
     Client client;
     Map map;
