@@ -86,68 +86,92 @@ void viderBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void attack_statut(Perso* self, int num_competence) {
-    //Competences de protection
-    if (strcmp(self->classe.competences[num_competence].nom_competence, "Mur de lianes")==0 ||
-        strcmp(self->classe.competences[num_competence].nom_competence, "Bulle d'eau")==0)
-        {
+void attack_statut(Perso* self, int idx) {
+    // Sécurité : idx dans [0..3]
+    if (idx < 0 || idx >= 4) return;
+
+    const char* nom = self->classe.competences[idx].nom_competence;
+
+    // Compétences de protection
+    if (strcmp(nom, "Mur de lianes") == 0 ||
+        strcmp(nom, "Bulle d'eau") == 0) {
         self->protection = true;
-    }
-    //Competences de soin
-    if (strcmp(self->classe.competences[num_competence].nom_competence, "Aromatherapie")==0 ||
-        strcmp(self->classe.competences[num_competence].nom_competence, "Recolte")==0 ||
-        strcmp(self->classe.competences[num_competence].nom_competence, "Eau de vie")==0)
-        {
-        int soin=0;
-        soin = self->classe.competences[num_competence].degat*self->classe.foi;
+        return;
+        }
+
+    // Compétences de soin
+    if (strcmp(nom, "Aromatherapie") == 0 ||
+        strcmp(nom, "Recolte")       == 0 ||
+        strcmp(nom, "Eau de vie")    == 0) {
+        int soin = self->classe.competences[idx].degat * self->classe.foi;
         self->pv_actuels += soin;
-        if (self->pv_actuels > self->pv_actuels) self->pv_actuels = self->pv_actuels;
-    }
-    //Compétence de boost
-    if (strcmp(self->classe.competences[num_competence].nom_competence, "Rage")==0) {
-        self->boost_modifier = 1.5;
+        if (self->pv_actuels > self->classe.pv)
+            self->pv_actuels = self->classe.pv;
+        return;
+        }
+
+    // Compétence de boost
+    if (strcmp(nom, "Rage") == 0) {
+        self->boost_modifier = 1.5f;
     }
 }
 
 
+void attack(Perso* attaquant, Perso* defenseur, int idx) {
+    // 0) Sécurité d'indice
+    if (idx < 0 || idx >= 4) return;
 
-void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
-    // 1) Vérification du coût en mana/PA
-    t_competence *spell = &attaquant->classe.competences[num_competence];
+    t_competence *spell = &attaquant->classe.competences[idx];
+
+    // 0.1) Empêcher les sorts de statut sur une autre cible
+    if (spell->type_stat == 'N' && defenseur != attaquant)
+        return;
+
+    // 0.2) Empêcher les attaques de dégâts sur soi (déjà en place)
+    if (spell->type_stat != 'N' && defenseur == attaquant)
+        return;
+
+    // 1) Vérif coût PA
     if (attaquant->p_attaque < spell->p_attaque)
         return;
 
-    // 2) Calcul des coordonnées écran isométriques du défenseur
-    const int origin_x = SCREEN_W / 2;
-    const int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
-    int iso_x = (defenseur->x - defenseur->y) * (TILE_WIDTH / 2) + origin_x;
-    int iso_y = (defenseur->x + defenseur->y) * (TILE_HEIGHT / 2) + offset_y;
+    // 2) Coordonnées écran isométriques de l’attaquant
+    const int origin_x = SCREEN_W/2;
+    const int offset_y = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
 
-    // 3) Affichage de l’animation de la compétence (3 frames)
-    for (int f = 0; f < 3; f++) {
-        // On dessine directement sur l’écran.
-        // Si vous avez un back‐buffer nommé 'buffer', remplacez 'screen' par 'buffer'
-        draw_sprite(screen,
-                    spell->sprite[f],
-                    iso_x,
-                    iso_y - spell->sprite[f]->h / 2  // décalage pour que l’anim "flotte" au‐dessus
-        );
-        rest(100);  // 100 ms entre chaque frame
-    }
-
-    // 4) Si c’est un sort de statut (type_stat == 'N'), on applique juste l’effet
+    // --- Sort de statut : animation sur soi ---
     if (spell->type_stat == 'N') {
-        attack_statut(attaquant, num_competence);
+        int atk_x = (attaquant->x - attaquant->y)*(TILE_WIDTH/2) + origin_x;
+        int atk_y = (attaquant->x + attaquant->y)*(TILE_HEIGHT/2) + offset_y;
+        for (int f = 0; f < 3; f++) {
+            draw_sprite(screen,
+                        spell->sprite[f],
+                        atk_x,
+                        atk_y - spell->sprite[f]->h/2);
+            rest(100);
+        }
+        attack_statut(attaquant, idx);
         return;
     }
 
-    // 5) Sinon on vérifie la portée et on calcule les dégâts
+    // --- Attaque classique : animation sur la cible ---
+    int iso_x = (defenseur->x - defenseur->y)*(TILE_WIDTH/2) + origin_x;
+    int iso_y = (defenseur->x + defenseur->y)*(TILE_HEIGHT/2) + offset_y;
+    for (int f = 0; f < 3; f++) {
+        draw_sprite(screen,
+                    spell->sprite[f],
+                    iso_x,
+                    iso_y - spell->sprite[f]->h/2);
+        rest(100);
+    }
+
+    // 3) Vérif portée
     int dx = abs(attaquant->x - defenseur->x);
     int dy = abs(attaquant->y - defenseur->y);
     if (dx + dy > spell->portee)
         return;
 
-    // Dégâts de base + stat
+    // 4) Calcul dégâts
     float total = (float)spell->degat;
     switch (spell->type_stat) {
         case 'F': total += attaquant->classe.foi;         break;
@@ -155,7 +179,6 @@ void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
         case 'I': total += attaquant->classe.intelligence;break;
         case 'D': total += attaquant->classe.dexterite;   break;
     }
-    // Application de la résistance de l’adversaire
     switch (spell->type_degat) {
         case 'C': total *= defenseur->classe.r_contandant; break;
         case 'T': total *= defenseur->classe.r_tranchant;  break;
@@ -167,9 +190,9 @@ void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
     total *= attaquant->boost_modifier;
     int dmg = (int)total;
 
-    // 6) On consomme les PA et on inflige les PV
-    attaquant->p_attaque -= spell->p_attaque;
-    defenseur->pv_actuels   -= dmg;
+    // 5) Consommation PA et application dégâts
+    attaquant->p_attaque  -= spell->p_attaque;
+    defenseur->pv_actuels -= dmg;
 }
 
 int found_player(Game game, int x, int y) {
@@ -398,41 +421,53 @@ void deplacement(Game* game, Perso* self,
     if (buffer != screen) destroy_bitmap(buffer);
 }
 
-void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y, int num_joueur) {
-    if (num_competence<=0 || num_competence>5) return;
-    printf("log action: %d, (%d,%d)", num_competence, action_x, action_y);
-    if (num_competence == 5) {
-        //Appel Can_move
-        int len_path;
-        Node map_path[PLAT_Y][PLAT_X];
-        for (int i = 0; i < PLAT_Y; i++) {
-            for (int j = 0; j < PLAT_X; j++) {
-                map_path[i][j].x = -1;
-                map_path[i][j].y = -1;
-            }
-        }
-    }
+void action(Game* game,
+            Perso* self,
+            const int num_competence,   // 1-based: 1–4 = sorts, 5 = déplacement
+            const int action_x,
+            const int action_y,
+            int num_joueur)
+{
+    // Valider num_competence
+    if (num_competence < 1 || num_competence > 5)
+        return;
+
+    printf("log action: compétence %d, cible (%d,%d)\n",
+           num_competence, action_x, action_y);
 
     if (num_competence == 5) {
-        //Appel Can_move
+        // déplacement
         int len_path;
         Node map_path[PLAT_Y][PLAT_X];
+        // initialiser map_path à -1
         for (int i = 0; i < PLAT_Y; i++) {
             for (int j = 0; j < PLAT_X; j++) {
                 map_path[i][j].x = -1;
                 map_path[i][j].y = -1;
             }
         }
-        printf("Debut can_move\n");
-        if (can_move(*game, *self, action_x, action_y,map_path,len_path)) {
-            //Appel fct déplacement
-            printf("debut deplacement\n");
-            deplacement(game, self, action_x, action_y, map_path, len_path, num_joueur);
-                //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
+
+        printf("Début can_move\n");
+        if (can_move(*game, *self, action_x, action_y,
+                     map_path, len_path))
+        {
+            printf("Début deplacement\n");
+            deplacement(game, self,
+                        action_x, action_y,
+                        map_path, len_path,
+                        num_joueur);
+            // TODO : envoyer déplacement over network
         }
     }
     else {
-        attack(self,&game->players[found_player(*game,action_x,action_y)],num_competence);
+        // attaque ou sort : convertir 1-based → 0-based
+        int idx = num_competence - 1;
+        // trouver l’indice du joueur ciblé
+        int cible = found_player(*game, action_x, action_y);
+        if (cible >= 0 && cible < NB_JOUEURS) {
+            attack(self, &game->players[cible], idx);
+            // TODO : envoyer attaque over network
+        }
     }
 }
 
