@@ -165,13 +165,13 @@ void attack(Perso* attaquant, Perso* defenseur, int idx) {
         rest(100);
     }
 
-    // 3) Vérif portée
+    // 5) Sinon on vérifie la portée et on calcule les dégâts
     int dx = abs(attaquant->x - defenseur->x);
     int dy = abs(attaquant->y - defenseur->y);
     if (dx + dy > spell->portee)
         return;
 
-    // 4) Calcul dégâts
+    // Dégâts de base + stat
     float total = (float)spell->degat;
     switch (spell->type_stat) {
         case 'F': total += attaquant->classe.foi;         break;
@@ -823,6 +823,22 @@ void update_portee(Game * game, Perso player, int num_competence) {
     int y = player.y;
     int pas =0;
     dishtra(game, x, y, portee, pas);
+
+
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
+            printf("%d  ", game->portee[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
+            printf("%d  ", game->plateau[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
 }
 
 void detection_competence (Game * game, Perso player,int * num_competence) {
@@ -883,7 +899,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
-            int id = game.plateau[y][x];
+            int id = game.plateau[x][y];
             if ( id < TILE_COUNT && game.map.images[id]) { // case vide
                 int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
