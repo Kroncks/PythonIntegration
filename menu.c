@@ -456,10 +456,9 @@ void menu_fin() {
         allegro_message("Erreur lors du chargement de l'arrière-plan !");
         exit(EXIT_FAILURE);
     }
-    BITMAP* next_button = charger_et_traiter_image(
-        "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
-        651*0.5, 342*0.5
-    );
+
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     int next = 0;
     while (next == 0) {
@@ -474,8 +473,7 @@ void menu_fin() {
             }
         }
     }
-    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
     destroy_bitmap(buffer);
     destroy_bitmap(fond);
     clear_keybuf();
