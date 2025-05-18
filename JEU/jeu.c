@@ -11,7 +11,6 @@ SAMPLE* musique;
 BITMAP* liste_avatar[12];
 BITMAP* liste_big_avatar[12];
 BITMAP* liste_story[12];
-t_classe classes_disponibles[12];
 
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
