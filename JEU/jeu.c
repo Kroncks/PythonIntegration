@@ -114,6 +114,8 @@ void attack_statut(Perso* self, int idx) {
     if (strcmp(nom, "Rage") == 0) {
         self->boost_modifier = 1.5f;
     }
+    self->p_attaque -= self->classe.competences[idx].p_attaque;
+    return;
 }
 
 
@@ -193,6 +195,8 @@ void attack(Perso* attaquant, Perso* defenseur, int idx) {
     // 5) Consommation PA et application dégâts
     attaquant->p_attaque  -= spell->p_attaque;
     defenseur->pv_actuels -= dmg;
+    if (defenseur->pv_actuels <= 0) {
+        defenseur->pv_actuels = 0;}
 }
 
 int found_player(Game game, int x, int y) {
