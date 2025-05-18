@@ -199,7 +199,7 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     defenseur->pv_actuels -= dmg;
     if (defenseur->pv_actuels <= 0) {
         defenseur->pv_actuels = 0;
-        game->poduim[game->nb_morts] = defenseur;
+        game->poduim[game->nb_morts] = *defenseur;
         game->nb_morts+=1;
     }
 }
