@@ -193,6 +193,8 @@ void attack(Perso* attaquant, Perso* defenseur, int idx) {
     // 5) Consommation PA et application dégâts
     attaquant->p_attaque  -= spell->p_attaque;
     defenseur->pv_actuels -= dmg;
+    if (defenseur->pv_actuels <= 0) {
+        defenseur->pv_actuels = 0;}
 }
 
 int found_player(Game game, int x, int y) {
