@@ -742,10 +742,21 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
          SCREEN_W, SCREEN_H);
 }
 
+void next(int * next) {
+    const int pad = 10;
+    int x = SCREEN_W - 651*0.5 - pad;
+    int y = SCREEN_H - 342*0.5 - pad;
+
+    if (mouse_x > x && mouse_x < x+651*0.5 && mouse_y > y && mouse_y < y+342*0.5) {
+        *next = 1;
+    }
+}
+
 void tour_graphique(Game * game, int i, int * competence,  int * next, int * quit ) {
     // clic sur la grille
     int x,y;
     if (mouse_b & 1) {
+        next(next);
         translation_to_iso(mouse_x, mouse_y, &x, &y);
         if (x != -1 && y != -1) {
             action(game, &game->players[i], *competence, x, y);
