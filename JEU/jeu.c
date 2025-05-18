@@ -154,7 +154,7 @@ int found_player(Game game, int x, int y) {
 }
 
 bool est_case_valide_BFS(int x, int y, int map[PLAT_Y][PLAT_X]) {
-    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 1;
+    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 0;
 }
 
 bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur, Node map_path[PLAT_Y][PLAT_X], int* len_path) {
@@ -168,7 +168,7 @@ bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, in
     // Marquer obstacles
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
-            if (game.plateau[y][x] != 1)
+            if (game.plateau[y][x] != 0)
                 visited[y][x] = -1;
         }
     }
@@ -586,7 +586,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         printf("[GAME] buffer : %s\n",buffer);
         // envoyer le theme
 #ifdef WIN32
-        Sleep(0.2); // version windows
+        Sleep(200); // version windows
 #else
         sleep(0.2);
 #endif
@@ -651,24 +651,8 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon)
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur)
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
 {
-    // --- IMPORT de l'image (chargée une seule fois) ---
-    static BITMAP* panneau_bas_gauche = NULL;
-    if (!panneau_bas_gauche) {
-        panneau_bas_gauche = charger_et_traiter_image(
-            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1024*0.7,459*0.7
-        );
-        if (!panneau_bas_gauche) {
-            allegro_message(
-              "Erreur : impossible de charger "
-              "1.bmp"
-            );
-            exit(EXIT_FAILURE);
-        }
-    }
-
     // --- Fond ---
     if (game.map.background) {
         stretch_blit(game.map.background, buffer,
@@ -697,8 +681,6 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    printf("case (%d,%d) : %d \n", x, y, id-TILE_COUNT);
-                    if (game.players[id-TILE_COUNT].classe.sprite[0]==NULL) printf("classe : NULL\n");
                     draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
                 }
             }
@@ -810,6 +792,10 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     stretch_blit(curseur, curseur_redimensionne, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
     curseur = curseur_redimensionne;
 
+    BITMAP* panneau_bas_gauche = charger_et_traiter_image(
+            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+            1024*0.7,459*0.7
+        );
 
 
     // ===
@@ -818,13 +804,15 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     int quit = 0;
     int n_turns = 0;
     int next = 0;
+    int selected_competence=-1;
     show(*game, 0, num); // log
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
+            selected_competence=-1;
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
                 }
@@ -832,14 +820,15 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
             }
         }
     }
+    destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);
     clear_keybuf();
@@ -907,6 +896,11 @@ void jouer_local_graphique(Game * game) {
 
     // Dimensions désirées du curseur (ex : 32x32)
 
+    BITMAP* panneau_bas_gauche = charger_et_traiter_image(
+            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+            1024*0.7,459*0.7
+        );
+
 
     // Redimensionner le curseur
     BITMAP* curseur_redimensionne = create_bitmap(32, 32);
@@ -919,18 +913,21 @@ void jouer_local_graphique(Game * game) {
     int quit = 0;
     int next = 0;
     int n_turns = 0;
+    int selected_competence=-1;
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
+            selected_competence=-1;
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
-                tour_graphique(game, i, &next, &quit ); // verifie les actions du joueur et joue joue
+                show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
+                tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
             //check_victory(game, &quit);
             if (quit) break;
         }
     }
+    destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);
     clear_keybuf();
