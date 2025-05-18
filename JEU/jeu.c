@@ -749,6 +749,7 @@ void next_cliqued(int * next) {
 
     if (mouse_x > x && mouse_x < x+651*0.5 && mouse_y > y && mouse_y < y+342*0.5) {
         *next = 1;
+        printf("next\n");
     }
 }
 
@@ -989,6 +990,7 @@ void jouer_local_graphique(Game * game) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
             selected_competence=-1;
+            next = 0;
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
                 tour_graphique(game, i,&selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
