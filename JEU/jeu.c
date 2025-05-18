@@ -642,7 +642,7 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-static void barre_jeu(BITMAP* buffer, BITMAP* icon, t_competence competences[4], int selected_competence)
+void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
 {
     if (!icon) return;
     const int pad = 10;
@@ -650,7 +650,12 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon, t_competence competences[4],
     int y = SCREEN_H - icon->h - pad;
     draw_sprite(buffer, icon, x, y);
 
-    draw_sprite(buffer, competences[0].sprite[2] , x+205, y+80);
+    draw_sprite(buffer, classe.competences[0].sprite[2] , x+205, y+80);
+    draw_sprite(buffer, classe.competences[1].sprite[2] , x+298, y+80);
+    draw_sprite(buffer, classe.competences[2].sprite[2] , x+392, y+80);
+    draw_sprite(buffer, classe.competences[3].sprite[2] , x+485, y+80);
+
+    draw_sprite(buffer, classe.sprite[8] , x+50, y+50);
 }
 
 void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
@@ -690,7 +695,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     }
 
     // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe.competences, selected_competence);
+    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
 
 
     // --- Curseur ---
@@ -796,7 +801,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
             "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1024*0.7,459*0.7
+            1016*0.7,442*0.7
         );
 
 
