@@ -3,12 +3,19 @@
 
 #define PLAT_X 20
 #define PLAT_Y 20
-
+#define MAX_NODE PLAT_X*PLAT_Y
 #include <math.h>
 #include <allegro.h>
 #include <string.h>
 #include <stdbool.h>
 #define TILE_COUNT 3
+
+typedef struct {
+    int x;
+    int y;
+    int precedent_x;
+    int precedent_y;
+}Node;
 
 typedef struct {
     char* nom_competence;
