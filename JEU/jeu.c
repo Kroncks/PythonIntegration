@@ -13,19 +13,17 @@ BITMAP* liste_big_avatar[12];
 BITMAP* liste_story[12];
 static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
-/*
+
+
 void init_tour(Game *game) {
     // Recharge pour chaque joueur :
     //  - points d'attaque = mana * 10
     //  - points de mouvement = endurance
     for (int i = 0; i < NB_JOUEURS; i++) {
-        Perso *p = &game->players[i];
-        // mana et endurance sont dans p->classe
-        p->p_attaque  = p->classe.mana * 10;
-        p->pm_restant = p->classe.endurance;
+        game->players[i].p_attaque  = game->players[i].classe.mana * 10;
+        game->players[i].pm_restant = game->players[i].classe.endurance;
     }
 }
-*/
 
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
@@ -1261,7 +1259,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             n_turns++;
             selected_competence=-1;
             init_portee(game);
-            //init_tour(game);
+            init_tour(game);
             time_t turn_start = time(NULL);
             if (num == i) {
                 while (!next) {
@@ -1355,7 +1353,7 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             selected_competence = -1;
             next = 0;
-            //init_tour(game);
+            init_tour(game);
             init_portee(game);
             if (game->players[i].pv_actuels == 0) next = 1;
             // ----- Début du chronométrage du tour -----
