@@ -650,7 +650,7 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-int detection_competence (int mouse_x, int mouse_y, int hauteur_icone) {
+int detection_competence (int hauteur_icone) {
     int x,y;
     const int pad = 10;
     x = mouse_x-pad;
@@ -662,6 +662,7 @@ int detection_competence (int mouse_x, int mouse_y, int hauteur_icone) {
     if (x < 660 && x > 545) num_competence = 3;
     if (x < 800 && x > 675) num_competence = 4;
     if (x < 985 && x > 810) num_competence = 5;
+    printf("num_competence = %d\n", num_competence);
     return num_competence;
 }
 void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
@@ -732,13 +733,15 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
          SCREEN_W, SCREEN_H);
 }
 
-void tour_graphique(Game * game, int i, int competence,  int * next, int * quit ) {
+void tour_graphique(Game * game, int i, int * competence,  int * next, int * quit ) {
     // clic sur la grille
     int x,y;
     if (mouse_b & 1) {
         translation_to_iso(mouse_x, mouse_y, &x, &y);
         if (x != -1 && y != -1) {
-            action(game, &game->players[i], competence, x, y);
+            action(game, &game->players[i], *competence, x, y);
+        } else {
+            *competence = detection_competence(442*0.7);
         }
     }
 
