@@ -12,14 +12,20 @@ t_classe init_classe(int num_classe) {
     char filename[100];
     int temp;
     snprintf(filename, sizeof(filename),"../Projet/Fichiers textes/Classe/%d.txt", num_classe+1);
+    printf("%s\n",filename);
     FILE* p_fichier_classe = fopen(filename, "r");
+    if (p_fichier_classe == NULL) {
+        printf("Erreur lors du chargement du fichier de classe");
+        exit(EXIT_FAILURE);
+    }
 
     //chargement des tailles des noms competences de la classe
     for (int j=0; j<4;j++) {
         fscanf(p_fichier_classe,"%d", &lenght_nom[j]);
     }
+    printf("Taille des noms chargées\n");
 
-
+    fscanf(p_fichier_classe,"\n");
     //Chargement des données de la classe
     fscanf(p_fichier_classe,"%d", &classe.pv);
     fscanf(p_fichier_classe,"%d", &classe.mana);
@@ -28,7 +34,8 @@ t_classe init_classe(int num_classe) {
     fscanf(p_fichier_classe,"%d", &classe.dexterite);
     fscanf(p_fichier_classe,"%d", &classe.intelligence);
     fscanf(p_fichier_classe,"%d", &classe.foi);
-
+    printf("Stat chargées\n");
+    fscanf(p_fichier_classe,"\n");
 
     fscanf(p_fichier_classe,"%d", &temp);
     transfert_temp_resistance(temp, &classe.r_contandant);
@@ -42,11 +49,14 @@ t_classe init_classe(int num_classe) {
     transfert_temp_resistance(temp, &classe.r_feu);
     fscanf(p_fichier_classe,"%d", &temp);
     transfert_temp_resistance(temp, &classe.r_terre);
+    printf("Resistance chargées\n");
+    fscanf(p_fichier_classe,"\n");
 
     for (int i=0; i<4;i++) {
         char token;
-        fscanf(p_fichier_classe, "%c", &token); //Liberation espace
+        classe.competences[i].nom_competence = malloc(lenght_nom[i]+1*sizeof(char));
         fgets(classe.competences[i].nom_competence, lenght_nom[i]+1, p_fichier_classe);
+        printf("Nom : %s\n",classe.competences[i].nom_competence);
         fscanf(p_fichier_classe,"%d", &classe.competences[i].ID_competence);
         fscanf(p_fichier_classe,"%d", &classe.competences[i].degat);
         fscanf(p_fichier_classe,"%d", &classe.competences[i].p_attaque);
@@ -55,6 +65,8 @@ t_classe init_classe(int num_classe) {
         fscanf(p_fichier_classe,"%c", &classe.competences[i].type_degat);
         fscanf(p_fichier_classe, "%c", &token); //Liberation espace
         fscanf(p_fichier_classe,"%c", &classe.competences[i].type_stat);
+        fscanf(p_fichier_classe,"\n");
+        printf("Competence %d chargée\n",i+1);
     }
     fclose(p_fichier_classe);
 
@@ -86,7 +98,7 @@ void init_player_classe( Perso * self) {
     self->protection = false;
     self->boost_modifier = 1.0;
     //Initialisation des variables ingame
-    self->pm_restant = self->classe.endurance*10;
+    self->pm_restant = self->classe.endurance;
     self->pv_actuels = self->classe.pv*10;
     self->p_attaque = self->classe.mana*10;
 }
