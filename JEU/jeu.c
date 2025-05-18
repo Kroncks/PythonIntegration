@@ -750,6 +750,7 @@ void next_cliqued(int * next) {
     if (mouse_x > x && mouse_x < x+651*0.5 && mouse_y > y && mouse_y < y+342*0.5) {
         *next = 1;
         printf("next\n");
+        Sleep(200);
     }
 }
 
