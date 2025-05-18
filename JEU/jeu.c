@@ -44,7 +44,7 @@ void init_plato(Game * game) {
 
 
 void show_selected_comp(BITMAP* buffer, int selected_competence) {
-    printf("selected_competence = %d\n", selected_competence);
+    //printf("selected_competence = %d\n", selected_competence);
     const int pad = 10;
     int x = pad;
     int y = SCREEN_H-pad-(int)(442*0.7);
@@ -328,12 +328,22 @@ bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,No
     //Toutes les vérifications sont validées
     return true;
 }
-void deplacement(Perso* self,
+void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
+    int origin_x = SCREEN_W/2;
+    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
+    *screen_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+    *screen_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
+    //if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H);
+}
+void deplacement(Game* game, Perso* self,
                  const int x_dest,
                  const int y_dest,
                  Node map_path[PLAT_Y][PLAT_X],
-                 int len_path)
+                 int len_path, int num_joueur)
 {
+    //Init position initiale
+    int origin_x = self->x;
+    int origin_y = self->y;
     // Création d’un back-buffer local
     BITMAP* buffer = create_bitmap(screen->w, screen->h);
     if (!buffer) buffer = screen;  // fallback si échec
@@ -371,9 +381,11 @@ void deplacement(Perso* self,
         // Animation des deux frames
         for (int frame = 0; frame < 2; frame++) {
             clear_bitmap(buffer);
+            int x_screen, y_screen;
+            iso_to_screen(path[i].x, path[i].y, &x_screen, &y_screen);
             draw_sprite(buffer,
                         self->classe.sprite[(frame == 0) ? f0 : f1],
-                        path[i].x, path[i].y);
+                        x_screen, y_screen);
             if (buffer != screen) {
                 blit(buffer, screen, 0,0, 0,0, screen->w, screen->h);
             }
@@ -388,12 +400,28 @@ void deplacement(Perso* self,
     // S’assurer d’être exactement à la destination
     self->x = x_dest;
     self->y = y_dest;
+    self->pm_restant -= len_path;
+    game->plateau[y_dest][x_dest] = TILE_COUNT + num_joueur;
+    game->plateau[origin_y][origin_x] = TILE_COUNT - num_joueur;
+    printf(" position : (%d, %d)\n", self->x, self->y);
 
     // Libération du buffer local
     if (buffer != screen) destroy_bitmap(buffer);
 }
 
-void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y) {
+void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y, int num_joueur) {
+    printf("log action: %d, (%d,%d)", num_competence, action_x, action_y);
+    if (num_competence == 5) {
+        //Appel Can_move
+        int len_path;
+        Node map_path[PLAT_Y][PLAT_X];
+        for (int i = 0; i < PLAT_Y; i++) {
+            for (int j = 0; j < PLAT_X; j++) {
+                map_path[i][j].x = -1;
+                map_path[i][j].y = -1;
+            }
+        }
+    }
     printf("log action: %d, (%d,%d)", num_competence, action_x, action_y);
     if (num_competence == 5) {
         //Appel Can_move
@@ -409,7 +437,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
         if (can_move(*game, *self, action_x, action_y,map_path,len_path)) {
             //Appel fct déplacement
             printf("debut deplacement\n");
-            deplacement(self, action_x, action_y, map_path, len_path);
+            deplacement(game, self, action_x, action_y, map_path, len_path, num_joueur);
                 //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
         }
     }
@@ -846,7 +874,7 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
 
         translation_to_iso(&x, &y);
         if (x != -1 && y != -1) {
-            action(game, &game->players[i], *competence, x, y);
+            action(game, &game->players[i], *competence, x, y, i);
         } else {
 
         *competence = detection_competence();
