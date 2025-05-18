@@ -605,7 +605,7 @@ void show_graphique(Game game, int n_turns, int i,
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
                     printf("case (%d,%d) : %d \n", x, y, id-TILE_COUNT);
                     if (game.players[id-TILE_COUNT].classe.sprite[0]==NULL) printf("classe : NULL\n");
-                    draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y);
+                    //draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y);
                 }
             }
         }
@@ -757,7 +757,6 @@ void init_local_game(Game * game, Perso * liste) {
     }
         init_plato(game);
     init_coord(game);
-
 }
 
 
