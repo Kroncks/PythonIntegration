@@ -432,7 +432,7 @@ void deplacement(Game* game, Perso* self,
         int dx = path[s+1].x - path[s].x;
         int dy = path[s+1].y - path[s].y;
         int f0, f1;
-        if      (dx > 0) { f0 = 0; f1 = 1; }  // →
+        if      (dx > 0) { f0 = 4; f1 = 5; }  // →
         else if (dx < 0) { f0 = 2; f1 = 3; }  // ←
         else if (dy > 0) { f0 = 4; f1 = 5; }  // ↓
         else             { f0 = 6; f1 = 7; }  // ↑
