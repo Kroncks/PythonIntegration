@@ -130,7 +130,7 @@ void attack_statut(Perso* self, int idx) {
         self->boost_modifier = 1.5f;
     }
     self->p_attaque -= self->classe.competences[idx].p_attaque;
-    return;
+
 }
 
 
@@ -171,6 +171,11 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
         return;
     }
 
+    // 5) Sinon on vérifie la portée et on calcule les dégâts
+    int dx = abs(attaquant->x - defenseur->x);
+    int dy = abs(attaquant->y - defenseur->y);
+    //if (dx + dy > spell->portee) return;
+
     // --- Attaque classique : animation sur la cible ---
     int iso_x = (defenseur->x - defenseur->y)*(TILE_WIDTH/2) + origin_x;
     int iso_y = (defenseur->x + defenseur->y)*(TILE_HEIGHT/2) + offset_y;
@@ -181,12 +186,6 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
                     iso_y - spell->sprite[f]->h/2);
         rest(100);
     }
-
-    // 5) Sinon on vérifie la portée et on calcule les dégâts
-    int dx = abs(attaquant->x - defenseur->x);
-    int dy = abs(attaquant->y - defenseur->y);
-    if (dx + dy > spell->portee)
-        return;
 
     // Dégâts de base + stat
     float total = (float)spell->degat;
