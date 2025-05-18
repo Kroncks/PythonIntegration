@@ -1238,6 +1238,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             n_turns++;
             selected_competence=-1;
             init_portee(game);
+            init_tour(game);
             time_t turn_start = time(NULL);
             if (num == i) {
                 while (!next) {
