@@ -1357,7 +1357,7 @@ void jouer_local_graphique(Game * game) {
             next = 0;
             //init_tour(game);
             init_portee(game);
-
+            if (game->players[i].pv_actuels == 0) next = 1;
             // ----- Début du chronométrage du tour -----
             time_t turn_start = time(NULL);
 
