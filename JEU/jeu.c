@@ -909,7 +909,7 @@ void bouton_next(BITMAP* buffer, BITMAP* icon) {
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche,BITMAP* next_button,  int selected_competence)
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche,BITMAP* next_button,  int selected_competence, time_t turn_start)
 {
     // --- Fond ---
     if (game.map.background) {
@@ -947,10 +947,13 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
         }
     }
 
-    // --- Affichage bas-gauche via notre helper ---
+    // --- Affichage autour de la map ---
     barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
     show_selected_comp(buffer, selected_competence);
     bouton_next(buffer,next_button);
+    // Barre de temps
+    float longueur = 1-difftime(time(NULL), turn_start)/15.0;
+    rectfill(buffer, 0, SCREEN_H, SCREEN_W*longueur, SCREEN_H-10, makecol(255, 255, 255));
 
 
     // --- Curseur ---
@@ -1104,13 +1107,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             n_turns++;
             selected_competence=-1;
             init_portee(game);
+
+            // ----- Début du chronométrage du tour -----
+            time_t turn_start = time(NULL);
+
             if (num == i) {
 
-                // ----- Début du chronométrage du tour -----
-                time_t turn_start = time(NULL);
-
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence, turn_start); // affiche l'ecran de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
 
@@ -1123,11 +1127,11 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence, turn_start); // affiche l'ecran de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence, turn_start); // affiche l'ecran de jeu
             }
         }
     }
@@ -1210,9 +1214,8 @@ void jouer_local_graphique(Game * game) {
             time_t turn_start = time(NULL);
 
             while (!next) {
-                show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence);
+                show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence, turn_start);
                 tour_graphique(game, i, &selected_competence, &next, &quit);
-
                 // Vérification du timeout de 15 secondes
                 if (difftime(time(NULL), turn_start) >= 15.0) {
                     next = 1;  // Force la fin du tour
