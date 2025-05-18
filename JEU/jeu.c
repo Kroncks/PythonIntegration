@@ -1105,10 +1105,19 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             selected_competence=-1;
             init_portee(game);
             if (num == i) {
+
+                // ----- Début du chronométrage du tour -----
+                time_t turn_start = time(NULL);
+
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
+
+                    // Vérification du timeout de 15 secondes
+                    if (difftime(time(NULL), turn_start) >= 15.0) {
+                        next = 1;  // Force la fin du tour
+                    }
                 }
                 tour(game, i, LAN_buffer); // le joueur joue
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
