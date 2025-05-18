@@ -695,7 +695,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     }
 
     // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
+    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe.competences, selected_competence);
 
 
     // --- Curseur ---
@@ -801,7 +801,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
             "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1016*0.7,442*0.7
+            1024*0.7,459*0.7
         );
 
 
