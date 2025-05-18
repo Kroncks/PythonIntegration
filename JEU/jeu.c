@@ -370,7 +370,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
     }
 }
 
-void translation_to_iso(int mouse_x, int mouse_y, int*x,int* y) {
+void translation_to_iso(int*x,int* y) {
     int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
     int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
     float x_fix =mouse_x-origin_x;
@@ -766,7 +766,7 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
     if (mouse_b & 1) {
         next_cliqued(next);
 
-        translation_to_iso(mouse_x, mouse_y, &x, &y);
+        translation_to_iso(&x, &y);
         if (x != -1 && y != -1) {
             action(game, &game->players[i], *competence, x, y);
         } else {
