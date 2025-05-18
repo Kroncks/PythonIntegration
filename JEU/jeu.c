@@ -1037,70 +1037,59 @@ void jouer_local_graphique(Game * game) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    /*
-    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
-    if (!game->map.background) {
-        allegro_message("Erreur lors du chargement de l'arrière-plan !");
-        exit(EXIT_FAILURE);
-    }
 
-    for(int i = 0; i < TILE_COUNT; i++) {
-        char path[100];
-        sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
-        game->map.images[i] = charger_et_traiter_image(path, 64, 64);
-    }*/
     import_terrainJeu_Via_Fichier_texte(game);
 
-    // Charger l'image du curseur
+    // Charger et traiter le curseur…
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
     }
-
-    // Appliquer la transparence sur le curseur
     appliquer_transparence_curseur(curseur);
-
-    // Dimensions désirées du curseur (ex : 32x32)
+    // … redimensionnement du curseur …
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
-            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1024*0.7,459*0.7
-        );
+        "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+        1024*0.7, 459*0.7
+    );
     BITMAP* next_button = charger_et_traiter_image(
-            "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
-            651*0.5,342*0.5
-        );
+        "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
+        651*0.5, 342*0.5
+    );
 
-
-
-    // Redimensionner le curseur
-    BITMAP* curseur_redimensionne = create_bitmap(32, 32);
-    if (!curseur_redimensionne) {
-        allegro_message("Erreur lors de la création du curseur redimensionné !");
-        exit(EXIT_FAILURE);
-    }
-    stretch_blit(curseur, curseur_redimensionne, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
-    curseur = curseur_redimensionne;
     int quit = 0;
     int next = 0;
     int n_turns = 0;
-    int selected_competence=-1;
+    int selected_competence = -1;
+
     while (!quit) {
-        for (int i=0; i<NB_JOUEURS; i++) {
+        for (int i = 0; i < NB_JOUEURS; i++) {
             n_turns++;
-            selected_competence=-1;
+            selected_competence = -1;
             next = 0;
             init_portee(game);
+
+            // ----- Début du chronométrage du tour -----
+            time_t turn_start = time(NULL);
+
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
-                tour_graphique(game, i,&selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
+                show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence);
+                tour_graphique(game, i, &selected_competence, &next, &quit);
+
+                // Vérification du timeout de 15 secondes
+                if (difftime(time(NULL), turn_start) >= 15.0) {
+                    next = 1;  // Force la fin du tour
+                }
+
                 rest(10);
             }
-            //check_victory(game, &quit);
+            // ----- Fin du chronométrage du tour -----
+
             if (quit) break;
         }
     }
+
     destroy_bitmap(panneau_bas_gauche);
     destroy_bitmap(buffer);
     destroy_bitmap(game->map.background);
