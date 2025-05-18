@@ -662,7 +662,6 @@ int detection_competence () {
     if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
     if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
     if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
-    printf("y : %d\n", y);
     printf("num_competence = %d\n", num_competence);
     return num_competence;
 }
