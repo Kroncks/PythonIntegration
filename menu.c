@@ -445,6 +445,7 @@ void menu_selection_personnages(int num, Perso * self) {
 }
 
 void menu_fin() {
+    printf("Fin du jeu\n");
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
