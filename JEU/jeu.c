@@ -112,75 +112,64 @@ void attack_statut(Perso* self, int num_competence) {
 
 
 void attack(Perso* attaquant, Perso* defenseur, int num_competence) {
-    //Vérification du nombre de points d'attaques/mana
-    if (attaquant->p_attaque < attaquant->classe.competences[num_competence].p_attaque) return;
+    // 1) Vérification du coût en mana/PA
+    t_competence *spell = &attaquant->classe.competences[num_competence];
+    if (attaquant->p_attaque < spell->p_attaque)
+        return;
 
-    if (attaquant->classe.competences[num_competence].type_stat == 'N') {
-        attack_statut(attaquant, num_competence);
-    }else {
-        //Vérification de la portée
-        int distance_x = attaquant->x - defenseur->x;
-        int distance_y = attaquant->y - defenseur->y;
-        if (distance_x < 0) distance_x = -distance_x;
-        if (distance_y < 0) distance_y = -distance_y;
-        if (distance_x+distance_y > attaquant->classe.competences[num_competence].portee) return;
-        //Calcul des dégats
-        //Initialisation
-        float degat_tot = 0;
-        int degat_tot_int=0;
+    // 2) Calcul des coordonnées écran isométriques du défenseur
+    const int origin_x = SCREEN_W / 2;
+    const int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
+    int iso_x = (defenseur->x - defenseur->y) * (TILE_WIDTH / 2) + origin_x;
+    int iso_y = (defenseur->x + defenseur->y) * (TILE_HEIGHT / 2) + offset_y;
 
-        if (defenseur->protection) {
-            degat_tot = 0;
-        }else {
-            //dégats de base
-            degat_tot = (float)attaquant->classe.competences[num_competence].degat;
-            //Ajout de la statistique associée
-            switch (attaquant->classe.competences[num_competence].type_stat) {
-                case 'F':
-                    degat_tot += (float)attaquant->classe.foi;
-                    break;
-                case 'S':
-                    degat_tot += (float)attaquant->classe.force;
-                    break;
-                case 'I':
-                    degat_tot += (float)attaquant->classe.intelligence;
-                    break;
-                case 'D':
-                    degat_tot += (float)attaquant->classe.dexterite;
-                    break;
-            }
-            //Ajout de la résistance/faiblesse de l'adversaire
-            switch (attaquant->classe.competences->type_degat) {
-                case 'C':
-                    degat_tot = degat_tot * defenseur->classe.r_contandant;
-                    break;
-                case 'T':
-                    degat_tot = degat_tot * defenseur->classe.r_tranchant;
-                    break;
-                case 'P':
-                    degat_tot = degat_tot * defenseur->classe.r_percant;
-                    break;
-                case 'E':
-                    degat_tot = degat_tot * defenseur->classe.r_eau;
-                    break;
-                case 'F':
-                    degat_tot = degat_tot * defenseur->classe.r_feu;
-                    break;
-                case 'S':
-                    degat_tot = degat_tot * defenseur->classe.r_terre;
-                    break;
-            }
-            degat_tot = degat_tot * attaquant->boost_modifier;
-            degat_tot_int = (int)degat_tot;
-        }
-
-        //On retire les points d'attaques à l'attaquant
-        attaquant->p_attaque -= attaquant->classe.competences[num_competence].p_attaque;
-        //On retire les pv à l'adversaire
-        defenseur->pv_actuels -= degat_tot_int;
-
-        //Animation possible
+    // 3) Affichage de l’animation de la compétence (3 frames)
+    for (int f = 0; f < 3; f++) {
+        // On dessine directement sur l’écran.
+        // Si vous avez un back‐buffer nommé 'buffer', remplacez 'screen' par 'buffer'
+        draw_sprite(screen,
+                    spell->sprite[f],
+                    iso_x,
+                    iso_y - spell->sprite[f]->h / 2  // décalage pour que l’anim "flotte" au‐dessus
+        );
+        rest(100);  // 100 ms entre chaque frame
     }
+
+    // 4) Si c’est un sort de statut (type_stat == 'N'), on applique juste l’effet
+    if (spell->type_stat == 'N') {
+        attack_statut(attaquant, num_competence);
+        return;
+    }
+
+    // 5) Sinon on vérifie la portée et on calcule les dégâts
+    int dx = abs(attaquant->x - defenseur->x);
+    int dy = abs(attaquant->y - defenseur->y);
+    if (dx + dy > spell->portee)
+        return;
+
+    // Dégâts de base + stat
+    float total = (float)spell->degat;
+    switch (spell->type_stat) {
+        case 'F': total += attaquant->classe.foi;         break;
+        case 'S': total += attaquant->classe.force;       break;
+        case 'I': total += attaquant->classe.intelligence;break;
+        case 'D': total += attaquant->classe.dexterite;   break;
+    }
+    // Application de la résistance de l’adversaire
+    switch (spell->type_degat) {
+        case 'C': total *= defenseur->classe.r_contandant; break;
+        case 'T': total *= defenseur->classe.r_tranchant;  break;
+        case 'P': total *= defenseur->classe.r_percant;    break;
+        case 'E': total *= defenseur->classe.r_eau;        break;
+        case 'F': total *= defenseur->classe.r_feu;        break;
+        case 'S': total *= defenseur->classe.r_terre;      break;
+    }
+    total *= attaquant->boost_modifier;
+    int dmg = (int)total;
+
+    // 6) On consomme les PA et on inflige les PV
+    attaquant->p_attaque -= spell->p_attaque;
+    defenseur->pv_actuels   -= dmg;
 }
 
 int found_player(Game game, int x, int y) {
