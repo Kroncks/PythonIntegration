@@ -259,7 +259,7 @@ bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, in
     // Remonter le chemin
     int len = 0;
     int cx = dest_x, cy = dest_y;
-    printf("%d , %d\n", cx, cy);
+    //printf("%d , %d\n", cx, cy);
     Node path_temp[PLAT_Y][PLAT_X]; // [y][x]
     for (int i = 0; i < PLAT_Y; i++) {
         for (int j = 0; j < PLAT_X; j++) {
@@ -269,12 +269,12 @@ bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, in
     }
     while (!(cx == origin_x && cy == origin_y)) {
         Node p = prev[cy][cx];
-        printf("%d , %d\n", p.x, p.y);
+        //printf("%d , %d\n", p.x, p.y);
         cx = p.x;
         cy = p.y;
         len++;
     }
-    printf("\n\n");
+    //printf("\n\n");
 
     for (int i = 0; i < PLAT_Y; i++) {
         for (int j = 0; j < PLAT_X; j++) {
@@ -310,21 +310,21 @@ void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len+1], 
     }
 }
 
-bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int* len_path) {
-    printf("init_verif\n");
+bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int len_path) {
+    //printf("init_verif\n");
     //La case cliquée se trouve-t-elle dans le plateau ?
     if (x_dest < 0 || y_dest < 0) return false;
-    printf("dans le plateau\n");
+    //printf("dans le plateau\n");
     //La case cliquée est-elle sur un obstacle ?
     if (game.plateau[x_dest][y_dest] !=0) return false;
-    printf("pas d'obstacle\n");
+    //printf("pas d'obstacle\n");
     //La case cliquée est-elle sur un joueur ?
     if (found_player(game, x_dest, y_dest)!=-1) return false;
-    printf("pas de joueur\n");
+    //printf("pas de joueur\n");
     //Verification du déplacement avec un BFS
-    printf("case dest valide\n");
-    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,len_path)) return false;
-    printf("BFS true\n");
+    //printf("case dest valide\n");
+    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,&len_path)) return false;
+    //printf("BFS true\n");
     //Toutes les vérifications sont validées
     return true;
 }
@@ -406,7 +406,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
             }
         }
         printf("Debut can_move\n");
-        if (Can_move(*game, *self, action_x, action_y,map_path,&len_path)) {
+        if (can_move(*game, *self, action_x, action_y,map_path,len_path)) {
             //Appel fct déplacement
             printf("debut deplacement\n");
             deplacement(self, action_x, action_y, map_path, len_path);
@@ -675,6 +675,34 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
     init_coord(game);
 }
 
+void dessiner_losange(BITMAP* buffer, int cx, int cy, int w, int h, int fill_color, int border_color) {
+    int points[8] = {
+        cx,         cy - h / 2,
+        cx + w / 2, cy,
+        cx,         cy + h / 2,
+        cx - w / 2, cy
+    };
+    set_trans_blender(0, 0, 0, 100);
+    drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
+    polygon(buffer, 4, points, fill_color);
+    drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
+    for (int i = 0; i < 4; i++) {
+        line(buffer, points[i*2], points[i*2+1], points[((i+1)%4)*2], points[((i+1)%4)*2+1], border_color);
+    }
+}
+
+void afficher_portee(BITMAP * buffer,Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
+    Node map_path[PLAT_Y][PLAT_X];
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
+            map_path[i][j].x = -1;
+            map_path[i][j].y = -1;
+        }
+    }
+    if (can_move(game, joueur, x,y,map_path, joueur.pm_restant)) {
+        dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
+    }
+}
 
 void show(Game game, int n_turns, int num) {
     printf("====================[%d]====================\n", n_turns);
@@ -766,12 +794,14 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[id],iso_x, iso_y);
+                    afficher_portee(buffer,game, game.players[i], x, y, iso_x,iso_y);
                 }
             } else {
                 int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
                     draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
+                    afficher_portee(buffer,game, game.players[i], x, y, iso_x,iso_y);
                     draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
                 }
             }
