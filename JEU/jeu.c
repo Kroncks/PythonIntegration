@@ -554,6 +554,12 @@ void action(Game* game,
                cible,
                game->players[cible].pv_actuels);
             // **Nouvel appel** : vérifier et afficher la mort si PV ≤ 0
+            if (game->players[cible].pv_actuels <= 0) {
+                game->plateau[game->players[cible].y][game->players[cible].x] = 0;
+                int iso_x, iso_y;
+                //iso_to_screen(game->players[cible].x, game->players[cible].y, &iso_x, &iso_y );
+                //draw_sprite(screen, sprite_mort, iso_x, iso_y);
+            }
             // TODO : envoyer attaque over network
         }
     }
@@ -1045,7 +1051,18 @@ void show_graphique(Game game,
                                 game.players[p_idx],
                                 x, y,
                                 iso_x, iso_y);
-            } else {
+            }/*else if (id > TILE_COUNT && game.players[p_idx].pv_actuels ==0) {
+                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
+                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
+                    draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
+                    draw_sprite(buffer,
+                                    sprite_mort,
+                                    iso_x,
+                                    iso_y - sprite_mort->h/2);
+                }
+            }*/
+            else {
                 int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
                 int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
                 if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
@@ -1054,7 +1071,7 @@ void show_graphique(Game game,
                     draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
                     }
             }
-
+                /*
                 for (int i=0; i<NB_JOUEURS;i++)
                 {
                     Perso *pl = &game.players[i];
@@ -1067,7 +1084,7 @@ void show_graphique(Game game,
                                     iso_x,
                                     iso_y - sprite_mort->h/2);
                     }
-                }
+                }*/
 
             }
         }
