@@ -42,6 +42,11 @@ void init_plato(Game * game) {
     }
 }
 
+
+void show_selected_comp(int selected_competence) {
+
+}
+
 void viderBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -727,6 +732,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
 
     // --- Affichage bas-gauche via notre helper ---
     barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
+    show_selected_comp(selected_competence);
     bouton_next(buffer,next_button);
 
 
