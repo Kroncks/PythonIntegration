@@ -254,7 +254,7 @@ Perso init_player_graphique(int num) {
             int keycode = readkey();
             int k = keycode >> 8;
             char ch = keycode & 0xFF;
-            if (k == KEY_ENTER) {
+            if (k == KEY_ENTER && strlen(self.pseudo)>0) {
                 break;
             }else if (k == KEY_BACKSPACE && strlen(self.pseudo) > 0) {
                 self.pseudo[strlen(self.pseudo) - 1] = '\0';

@@ -642,21 +642,7 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-int detection_competence (int hauteur_icone) {
-    int x,y;
-    const int pad = 10;
-    x = mouse_x-pad;
-    y = mouse_y-pad-SCREEN_H-hauteur_icone;
-    int num_competence = 0;
-    if (x > 985 || x < 280 || y > 230 || y < 80) return 0;
-    if (x < 400 && x > 280) num_competence = 1;
-    if (x < 530 && x > 410) num_competence = 2;
-    if (x < 660 && x > 545) num_competence = 3;
-    if (x < 800 && x > 675) num_competence = 4;
-    if (x < 985 && x > 810) num_competence = 5;
-    return num_competence;
-}
-static void barre_jeu(BITMAP* buffer, BITMAP* icon, t_competence competences[4], int selected_competence)
+void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
 {
     if (!icon) return;
     const int pad = 10;
@@ -664,7 +650,12 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon, t_competence competences[4],
     int y = SCREEN_H - icon->h - pad;
     draw_sprite(buffer, icon, x, y);
 
-    draw_sprite(buffer, competences[0].sprite[2] , x+205, y+80);
+    draw_sprite(buffer, classe.competences[0].sprite[2] , x+205, y+80);
+    draw_sprite(buffer, classe.competences[1].sprite[2] , x+298, y+80);
+    draw_sprite(buffer, classe.competences[2].sprite[2] , x+392, y+80);
+    draw_sprite(buffer, classe.competences[3].sprite[2] , x+485, y+80);
+
+    draw_sprite(buffer, classe.sprite[8] , x-4, y+11);
 }
 
 void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
@@ -704,7 +695,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     }
 
     // --- Affichage bas-gauche via notre helper ---
-    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe.competences, selected_competence);
+    barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
 
 
     // --- Curseur ---
