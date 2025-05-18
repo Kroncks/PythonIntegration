@@ -153,12 +153,125 @@ int found_player(Game game, int x, int y) {
     return -1;
 }
 
-bool verif_bfs(int plateau[PLAT_X][PLAT_Y], const int origin_x, const int origin_y, const int dest_x, const int dest_y) {
-
-    return true;
+bool est_case_valide_BFS(int x, int y, int map[PLAT_Y][PLAT_X]) {
+    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 1;
 }
 
-bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest) {
+bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur, Node map_path[PLAT_Y][PLAT_X], int* len_path) {
+//bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur) {
+
+    if (!est_case_valide_BFS(dest_x, dest_y, game.plateau)) return false;
+
+    int visited[PLAT_Y][PLAT_X] = {0};
+    Node prev[PLAT_Y][PLAT_X];
+
+    // Marquer obstacles
+    for (int y = 0; y < PLAT_Y; y++) {
+        for (int x = 0; x < PLAT_X; x++) {
+            if (game.plateau[y][x] != 1)
+                visited[y][x] = -1;
+        }
+    }
+
+    // Marquer joueurs
+    for (int i = 0; i < 4; i++) {
+        if (game.players[i].x == origin_x && game.players[i].y == origin_y)
+            continue;
+        visited[game.players[i].y][game.players[i].x] = -1;
+    }
+
+    int queue_x[MAX_NODE], queue_y[MAX_NODE];
+    int front = 0, back = 0;
+    queue_x[back] = origin_x;
+    queue_y[back] = origin_y;
+    back++;
+    visited[origin_y][origin_x] = 1;
+
+    bool found = false;
+    int directions[4][2] = {{0,-1},{0,1},{-1,0},{1,0}};
+
+    while (front < back && !found) {
+        int ux = queue_x[front];
+        int uy = queue_y[front];
+        front++;
+
+        for (int i = 0; i < 4; i++) {
+            int vx = ux + directions[i][0];
+            int vy = uy + directions[i][1];
+
+            if (est_case_valide_BFS(vx, vy, game.plateau) && visited[vy][vx] == 0) {
+                visited[vy][vx] = 1;
+                prev[vy][vx].x = ux;
+                prev[vy][vx].y = uy;
+                queue_x[back] = vx;
+                queue_y[back] = vy;
+                back++;
+
+                if (vx == dest_x && vy == dest_y) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!found) return false;
+
+    // Remonter le chemin
+    int len = 0;
+    int cx = dest_x, cy = dest_y;
+    printf("%d , %d\n", cx, cy);
+    Node path_temp[PLAT_Y][PLAT_X]; // [y][x]
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
+            path_temp[i][j].x = prev[i][j].x;
+            path_temp[i][j].y = prev[i][j].y;
+        }
+    }
+    while (!(cx == origin_x && cy == origin_y)) {
+        Node p = prev[cy][cx];
+        printf("%d , %d\n", p.x, p.y);
+        cx = p.x;
+        cy = p.y;
+        len++;
+    }
+    printf("\n\n");
+
+    for (int i = 0; i < PLAT_Y; i++) {
+        for (int j = 0; j < PLAT_X; j++) {
+            map_path[i][j].x = path_temp[i][j].x;
+            map_path[i][j].y = path_temp[i][j].y;
+        }
+    }
+
+    if (len <= pm_joueur) {
+        *len_path = len;
+        return true;
+    }
+    return false;
+}
+
+void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len+1], int dest_x, int dest_y, int origin_x, int origin_y) {
+
+    int i=0;
+    int cx = dest_x, cy = dest_y;
+    path[0].x = origin_x;
+    path[0].y = origin_y;
+    path[len].x = cx;
+    path[len].y = cy;
+    while (!(cx == origin_x && cy == origin_y)) {
+        Node p2 = map_path[cy][cx];
+        cx = p2.x;
+        cy = p2.y;
+        i++;
+        path[len-i]=p2;
+    }
+    for (int j = 0; j < len+1; j++) {
+        printf("%d , %d\n", path[j].x, path[j].y);
+    }
+}
+
+bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int* len_path) {
     //La case cliquée se trouve-t-elle dans le plateau ?
     if (x_dest < 0 || y_dest < 0) return false;
     //La case cliquée est-elle sur un obstacle ?
@@ -166,20 +279,24 @@ bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest) {
     //La case cliquée est-elle sur un joueur ?
     if (found_player(game, x_dest, y_dest)==-1) return false;
     //Verification du déplacement avec un BFS
-    if (!verif_bfs(game.plateau,self.x, self.y,x_dest,y_dest)) return false;
+    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,len_path)) return false;
     //Toutes les vérifications sont validées
     return true;
 }
-void deplacement(Perso* self,const int x_dest,const int y_dest) {
+void deplacement(Perso* self,const int x_dest,const int y_dest, Node map_path[PLAT_Y][PLAT_X], int len_path) {
+    Node path[len_path+1];
+    inversion_chemin(map_path, len_path, path, x_dest, y_dest, self->x, self->y);
     self->x = x_dest;
     self->y = y_dest;
 }
 void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y) {
     if (num_competence == 5) {
         //Appel Can_move
-        if (Can_move(*game, *self, action_x, action_y)) {
+        int len_path;
+        Node map_path[PLAT_Y][PLAT_X];
+        if (Can_move(*game, *self, action_x, action_y,map_path,&len_path)) {
             //Appel fct déplacement
-            deplacement(self, action_x, action_y);
+            deplacement(self, action_x, action_y, map_path, len_path);
             //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
         }
     }
