@@ -1,7 +1,5 @@
 #include "init.h"
 
-t_classe classes_disponibles[12];
-
 
 void init_player_classe( Perso * self) {
 
