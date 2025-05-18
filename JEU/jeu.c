@@ -43,8 +43,42 @@ void init_plato(Game * game) {
 }
 
 
-void show_selected_comp(int selected_competence) {
-
+void show_selected_comp(BITMAP* buffer, int selected_competence) {
+    printf("selected_competence = %d\n", selected_competence);
+    const int pad = 10;
+    int x = pad;
+    int y = SCREEN_H-pad-(int)(442*0.7);
+    /*
+    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return 0;
+    if (x < 400*0.7 && x > 280*0.7) num_competence = 1;
+    if (x < 530*0.7 && x > 410*0.7) num_competence = 2;
+    if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
+    if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
+    if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
+    */
+    switch (selected_competence) {
+        case 1:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+280*0.7+i, y+45+i, x+400*0.7-i, y+100+45-i, makecol(255,255,0));
+            } break;
+        case 2:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+410*0.7+i, y+45+i, x+530*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 3:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+545*0.7+i, y+45+i, x+660*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 4:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+675*0.7+i, y+45+i, x+800*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 5:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+810*0.7+i, y+45+i, x+985*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        default: return;
+    }
 }
 
 void viderBuffer() {
@@ -732,7 +766,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
 
     // --- Affichage bas-gauche via notre helper ---
     barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
-    show_selected_comp(selected_competence);
+    show_selected_comp(buffer, selected_competence);
     bouton_next(buffer,next_button);
 
 
