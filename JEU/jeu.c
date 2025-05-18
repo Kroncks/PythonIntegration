@@ -650,18 +650,19 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-int detection_competence (int hauteur_icone) {
-    int x,y;
+int detection_competence () {
+
     const int pad = 10;
-    x = mouse_x-pad;
-    y = mouse_y-pad-SCREEN_H-hauteur_icone;
+    int x = mouse_x-pad;
+    int y = mouse_y-pad-SCREEN_H-(int)(442*0.7);
     int num_competence = 0;
-    if (x > 985 || x < 280 || y > 230 || y < 80) return 0;
-    if (x < 400 && x > 280) num_competence = 1;
-    if (x < 530 && x > 410) num_competence = 2;
-    if (x < 660 && x > 545) num_competence = 3;
-    if (x < 800 && x > 675) num_competence = 4;
-    if (x < 985 && x > 810) num_competence = 5;
+    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return 0;
+    if (x < 400*0.7 && x > 280*0.7) num_competence = 1;
+    if (x < 530*0.7 && x > 410*0.7) num_competence = 2;
+    if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
+    if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
+    if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
+    printf("y : %d\n", y);
     printf("num_competence = %d\n", num_competence);
     return num_competence;
 }
@@ -758,11 +759,13 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
     int x,y;
     if (mouse_b & 1) {
         next_cliqued(next);
+
         translation_to_iso(mouse_x, mouse_y, &x, &y);
         if (x != -1 && y != -1) {
             action(game, &game->players[i], *competence, x, y);
         } else {
-            *competence = detection_competence(442*0.7);
+
+        *competence = detection_competence();
         }
     }
 
