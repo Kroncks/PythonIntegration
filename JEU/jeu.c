@@ -430,14 +430,26 @@ void deplacement(Game* game, Perso* self,
             }
         }
 
-        // b) Choix des frames selon la direction
+        // b) Choix des frames selon la direction du segment
         int dx = path[s+1].x - path[s].x;
         int dy = path[s+1].y - path[s].y;
         int f0, f1;
-        if      (dx > 0) { f0 = 4; f1 = 5; }  // →
-        else if (dx < 0) { f0 = 2; f1 = 3; }  // ←
-        else if (dy > 0) { f0 = 4; f1 = 5; }  // ↓
-        else             { f0 = 6; f1 = 7; }  // ↑
+        if (dx > 0) {
+            // →  bas-droite  (frames 1 & 2)
+            f0 = 0; f1 = 1;
+        }
+        else if (dx < 0) {
+            // ←  haut-gauche (frames 3 & 4)
+            f0 = 2; f1 = 3;
+        }
+        else if (dy > 0) {
+            // ↓  bas-gauche (frames 5 & 6)
+            f0 = 4; f1 = 5;
+        }
+        else {
+            // ↑  haut-droite (frames 7 & 8)
+            f0 = 6; f1 = 7;
+        }
 
         // c) Animation 2 frames du self
         for (int frame = 0; frame < 2; frame++) {
