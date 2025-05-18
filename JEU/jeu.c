@@ -14,6 +14,12 @@ BITMAP* liste_story[12];
 static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
 
+
+void init_tour(game) {
+
+}
+
+
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
     game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
@@ -1325,6 +1331,7 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             selected_competence = -1;
             next = 0;
+            init_tour(game);
             init_portee(game);
 
             // ----- Début du chronométrage du tour -----
