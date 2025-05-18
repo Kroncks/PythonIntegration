@@ -415,7 +415,6 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
 
     if (num_competence == 5) {
         //Appel Can_move
-        int len_path;
         Node map_path[PLAT_Y][PLAT_X];
         for (int i = 0; i < PLAT_Y; i++) {
             for (int j = 0; j < PLAT_X; j++) {
