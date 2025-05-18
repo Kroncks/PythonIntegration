@@ -311,14 +311,20 @@ void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len+1], 
 }
 
 bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int* len_path) {
+    printf("init_verif\n");
     //La case cliquée se trouve-t-elle dans le plateau ?
     if (x_dest < 0 || y_dest < 0) return false;
+    printf("dans le plateau\n");
     //La case cliquée est-elle sur un obstacle ?
     if (game.plateau[x_dest][y_dest] !=0) return false;
+    printf("pas d'obstacle\n");
     //La case cliquée est-elle sur un joueur ?
-    if (found_player(game, x_dest, y_dest)==-1) return false;
+    if (found_player(game, x_dest, y_dest)!=-1) return false;
+    printf("pas de joueur\n");
     //Verification du déplacement avec un BFS
+    printf("case dest valide\n");
     if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,len_path)) return false;
+    printf("BFS true\n");
     //Toutes les vérifications sont validées
     return true;
 }
@@ -393,8 +399,10 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
         //Appel Can_move
         int len_path;
         Node map_path[PLAT_Y][PLAT_X];
+        printf("Debut can_move\n");
         if (Can_move(*game, *self, action_x, action_y,map_path,&len_path)) {
             //Appel fct déplacement
+            printf("debut deplacement\n");
             deplacement(self, action_x, action_y, map_path, len_path);
                 //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
         }
@@ -415,7 +423,7 @@ void translation_to_iso(int*x,int* y) {
     float fy =(y_fix/hh-x_fix/hw) / 2.0f;
     int x_temp =(int)(fx-0.5f);
     int y_temp =(int)(fy-0.5f);
-    if (y_temp>5) y+=1;
+    if (y_temp>5) y_temp+=1;
     if(x_temp>=0 && x_temp<PLAT_X && y_temp>=0 && y_temp<PLAT_Y) {
         *x = x_temp;
         *y = y_temp;
