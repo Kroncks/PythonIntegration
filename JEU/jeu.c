@@ -592,7 +592,7 @@ static void barre_jeu(BITMAP* buffer, BITMAP* icon)
     draw_sprite(buffer, icon, x, y);
 }
 
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur)
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur, int selected_competence)
 {
     // --- IMPORT de l'image (chargée une seule fois) ---
     static BITMAP* panneau_bas_gauche = NULL;
@@ -759,13 +759,15 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     int quit = 0;
     int n_turns = 0;
     int next = 0;
+    int selected_competence=-1;
     show(*game, 0, num); // log
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
+            selected_competence=-1;
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
                 }
@@ -773,11 +775,11 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
             }
         }
     }
@@ -860,12 +862,14 @@ void jouer_local_graphique(Game * game) {
     int quit = 0;
     int next = 0;
     int n_turns = 0;
+    int selected_competence=-1;
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
+            selected_competence=-1;
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
-                tour_graphique(game, i, &next, &quit ); // verifie les actions du joueur et joue joue
+                show_graphique(*game,n_turns,i, buffer, curseur, selected_competence); // affiche l'ecrant de jeu
+                tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
             //check_victory(game, &quit);
