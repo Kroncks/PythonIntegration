@@ -188,7 +188,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
     }
 }
 
-void translation_to_iso(int mouse_x, int mouse_y) {
+void translation_to_iso(int mouse_x, int mouse_y, int*x,int* y) {
     int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
     int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
     float x_fix =mouse_x-origin_x;
@@ -197,10 +197,10 @@ void translation_to_iso(int mouse_x, int mouse_y) {
     float hh=TILE_HEIGHT/2.0f;
     float fx=(x_fix/hw+y_fix/hh) / 2.0f;
     float fy =(y_fix/hh-x_fix/hw) / 2.0f;
-    int x =(int)(fx-0.5f);
-    int y =(int)(fy-0.5f);
-    if (y>5) y+=1;
-    if(x>=0 && x<PLAT_X && y>=0 && y<PLAT_Y) printf("x : %d\ny : %d\n", x,y);
+    *x =(int)(fx-0.5f);
+    *y =(int)(fy-0.5f);
+    if (*y>5) y+=1;
+    if(*x>=0 && *x<PLAT_X && *y>=0 && *y<PLAT_Y) printf("x : %d\ny : %d\n", *x,*y);
 }
 
 int change_music(const char *filename)
