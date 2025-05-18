@@ -283,12 +283,71 @@ bool Can_move(Game game, const Perso self, const int x_dest, const int y_dest,No
     //Toutes les vérifications sont validées
     return true;
 }
-void deplacement(Perso* self,const int x_dest,const int y_dest, Node map_path[PLAT_Y][PLAT_X], int len_path) {
+void deplacement(Perso* self,
+                 const int x_dest,
+                 const int y_dest,
+                 Node map_path[PLAT_Y][PLAT_X],
+                 int len_path)
+{
+    // Création d’un back-buffer local
+    BITMAP* buffer = create_bitmap(screen->w, screen->h);
+    if (!buffer) buffer = screen;  // fallback si échec
+
+    // Reconstruction du chemin
     Node path[len_path+1];
-    inversion_chemin(map_path, len_path, path, x_dest, y_dest, self->x, self->y);
+    inversion_chemin(map_path, len_path, path,
+                     x_dest, y_dest,
+                     self->x, self->y);
+
+    // Parcours des segments
+    for (int i = 0; i < len_path; i++) {
+        int dx = path[i+1].x - path[i].x;
+        int dy = path[i+1].y - path[i].y;
+
+        // Choix des deux frames selon la direction
+        int f0, f1;
+        if (dx > 0) {
+            // →  (frames 3 & 4)
+            f0 = 2;  f1 = 3;
+        }
+        else if (dx < 0) {
+            // ←  (frames 5 & 6)
+            f0 = 4;  f1 = 5;
+        }
+        else if (dy > 0) {
+            // ↓  (frames 1 & 2)
+            f0 = 0;  f1 = 1;
+        }
+        else {
+            // ↑  (frames 7 & 8)
+            f0 = 6;  f1 = 7;
+        }
+
+        // Animation des deux frames
+        for (int frame = 0; frame < 2; frame++) {
+            clear_bitmap(buffer);
+            draw_sprite(buffer,
+                        self->classe.sprite[(frame == 0) ? f0 : f1],
+                        path[i].x, path[i].y);
+            if (buffer != screen) {
+                blit(buffer, screen, 0,0, 0,0, screen->w, screen->h);
+            }
+            rest(100);
+        }
+
+        // Mise à jour logique de la position
+        self->x = path[i+1].x;
+        self->y = path[i+1].y;
+    }
+
+    // S’assurer d’être exactement à la destination
     self->x = x_dest;
     self->y = y_dest;
+
+    // Libération du buffer local
+    if (buffer != screen) destroy_bitmap(buffer);
 }
+
 void action(Game* game, Perso* self, const int num_competence, const int action_x, const int action_y) {
     if (num_competence == 5) {
         //Appel Can_move
@@ -297,7 +356,7 @@ void action(Game* game, Perso* self, const int num_competence, const int action_
         if (Can_move(*game, *self, action_x, action_y,map_path,&len_path)) {
             //Appel fct déplacement
             deplacement(self, action_x, action_y, map_path, len_path);
-            //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
+                //Appel fct qui transfère les données au réseau (compétence 5, x_dest, x_dest)
         }
     }
     else {
