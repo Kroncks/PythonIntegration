@@ -482,7 +482,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
     if (!panneau_bas_gauche) {
         panneau_bas_gauche = charger_et_traiter_image(
             "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            512,384
+            1024*0.7,459*0.7
         );
         if (!panneau_bas_gauche) {
             allegro_message(
