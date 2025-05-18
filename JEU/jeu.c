@@ -650,6 +650,20 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
+int detection_competence (int mouse_x, int mouse_y, int hauteur_icone) {
+    int x,y;
+    const int pad = 10;
+    x = mouse_x-pad;
+    y = mouse_y-pad-SCREEN_H-hauteur_icone;
+    int num_competence = 0;
+    if (x > 985 || x < 280 || y > 230 || y < 80) return 0;
+    if (x < 400 && x > 280) num_competence = 1;
+    if (x < 530 && x > 410) num_competence = 2;
+    if (x < 660 && x > 545) num_competence = 3;
+    if (x < 800 && x > 675) num_competence = 4;
+    if (x < 985 && x > 810) num_competence = 5;
+    return num_competence;
+}
 void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
 {
     if (!icon) return;
