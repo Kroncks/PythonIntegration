@@ -642,7 +642,7 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-int detection_competence (int mouse_x, int mouse_y, int hauteur_icone) {
+int detection_competence (int hauteur_icone) {
     int x,y;
     const int pad = 10;
     x = mouse_x-pad;
