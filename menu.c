@@ -377,7 +377,9 @@ void menu_selection_personnages(int num, Perso * self) {
                 draw_sprite(buffer,liste_avatar[ligne * nb_col + col], x, y);
                 rect(buffer, x, y, x + case_w, y + case_h, makecol(255, 255, 255));
                 if (selection_case == ligne * nb_col + col) {
-                    rect(buffer, x + 2, y + 2, x + case_w - 2, y + case_h - 2, makecol(255, 0, 0));
+                    for (int i = 0; i < 6; i++) {
+                        rect(buffer, x + 2 + i , y + 2 + i, x + case_w - 2 - i, y + case_h - 2 - i, makecol(255, 0, 0));
+                    }
                 }
             }
         }

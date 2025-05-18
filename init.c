@@ -79,7 +79,6 @@ t_classe init_classe(int num_classe) {
 }
 
 void init_player_classe( Perso * self) {
-
     int num_classe = self->avatar[0] - 'a';
     //Chargement de la classe
     self->classe = init_classe(num_classe);
