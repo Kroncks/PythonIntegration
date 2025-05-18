@@ -20,5 +20,7 @@ void jouer_graphique(socket_t sock, Game * game, int num);
 static void barre_joueur(BITMAP* buffer, BITMAP* icon);
 int get_path(Game *game, int x, int y, Coord path[], int max_len) ;
 void dishtra(Game *game, int start_x, int start_y, int portee, int pas);
+void bouton_next(BITMAP* buffer, BITMAP* icon);
+void next_cliqued(int * next);
 
 #endif //JEU_H
