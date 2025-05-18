@@ -154,7 +154,7 @@ int found_player(Game game, int x, int y) {
 }
 
 bool est_case_valide_BFS(int x, int y, int map[PLAT_Y][PLAT_X]) {
-    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 1;
+    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 0;
 }
 
 bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur, Node map_path[PLAT_Y][PLAT_X], int* len_path) {
@@ -168,7 +168,7 @@ bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, in
     // Marquer obstacles
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
-            if (game.plateau[y][x] != 1)
+            if (game.plateau[y][x] != 0)
                 visited[y][x] = -1;
         }
     }
