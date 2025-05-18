@@ -1140,6 +1140,7 @@ void jouer(socket_t sock, Game * game, int num) {
 
 
 void jouer_graphique(socket_t sock, Game * game, int num) {
+    game->nb_morts=0;
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
@@ -1275,6 +1276,7 @@ void init_local_game(Game * game, Perso * liste) {
 
 
 void jouer_local_graphique(Game * game) {
+    game->nb_morts=0;
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
