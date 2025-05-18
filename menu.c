@@ -208,7 +208,7 @@ Perso init_player_graphique(int num) {
                      0, 0, SCREEN_W, SCREEN_H);
 
         // Afficher le bouton « Valider »
-        afficher_boutons(buffer, boutons, nb_boutons);
+        if (strlen(self.pseudo) > 0) afficher_boutons(buffer, boutons, nb_boutons);
 
         // Afficher l'image du numéro de joueur
         draw_sprite(buffer, img_joueur,
@@ -258,7 +258,6 @@ Perso init_player_graphique(int num) {
                 break;
             }else if (k == KEY_BACKSPACE && strlen(self.pseudo) > 0) {
                 self.pseudo[strlen(self.pseudo) - 1] = '\0';
-                break;
             } else if (k == KEY_DEL) {
                 self.pseudo[0] = '\0';
             } else if (isprint(ch) && strlen(self.pseudo) < 20) {
@@ -268,7 +267,7 @@ Perso init_player_graphique(int num) {
             }
         }
 
-        // ** Afficher le curseur personnalisé avec masque **
+        //  Afficher le curseur personnalisé avec masque
         stretch_sprite(buffer,
                        curseur_redimensionne,
                        mouse_x, mouse_y,
@@ -358,7 +357,7 @@ void menu_selection_personnages(int num, Perso * self) {
 
 
 
-    int selection_case = 0;
+    int selection_case = -1;
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
 
@@ -385,16 +384,16 @@ void menu_selection_personnages(int num, Perso * self) {
 
 
         // dessiner perso choisi
-        draw_sprite(buffer,liste_big_avatar[selection_case], SCREEN_W/4 - liste_big_avatar[selection_case]->w/2, SCREEN_H/2 - liste_big_avatar[selection_case]->h);
+        if (selection_case != -1) draw_sprite(buffer,liste_big_avatar[selection_case], SCREEN_W/4 - liste_big_avatar[selection_case]->w/2, SCREEN_H/2 - liste_big_avatar[selection_case]->h);
 
         //dessiner histoire centrée
-        stretch_blit(liste_story[selection_case], buffer,
+        if (selection_case != -1) stretch_blit(liste_story[selection_case], buffer,
             0,0,liste_story[selection_case]->w, liste_story[selection_case]->h,
             SCREEN_W/4 - liste_story[selection_case]->w /4, SCREEN_H/2, liste_story[selection_case]->w/2 , liste_story[selection_case]->h/2 );
 
 
         // Afficher bouton valider
-        afficher_boutons(buffer, boutons, nb_boutons);
+        if (selection_case != -1) afficher_boutons(buffer, boutons, nb_boutons);
 
         // Gestion de la saisie clavier
         if (keypressed()) {
