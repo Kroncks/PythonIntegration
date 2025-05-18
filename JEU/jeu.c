@@ -374,10 +374,17 @@ void translation_to_iso(int mouse_x, int mouse_y, int*x,int* y) {
     float hh=TILE_HEIGHT/2.0f;
     float fx=(x_fix/hw+y_fix/hh) / 2.0f;
     float fy =(y_fix/hh-x_fix/hw) / 2.0f;
-    *x =(int)(fx-0.5f);
-    *y =(int)(fy-0.5f);
-    if (*y>5) y+=1;
-    if(*x>=0 && *x<PLAT_X && *y>=0 && *y<PLAT_Y) printf("x : %d\ny : %d\n", *x,*y);
+    int x_temp =(int)(fx-0.5f);
+    int y_temp =(int)(fy-0.5f);
+    if (y_temp>5) y+=1;
+    if(x_temp>=0 && x_temp<PLAT_X && y_temp>=0 && y_temp<PLAT_Y) {
+        *x = x_temp;
+        *y = y_temp;
+        printf("x : %d\ny : %d\n", *x,*y);
+    }else {
+        *y=-1;
+        *x=-1;
+    }
 }
 
 int change_music(const char *filename)
@@ -711,13 +718,10 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
          SCREEN_W, SCREEN_H);
 }
 
-void tour_graphique(Game * game, int i, int * competence,  int * next, int * quit ) {
+void tour_graphique(Game * game, int i, int * next, int * quit ) {
     // clic sur la grille
     int x,y;
-    if (mouse_b & 1) {
-        translation_to_iso(mouse_x, mouse_y, &x, &y);
-        if (x!=-1 && y!=-1) action(game, &game->players[i] , *competence, x,y );
-    }
+    translation_to_iso(mouse_x, mouse_y, &x, &y);
 
     // clavier
     if (keypressed()) {
@@ -931,7 +935,7 @@ void jouer_local_graphique(Game * game) {
             selected_competence=-1;
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
-                tour_graphique(game, i,selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
+                tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
             //check_victory(game, &quit);
