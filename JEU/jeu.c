@@ -664,8 +664,14 @@ void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_compe
 
     draw_sprite(buffer, classe.sprite[8] , x-4, y+11);
 }
-
-void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)
+void bouton_next(BITMAP* buffer, BITMAP* icon) {
+    if (!icon) return;
+    const int pad = 10;
+    int x = SCREEN_W - icon->w - pad;
+    int y = SCREEN_H - icon->h - pad;
+    draw_sprite(buffer, icon, x, y);
+}
+void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche,BITMAP* next_button,  int selected_competence)
 {
     // --- Fond ---
     if (game.map.background) {
@@ -703,6 +709,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
 
     // --- Affichage bas-gauche via notre helper ---
     barre_jeu(buffer, panneau_bas_gauche, game.players[i].classe, selected_competence);
+    bouton_next(buffer,next_button);
 
 
     // --- Curseur ---
@@ -791,6 +798,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         exit(EXIT_FAILURE);
     }
 
+    // Charger l'image du bouton next
+
+    BITMAP* next_button = charger_et_traiter_image(
+            "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
+            651*0.5,342*0.5
+        );
+
+
     // Appliquer la transparence sur le curseur
     appliquer_transparence_curseur(curseur);
 
@@ -826,7 +841,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             selected_competence=-1;
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence); // affiche l'ecrant de jeu
                     //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
                     rest(10);
                 }
@@ -834,11 +849,11 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
             }
         }
     }
@@ -914,6 +929,11 @@ void jouer_local_graphique(Game * game) {
             "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
             1024*0.7,459*0.7
         );
+    BITMAP* next_button = charger_et_traiter_image(
+            "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
+            651*0.5,342*0.5
+        );
+
 
 
     // Redimensionner le curseur
@@ -933,7 +953,7 @@ void jouer_local_graphique(Game * game) {
             n_turns++;
             selected_competence=-1;
             while (!next) {
-                show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
+                show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche,next_button, selected_competence); // affiche l'ecrant de jeu
                 tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
