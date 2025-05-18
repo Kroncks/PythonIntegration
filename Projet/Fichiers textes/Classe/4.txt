@@ -1,0 +1,7 @@
+10 5 14 6
+
+10 3 9 8 4 3 3 0 1 0 2 2 1
+Ecrasement 1 8 15 1 C S
+Calin 2 15 30 1 C S
+Jet de pierres 3 15 30 3 P S
+Seisme 4 15 30 1 S S
