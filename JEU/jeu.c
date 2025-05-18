@@ -302,7 +302,7 @@ bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, in
     return false;
 }
 
-void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len+1], int dest_x, int dest_y, int origin_x, int origin_y) {
+void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len], int dest_x, int dest_y, int origin_x, int origin_y) {
 
     int i=0;
     int cx = dest_x, cy = dest_y;
@@ -310,19 +310,22 @@ void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len+1], 
     path[0].y = origin_y;
     path[len].x = cx;
     path[len].y = cy;
+    printf("fin init inv\n");
     while (!(cx == origin_x && cy == origin_y)) {
+        printf("ahhh\n");
         Node p2 = map_path[cy][cx];
         cx = p2.x;
         cy = p2.y;
         i++;
-        path[len-i]=p2;
+        path[len-i-1]=p2;
+        printf("aled\n");
     }
     for (int j = 0; j < len+1; j++) {
         printf("%d , %d\n", path[j].x, path[j].y);
     }
 }
 
-bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int len_path) {
+bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int* len_path) {
     //printf("init_verif\n");
     //La case cliquée se trouve-t-elle dans le plateau ?
     if (x_dest < 0 || y_dest < 0) return false;
@@ -335,7 +338,7 @@ bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,No
     //printf("pas de joueur\n");
     //Verification du déplacement avec un BFS
     //printf("case dest valide\n");
-    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,&len_path)) return false;
+    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,len_path)) return false;
     //printf("BFS true\n");
     //Toutes les vérifications sont validées
     return true;
@@ -359,13 +362,16 @@ void deplacement(Game* game, Perso* self,
     // Création d’un back-buffer local
     BITMAP* buffer = create_bitmap(screen->w, screen->h);
     if (!buffer) buffer = screen;  // fallback si échec
-
+    printf("fin init\n");
     // Reconstruction du chemin
-    Node path[len_path+1];
-    inversion_chemin(map_path, len_path, path,
+    len_path = len_path+1;
+    printf("%d\n", len_path);
+    Node path[len_path];
+    printf("init path\n");
+    inversion_chemin(map_path, len_path+1, path,
                      x_dest, y_dest,
                      self->x, self->y);
-
+    printf("fin inversion\n");
     // Parcours des segments
     for (int i = 0; i < len_path; i++) {
         int dx = path[i+1].x - path[i].x;
@@ -413,8 +419,9 @@ void deplacement(Game* game, Perso* self,
     self->x = x_dest;
     self->y = y_dest;
     self->pm_restant -= len_path;
-    game->plateau[y_dest][x_dest] = TILE_COUNT + num_joueur;
-    game->plateau[origin_y][origin_x] = TILE_COUNT - num_joueur;
+    printf(" num_joueur : %d\n", num_joueur);
+    game->plateau[x_dest][y_dest] = TILE_COUNT + num_joueur;
+    game->plateau[origin_x][origin_y] -=  (TILE_COUNT - num_joueur);
     printf(" position : (%d, %d)\n", self->x, self->y);
 
     // Libération du buffer local
@@ -449,7 +456,7 @@ void action(Game* game,
 
         printf("Début can_move\n");
         if (can_move(*game, *self, action_x, action_y,
-                     map_path, len_path))
+                     map_path, &len_path))
         {
             printf("Début deplacement\n");
             deplacement(game, self,
