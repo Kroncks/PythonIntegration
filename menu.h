@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include "JEU/structures.h"
+#include "JEU/jeu.h"
 
 void menu(int * choix );
 void init_nb_players_graphique();
