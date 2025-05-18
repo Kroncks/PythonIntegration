@@ -1330,7 +1330,7 @@ void jouer_local_graphique(Game * game) {
                 rest(10);
             }
             // ----- Fin du chronométrage du tour -----
-
+            if (game->nb_morts==NB_JOUEURS-1) quit =1;
             if (quit) break;
         }
     }
