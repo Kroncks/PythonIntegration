@@ -114,6 +114,8 @@ void attack_statut(Perso* self, int idx) {
     if (strcmp(nom, "Rage") == 0) {
         self->boost_modifier = 1.5f;
     }
+    self->p_attaque -= self->classe.competences[idx].p_attaque;
+    return;
 }
 
 
