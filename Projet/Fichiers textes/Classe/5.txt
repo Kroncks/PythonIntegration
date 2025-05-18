@@ -1,0 +1,7 @@
+8 12 10 14
+
+5 4 9 4 10 5 3 2 0 0 1 1 2
+Taillade 1 5 10 1 T D
+Coup d'estoc 2 15 40 2 P D
+Laceration 3 15 40 1 T D
+Coup de torche 4 10 20 1 F D

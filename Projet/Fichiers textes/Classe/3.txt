@@ -1,0 +1,7 @@
+13 14 17 9
+
+5 4 6 7 8 7 3 0 1 0 2 1 2
+Combo-griffes 1 5 10 1 T D
+Vague de chats 2 15 40 2 E I
+Fissure aquatique 3 10 30 1 E I
+Cicatrice 4 15 40 1 T S

@@ -1,0 +1,7 @@
+13 14 11 16
+
+3 9 5 3 4 10 6 2 1 2 0 0 1
+Lance-flammes 1 15 60 2 F I
+Lance de glace 2 5 30 5 E I
+Bulle d'eau 3 0 60 0 N N
+Tempete de sable 4 15 60 3 S I

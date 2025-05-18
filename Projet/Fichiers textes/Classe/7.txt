@@ -1,0 +1,7 @@
+9 14 6 7
+
+7 6 5 8 4 3 7 1 0 2 2 0 1
+Labourage 1 15 50 1 S S
+Charge fourche 2 15 60 3 P S
+Deluge 3 15 60 1 E F
+Recolte 4 5 60 0 N N
