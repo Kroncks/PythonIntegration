@@ -11,7 +11,7 @@ SAMPLE* musique;
 BITMAP* liste_avatar[12];
 BITMAP* liste_big_avatar[12];
 BITMAP* liste_story[12];
-
+static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
 
 void init_coord(Game * game) {
@@ -362,75 +362,118 @@ void deplacement(Game* game, Perso* self,
                  Node map_path[PLAT_Y][PLAT_X],
                  int len_path, int num_joueur)
 {
-    //Init position initiale
+    // 1) Origine logique
     int origin_x = self->x;
     int origin_y = self->y;
-    // Création d’un back-buffer local
-    BITMAP* buffer = create_bitmap(screen->w, screen->h);
-    if (!buffer) buffer = screen;  // fallback si échec
-    printf("fin init\n");
-    // Reconstruction du chemin
-    len_path = len_path+1;
-    printf("%d\n", len_path);
-    Node path[len_path];
-    printf("init path\n");
-    inversion_chemin(map_path, len_path+1, path,
+
+    // 2) Back-buffer
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) buffer = screen;
+
+    // 3) Reconstruction du chemin
+    int steps = len_path;
+    Node path[steps+1];
+    inversion_chemin(map_path, steps, path,
                      x_dest, y_dest,
-                     self->x, self->y);
-    printf("fin inversion\n");
-    // Parcours des segments
-    for (int i = 0; i < len_path; i++) {
-        int dx = path[i+1].x - path[i].x;
-        int dy = path[i+1].y - path[i].y;
+                     origin_x, origin_y);
 
-        // Choix des deux frames selon la direction
-        int f0, f1;
-        if (dx > 0) {
-            // →  (frames 3 & 4)
-            f0 = 2;  f1 = 3;
-        }
-        else if (dx < 0) {
-            // ←  (frames 5 & 6)
-            f0 = 4;  f1 = 5;
-        }
-        else if (dy > 0) {
-            // ↓  (frames 1 & 2)
-            f0 = 0;  f1 = 1;
-        }
-        else {
-            // ↑  (frames 7 & 8)
-            f0 = 6;  f1 = 7;
+    // 4) Origine écran isométrique
+    const int originScrX = SCREEN_W/2;
+    const int originScrY = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
+
+    // 5) Parcours des segments
+    for (int s = 0; s < steps; s++) {
+        // a) Redessiner MAP + AUTRES joueurs
+        if (game->map.background) {
+            stretch_blit(game->map.background, buffer,
+                         0,0,
+                         game->map.background->w, game->map.background->h,
+                         0,0,
+                         SCREEN_W, SCREEN_H);
         }
 
-        // Animation des deux frames
-        for (int frame = 0; frame < 2; frame++) {
-            clear_bitmap(buffer);
-            int x_screen, y_screen;
-            iso_to_screen(path[i].x, path[i].y, &x_screen, &y_screen);
-            draw_sprite(buffer,
-                        self->classe.sprite[(frame == 0) ? f0 : f1],
-                        x_screen, y_screen);
-            if (buffer != screen) {
-                blit(buffer, screen, 0,0, 0,0, screen->w, screen->h);
+        for (int y = 0; y < PLAT_Y; y++) {
+            for (int x = 0; x < PLAT_X; x++) {
+                int id = game->plateau[x][y];
+                int iso_x = (x - y)*(TILE_WIDTH/2) + originScrX;
+                int iso_y = (x + y)*(TILE_HEIGHT/2) + originScrY;
+
+                if (iso_x + TILE_WIDTH  <= 0 || iso_x >= SCREEN_W ||
+                    iso_y + TILE_HEIGHT <= 0 || iso_y >= SCREEN_H)
+                    continue;
+
+                // tuile
+                draw_sprite(buffer,
+                            game->map.images[id < TILE_COUNT ? id : 0],
+                            iso_x, iso_y);
+
+                // si case occupée et pas le self
+                if (id >= TILE_COUNT) {
+                    int pidx = id - TILE_COUNT;
+                    if (pidx != num_joueur) {
+                        Perso* pl = &game->players[pidx];
+                        BITMAP* spr = (pl->pv_actuels > 0)
+                            ? pl->classe.sprite[0]
+                            : sprite_mort;
+                        int oy = (spr == sprite_mort)
+                                 ? spr->h/2
+                                 : spr->h/3;
+                        draw_sprite(buffer,
+                                    spr,
+                                    iso_x,
+                                    iso_y - oy);
+                    }
+                }
             }
-            rest(100);
         }
 
-        // Mise à jour logique de la position
-        self->x = path[i+1].x;
-        self->y = path[i+1].y;
+        // b) Choix des frames selon la direction
+        int dx = path[s+1].x - path[s].x;
+        int dy = path[s+1].y - path[s].y;
+        int f0, f1;
+        if      (dx > 0) { f0 = 0; f1 = 1; }  // →
+        else if (dx < 0) { f0 = 2; f1 = 3; }  // ←
+        else if (dy > 0) { f0 = 4; f1 = 5; }  // ↓
+        else             { f0 = 6; f1 = 7; }  // ↑
+
+        // c) Animation 2 frames du self
+        for (int frame = 0; frame < 2; frame++) {
+            // (re)dessiner la frame courante du self
+            int px = path[s].x, py = path[s].y;
+            int iso_x = (px - py)*(TILE_WIDTH/2) + originScrX;
+            int iso_y = (px + py)*(TILE_HEIGHT/2) + originScrY;
+
+            BITMAP* spr = self->classe.sprite[
+                (frame == 0) ? f0 : f1
+            ];
+            draw_sprite(buffer,
+                        spr,
+                        iso_x,
+                        iso_y - spr->h/3);
+
+            // blit & pause
+            blit(buffer, screen,
+                 0,0,
+                 0,0,
+                 SCREEN_W, SCREEN_H);
+            rest(50);
+        }
+
+        // d) Mise à jour de la position
+        self->x = path[s+1].x;
+        self->y = path[s+1].y;
     }
 
-    // S’assurer d’être exactement à la destination
+    // 6) Position finale
     self->x = x_dest;
     self->y = y_dest;
-    self->pm_restant -= len_path;
-    printf(" num_joueur : %d\n", num_joueur);
-    game->plateau[x_dest][y_dest] = TILE_COUNT + num_joueur;
-    game->plateau[origin_x][origin_y] -=  (TILE_COUNT - num_joueur);
-    printf(" position : (%d, %d)\n", self->x, self->y);
+    self->pm_restant -= steps;
 
-    // Libération du buffer local
+    // 7) Mettre à jour la map
+    game->plateau[origin_x][origin_y] = 0;
+    game->plateau[x_dest][y_dest]     = TILE_COUNT + num_joueur;
+
+    // 8) Libérer le buffer
     if (buffer != screen) destroy_bitmap(buffer);
 }
 
@@ -928,7 +971,6 @@ void bouton_next(BITMAP* buffer, BITMAP* icon) {
     draw_sprite(buffer, icon, x, y);
 }
 
-static BITMAP* sprite_mort = NULL;
 
 void show_graphique(Game game,
                     int n_turns,
