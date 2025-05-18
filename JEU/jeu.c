@@ -14,9 +14,16 @@ BITMAP* liste_story[12];
 static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
 
-
-void init_tour(Game * game) {
-
+void init_tour(Game *game) {
+    // Recharge pour chaque joueur :
+    //  - points d'attaque = mana * 10
+    //  - points de mouvement = endurance
+    for (int i = 0; i < NB_JOUEURS; i++) {
+        Perso *p = &game->players[i];
+        // mana et endurance sont dans p->classe
+        p->p_attaque  = p->classe.mana * 10;
+        p->pm_restant = p->classe.endurance;
+    }
 }
 
 
