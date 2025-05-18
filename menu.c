@@ -445,7 +445,6 @@ void menu_selection_personnages(int num, Perso * self) {
 }
 
 void menu_fin() {
-    printf("Fin du jeu\n");
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
         allegro_message("Erreur lors de la création du buffer !");
@@ -460,8 +459,10 @@ void menu_fin() {
         "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
         651*0.5, 342*0.5
     );
+
+
     int next = 0;
-    while (next = 0) {
+    while (next == 0) {
         bouton_next(buffer, next_button);
         next_cliqued(&next);
     }
