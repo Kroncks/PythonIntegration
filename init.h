@@ -6,6 +6,7 @@
 #define INIT_H
 
 #include "JEU/structures.h"
+#include "GRAPHISMES/graphismes.h"
 #include <stdio.h>
 
 
