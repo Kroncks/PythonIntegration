@@ -546,6 +546,11 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
 }
 
 void tour_graphique(Game * game, int i, int * next, int * quit ) {
+    // clic sur la grille
+    int x,y;
+    translation_to_iso(mouse_x, mouse_y, &x, &y);
+
+    // clavier
     if (keypressed()) {
         int keycode = readkey();
         int k = keycode >> 8;
@@ -745,7 +750,6 @@ void jouer_local_graphique(Game * game) {
                 show_graphique(*game,n_turns,i, buffer, curseur); // affiche l'ecrant de jeu
                 tour_graphique(game, i, &next, &quit ); // verifie les actions du joueur et joue joue
                 rest(10);
-                translation_to_iso(mouse_x, mouse_y);
             }
             //check_victory(game, &quit);
             if (quit) break;
