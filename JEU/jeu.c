@@ -742,7 +742,7 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
          SCREEN_W, SCREEN_H);
 }
 
-void next(int * next) {
+void next_cliqued(int * next) {
     const int pad = 10;
     int x = SCREEN_W - 651*0.5 - pad;
     int y = SCREEN_H - 342*0.5 - pad;
