@@ -742,7 +742,55 @@ void show(Game game, int n_turns, int num) {
     }
     printf("===========================================\n");
 }
-void detection_competence (Game * game,int * num_competence) {
+
+void dishtra(Game * game, int x, int y, int portee, int pas) {
+    pas += 1;
+    game->portee[y][x]=1;
+    if (pas > portee) return;
+
+    // haut
+    if (y-1 >= 0) {
+        if (game->plateau[y-1][x] == 0 && game->portee[y-1][x] == 0) {
+            dishtra(game, x, y-1, portee, pas);
+        }
+    }
+    // droite
+    if (x+1 < PLAT_X) {
+        if (game->plateau[y][x+1] == 0 && game->portee[y][x+1] == 0) {
+            dishtra(game, x+1, y, portee, pas);
+        }
+    }
+    // bas
+    if (y+1 < PLAT_Y) {
+        if (game->plateau[y+1][x] == 0 && game->portee[y+1][x] == 0) {
+            dishtra(game, x, y+1, portee, pas );
+        }
+    }
+    // gauche
+    if (x-1 >= 0) {
+        if (game->plateau[y][x-1] == 0 && game->portee[y][x-1] == 0) {
+            dishtra(game, x-1, y, portee, pas);
+        }
+    }
+}
+
+void update_portee(Game * game, Perso player, int num_competence) {
+    init_portee(game);
+    int portee;
+    if (num_competence == 5 )
+        portee = player.pm_restant;
+    else
+        portee = player.classe.competences[num_competence-1].portee;
+
+    printf("portee : %d\n", portee);
+
+    int x = player.x;
+    int y = player.y;
+    int pas =0;
+    dishtra(game, x, y, portee, pas);
+}
+
+void detection_competence (Game * game, Perso player,int * num_competence) {
     const int pad = 10;
     int x = mouse_x-pad;
     int y = mouse_y-pad-SCREEN_H-(int)(442*0.7);
@@ -755,7 +803,7 @@ void detection_competence (Game * game,int * num_competence) {
     if (x < 985*0.7 && x > 810*0.7) *num_competence = 5;
 
     if (*num_competence != buff) { // nouvelle competence
-        // update portee
+        update_portee(game, player, *num_competence);
     }
 }
 void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
@@ -861,7 +909,7 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
             action(game, &game->players[i], *competence, x, y, i);
         } else {
 
-        detection_competence(game, competence);
+        detection_competence(game,game->players[i], competence);
         }
     }
 
