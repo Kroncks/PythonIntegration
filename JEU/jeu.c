@@ -655,7 +655,7 @@ void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_compe
     draw_sprite(buffer, classe.competences[2].sprite[2] , x+392, y+80);
     draw_sprite(buffer, classe.competences[3].sprite[2] , x+485, y+80);
 
-    draw_sprite(buffer, classe.sprite[8] , x+50, y+50);
+    draw_sprite(buffer, classe.sprite[8] , x-4, y+13);
 }
 
 void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curseur,BITMAP* panneau_bas_gauche, int selected_competence)

@@ -88,7 +88,7 @@ t_classe init_classe(int num_classe) {
         }
     }
     snprintf(filename, sizeof(filename),"../Projet/Graphismes/Menus/Select/%d.bmp", num_classe+1);
-    classe.sprite[8] = charger_et_traiter_image(filename, 64,64);
+    classe.sprite[8] = charger_et_traiter_image(filename, 200,200);
     return classe;
 }
 
