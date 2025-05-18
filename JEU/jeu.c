@@ -185,8 +185,8 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     // 5) Sinon on vérifie la portée et on calcule les dégâts
     int dx = abs(attaquant->x - defenseur->x);
     int dy = abs(attaquant->y - defenseur->y);
-    //if (dx + dy > spell->portee)
-        //return;
+    if (dx + dy > spell->portee)
+        return;
 
     // Dégâts de base + stat
     float total = (float)spell->degat;
