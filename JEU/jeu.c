@@ -718,10 +718,16 @@ void show_graphique(Game game, int n_turns, int i, BITMAP* buffer, BITMAP* curse
          SCREEN_W, SCREEN_H);
 }
 
-void tour_graphique(Game * game, int i, int * next, int * quit ) {
+void tour_graphique(Game * game, int i, int competence,  int * next, int * quit ) {
     // clic sur la grille
     int x,y;
-    translation_to_iso(mouse_x, mouse_y, &x, &y);
+    if (mouse_b & 1) {
+        translation_to_iso(mouse_x, mouse_y, &x, &y);
+        if (x != -1 && y != -1) {
+            action(game, &game->players[i], competence, x, y);
+        }
+    }
+
 
     // clavier
     if (keypressed()) {
@@ -935,7 +941,7 @@ void jouer_local_graphique(Game * game) {
             selected_competence=-1;
             while (!next) {
                 show_graphique(*game,n_turns,i, buffer, curseur, panneau_bas_gauche, selected_competence); // affiche l'ecrant de jeu
-                tour_graphique(game, i, &next, &quit); // verifie les actions du joueur et joue joue
+                tour_graphique(game, i,selected_competence, &next, &quit); // verifie les actions du joueur et joue joue
                 rest(10);
             }
             //check_victory(game, &quit);
