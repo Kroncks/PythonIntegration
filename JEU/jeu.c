@@ -1113,7 +1113,9 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                     }
                     rest(10);
 
-                    if (game->last_action[0]=='0') next=1;
+                    if (game->last_action[0]!='0') {
+                        next=1;
+                    }
                 }
                 game->last_action[strlen(game->last_action)] = '\0';
                 printf("sending END : %s\n", game->last_action);
