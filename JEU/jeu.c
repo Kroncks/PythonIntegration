@@ -115,7 +115,7 @@ void attack_statut(Perso* self, int idx) {
     if (strcmp(nom, "Mur de lianes") == 0 ||
         strcmp(nom, "Bulle d'eau") == 0) {
         self->protection = true;
-        return;
+        //return;
         }
 
     // Compétences de soin
@@ -125,8 +125,8 @@ void attack_statut(Perso* self, int idx) {
         int soin = self->classe.competences[idx].degat * self->classe.foi;
         self->pv_actuels += soin;
         if (self->pv_actuels > self->classe.pv)
-            self->pv_actuels = self->classe.pv;
-        return;
+            self->pv_actuels = self->classe.pv*10;
+        //return;
         }
 
     // Compétence de boost
@@ -190,7 +190,6 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
                     iso_y - spell->sprite[f]->h/2);
         rest(100);
     }
-
     // Dégâts de base + stat
     float total = (float)spell->degat;
     switch (spell->type_stat) {
@@ -209,7 +208,10 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     }
     total *= attaquant->boost_modifier;
     int dmg = (int)total;
-
+    if (defenseur->protection) {
+        defenseur->protection = false;
+        dmg = 0;
+    }
     // 5) Consommation PA et application dégâts
     attaquant->p_attaque  -= spell->p_attaque;
     defenseur->pv_actuels -= dmg;
@@ -379,6 +381,7 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
     }
 }
 
+
 void translation_to_iso(int* x, int* y) {
     int origin_x = SCREEN_W / 2;
     int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
@@ -401,7 +404,6 @@ void translation_to_iso(int* x, int* y) {
         *y = -1;
     }
 }
-
 
 int change_music(const char *filename)
 {
@@ -803,7 +805,7 @@ void barre_jeu(BITMAP* buffer,
     const int pv_bar_h = 30;
 
     // Récupération et clamp des PV
-    int maxPV = perso->classe.pv;
+    int maxPV = perso->classe.pv*10;
     int curPV = perso->pv_actuels;
     if (curPV < 0)     curPV = 0;
     if (curPV > maxPV) curPV = maxPV;
