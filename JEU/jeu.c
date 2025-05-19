@@ -23,7 +23,9 @@ void init_tour(Game *game) {
         game->players[i].p_attaque  = game->players[i].classe.mana * 10;
         game->players[i].pm_restant = game->players[i].classe.endurance;
     }
-    game->last_action[0]="\0";
+    sprintf(game->last_action, "%d %d %d",-1, -1, -1);
+    game->last_action[strlen(game->last_action)] = '\0';
+    printf("last_action : %s\n", game->last_action);
 }
 
 void init_coord(Game * game) {
@@ -1109,9 +1111,9 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                         printf("[Game] Data sent\n");
                     }
                 }
-                strcpy(LAN_buffer, "FIN_TOUR\0");
-                send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
-                printf("[Game] Data sent\n");
+                sprintf(game->last_action, "%d %d %d",-1, -1, -1);
+                game->last_action[strlen(game->last_action)] = '\0';
+                printf("last_action : %s\n", game->last_action);
             } else {
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
