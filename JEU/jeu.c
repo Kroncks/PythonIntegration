@@ -534,11 +534,11 @@ void tour(Game * game, int num, char * data) {
 void process_data(Game * game, int num, char * data, int * next) {
     int num_competence, action_x, action_y;
     sscanf(data, "%d %d %d", &num_competence, &action_x, &action_y);
+    printf(" JOUE player %d : %d (%d,%d)\n", num, num_competence, action_x, action_y);
     if (num_competence == -1) {
         *next = 1;
         return;
     }
-    printf(" JOUE player %d : %d (%d,%d)\n");
     action(game, &game->players[num], num_competence, action_x, action_y, num);
 }
 
@@ -1104,12 +1104,6 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                     }
 
                     rest(10);
-
-                    if (game->last_action[0] != '\0') {
-                        strcpy(LAN_buffer, game->last_action);
-                        send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
-                        printf("[Game] Data sent\n");
-                    }
                 }
                 sprintf(game->last_action, "%d %d %d",-1, -1, -1);
                 game->last_action[strlen(game->last_action)] = '\0';
