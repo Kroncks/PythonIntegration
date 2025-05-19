@@ -63,6 +63,126 @@ void init_plato(Game * game) {
 }
 
 
+
+
+
+void dessiner_losange(BITMAP* buffer, int cx, int cy, int w, int h, int fill_color, int border_color) {
+    int points[8] = {
+        cx,         cy - h / 2,
+        cx + w / 2, cy,
+        cx,         cy + h / 2,
+        cx - w / 2, cy
+    };
+    set_trans_blender(0, 0, 0, 100);
+    drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
+    polygon(buffer, 4, points, fill_color);
+    drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
+    for (int i = 0; i < 4; i++) {
+        line(buffer, points[i*2], points[i*2+1], points[((i+1)%4)*2], points[((i+1)%4)*2+1], border_color);
+    }
+}
+
+
+
+// ====================================================================================
+
+
+
+void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
+    typedef struct { int x, y, dist; } Node;
+    Node queue[PLAT_X * PLAT_Y];
+    int front = 0, rear = 0;
+
+    game->portee[start_x][start_y] = 1;
+    game->prev[start_x][start_y] = (Coord){-1, -1};
+    queue[rear++] = (Node){start_x, start_y, 0};
+
+    while (front < rear) {
+        Node curr = queue[front++];
+        if (curr.dist >= portee) continue;
+
+        int dx[4] = {1, -1, 0, 0};
+        int dy[4] = {0, 0, 1, -1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = curr.x + dx[i];
+            int ny = curr.y + dy[i];
+
+            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
+            if (game->plateau[nx][ny] != 0) continue;
+            if (game->portee[nx][ny]) continue;
+
+            game->portee[nx][ny] = 1;
+            game->prev[nx][ny] = (Coord){curr.x, curr.y};
+            queue[rear++] = (Node){nx, ny, curr.dist + 1};
+        }
+    }
+}
+
+
+int get_path(Game *game, int x, int y, Coord path[], int max_len) {
+    int len = 0;
+    while (x != -1 && y != -1 && len < max_len) {
+        path[len++] = (Coord){x, y};
+        Coord p = game->prev[x][y];
+        x = p.x;
+        y = p.y;
+    }
+    for (int i = 0; i < len / 2; i++) {
+        Coord tmp = path[i];
+        path[i] = path[len - 1 - i];
+        path[len - 1 - i] = tmp;
+    }
+    return len;
+}
+
+
+void update_portee(Game *game, Perso player, int num_competence) {
+    init_portee(game);
+    int portee = (num_competence == 5)
+        ? player.pm_restant
+        : player.classe.competences[num_competence - 1].portee;
+
+    int x = player.x;
+    int y = player.y;
+    dishtra(game, x, y, portee, 0);
+}
+
+void afficher_portee(BITMAP * buffer, Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
+    if (x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && game.portee[x][y] == 1) {
+        dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
+    }
+}
+
+void translation_to_iso(int* x, int* y) {
+    const int origin_x = SCREEN_W/2;
+    const int origin_y = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
+    const int click_offset = 14;
+
+    float mx = mouse_x - origin_x;
+    float my = mouse_y - (origin_y + click_offset);
+    float half_w = TILE_WIDTH  / 2.0f;
+    float half_h = TILE_HEIGHT / 2.0f;
+
+    float fx = (mx/half_w + my/half_h) * 0.5f;
+    float fy = (my/half_h - mx/half_w) * 0.5f;
+
+    int tx = (int)floorf(fx);
+    int ty = (int)floorf(fy);
+
+    if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
+        *x = tx;
+        *y = ty;
+    } else {
+        *x = -1;
+        *y = -1;
+    }
+}
+
+
+
+// ====================================================================================
+
 void show_selected_comp(BITMAP* buffer, int selected_competence) {
     //printf("selected_competence = %d\n", selected_competence);
     const int pad = 10;
@@ -232,37 +352,7 @@ int found_player(Game game, int x, int y) {
     return -1;
 }
 
-void update_portee(Game *game, Perso player, int num_competence) {
-    init_portee(game);
 
-    int portee = (num_competence == 5)
-                 ? player.pm_restant
-                 : player.classe.competences[num_competence - 1].portee;
-
-    printf("Portée : %d\n", portee);
-
-    int x = player.x;
-    int y = player.y;
-    int pas = 0;
-
-    dishtra(game, x, y, portee, pas);
-
-    printf("Portée calculée :\n");
-    for (int i = 0; i < PLAT_X; i++) {
-        for (int j = 0; j < PLAT_Y; j++) {
-            printf("%d  ", game->portee[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\nPlateau :\n");
-    for (int i = 0; i < PLAT_X; i++) {
-        for (int j = 0; j < PLAT_Y; j++) {
-            printf("%d  ", game->plateau[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-}
 void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
     int origin_x = SCREEN_W/2;
     int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
@@ -383,35 +473,6 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
 }
 
 
-void translation_to_iso(int* x, int* y) {
-    // Origine écran de la carte isométrique
-    const int origin_x     = SCREEN_W/2;
-    const int origin_y     = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
-    const int click_offset = 14;  // on décale de 10px vers le bas
-
-    // 2) Calcul de la tuile sous la souris (avec le même décalage)
-    float mx = mouse_x - origin_x;
-    float my = mouse_y - (origin_y + click_offset);
-
-    float half_w = TILE_WIDTH  / 2.0f;
-    float half_h = TILE_HEIGHT / 2.0f;
-
-    // conversion inverse isométrique → cartésien
-    float fx = (mx/half_w + my/half_h) * 0.5f;
-    float fy = (my/half_h - mx/half_w) * 0.5f;
-
-    int tx = (int)floorf(fx);
-    int ty = (int)floorf(fy);
-
-    // 3) Vérification des bornes
-    if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
-        *x = tx;
-        *y = ty;
-    } else {
-        *x = -1;
-        *y = -1;
-    }
-}
 
 int change_music(const char *filename)
 {
@@ -666,27 +727,8 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
     init_coord(game);
 }
 
-void dessiner_losange(BITMAP* buffer, int cx, int cy, int w, int h, int fill_color, int border_color) {
-    int points[8] = {
-        cx,         cy - h / 2,
-        cx + w / 2, cy,
-        cx,         cy + h / 2,
-        cx - w / 2, cy
-    };
-    set_trans_blender(0, 0, 0, 100);
-    drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
-    polygon(buffer, 4, points, fill_color);
-    drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
-    for (int i = 0; i < 4; i++) {
-        line(buffer, points[i*2], points[i*2+1], points[((i+1)%4)*2], points[((i+1)%4)*2+1], border_color);
-    }
-}
 
-void afficher_portee(BITMAP * buffer,Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
-    if (game.portee[x][y]==1) {
-        dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
-    }
-}
+
 
 void show(Game game, int n_turns, int num) {
     printf("====================[%d]====================\n", n_turns);
@@ -717,64 +759,6 @@ void show(Game game, int n_turns, int num) {
 }
 Coord prev[PLAT_Y][PLAT_X]; // pour reconstruire le chemin
 
-
-void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
-    typedef struct {
-        int x, y, dist;
-    } Node;
-
-    Node queue[PLAT_X * PLAT_Y];
-    int front = 0, rear = 0;
-
-    game->portee[start_y][start_x] = 1;
-    game->prev[start_y][start_x].x = -1;
-    game->prev[start_y][start_x].y = -1;
-
-    queue[rear++] = (Node){start_x, start_y, 0};
-
-    while (front < rear) {
-        Node curr = queue[front++];
-        if (curr.dist >= portee) continue;
-
-        int dx[4] = {1, -1, 0, 0};
-        int dy[4] = {0, 0, 1, -1};
-
-        for (int i = 0; i < 4; i++) {
-            int nx = curr.x + dx[i];
-            int ny = curr.y + dy[i];
-
-            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
-            if (game->plateau[ny][nx] != 0) continue;
-            if (game->portee[ny][nx]) continue;
-
-            game->portee[ny][nx] = 1;
-            game->prev[ny][nx].x = curr.x;
-            game->prev[ny][nx].y = curr.y;
-
-            queue[rear++] = (Node){nx, ny, curr.dist + 1};
-        }
-    }
-}
-
-// Stocke le chemin de (x, y) jusqu'au joueur dans path[], retourne sa taille
-int get_path(Game *game, int x, int y, Coord path[], int max_len) {
-    int len = 0;
-    while (x != -1 && y != -1 && len < max_len) {
-        path[len++] = (Coord){x, y};
-        Coord p = game->prev[y][x];
-        x = p.x;
-        y = p.y;
-    }
-
-    // Inverser le chemin pour aller du joueur vers la destination
-    for (int i = 0; i < len / 2; i++) {
-        Coord tmp = path[i];
-        path[i] = path[len - 1 - i];
-        path[len - 1 - i] = tmp;
-    }
-
-    return len;
-}
 
 
 
