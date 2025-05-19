@@ -360,7 +360,7 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
             // mise en buffer de la donnee a envoyer (olalalala)
             sprintf(game->last_action, "%d %d %d",num_competence, action_x, action_y);
             game->last_action[strlen(game->last_action)] = '\0';
-            printf("last_action : %s\n", game->last_action);
+            printf("saving last_action : %s\n", game->last_action);
         }
     } else {
         int idx = num_competence - 1;
@@ -374,7 +374,7 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
             // mise en buffer de la donnee a envoyer (olalalala)
             sprintf(game->last_action, "%d %d %d",num_competence, action_x, action_y);
             game->last_action[strlen(game->last_action)] = '\0';
-            printf("last_action : %s\n", game->last_action);
+            printf("saving last_action : %s\n", game->last_action);
         }
     }
 }
@@ -1104,10 +1104,20 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                     }
 
                     rest(10);
+
+                    int num_competence, action_x, action_y;
+                    sscanf(game->last_action, "%d %d %d", &num_competence, &action_x, &action_y);
+                    if (num_competence != -1) {
+                        printf("sending last_action : %s\n", game->last_action);
+                        send(sock, game->last_action, strlen(game->last_action), 0);
+                    }
+
                 }
                 sprintf(game->last_action, "%d %d %d",-1, -1, -1);
                 game->last_action[strlen(game->last_action)] = '\0';
-                printf("last_action : %s\n", game->last_action);
+                printf("sending END : %s\n", game->last_action);
+                send(sock, game->last_action, strlen(game->last_action), 0);
+
             } else {
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
