@@ -23,9 +23,9 @@ void init_tour(Game *game) {
         game->players[i].p_attaque  = game->players[i].classe.mana * 10;
         game->players[i].pm_restant = game->players[i].classe.endurance;
     }
-    sprintf(game->last_action, "%d %d %d",-1, -1, -1);
+    sprintf(game->last_action, "%d %d %d",0, 0, 0);
     game->last_action[strlen(game->last_action)] = '\0';
-    printf("last_action : %s\n", game->last_action);
+    printf("INIT last_action : %s\n", game->last_action);
 }
 
 void init_coord(Game * game) {
@@ -1104,34 +1104,21 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                     if (difftime(time(NULL), turn_start) >= 15.0) {
                         next = 1;  // Force la fin du tour
                     }
-
                     rest(10);
 
-                    int num_competence, action_x, action_y;
-                    sscanf(game->last_action, "%d %d %d", &num_competence, &action_x, &action_y);
-                    if (num_competence != -1) {
-                        printf("sending last_action : %s\n", game->last_action);
-                        send(sock, game->last_action, strlen(game->last_action), 0);
-                    }
-
+                    if (game->last_action[0]=='0') next=1;
                 }
-                sprintf(game->last_action, "%d %d %d",-1, -1, -1);
                 game->last_action[strlen(game->last_action)] = '\0';
                 printf("sending END : %s\n", game->last_action);
                 send(sock, game->last_action, strlen(game->last_action), 0);
 
             } else {
-                while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                    while (!next) {
-                        printf("waiting for data\n");
-                        get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
-                        if(quit) break;
-                        process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
-                        show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                    }
-                    if(quit) break;
-                }
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                printf("waiting for data\n");
+                get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
+                if(quit) break;
+                process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
+                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
             }
             if (game->nb_morts==NB_JOUEURS-1) {
                 quit =1;
