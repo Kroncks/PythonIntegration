@@ -30,7 +30,7 @@ void init_coord(Game * game) {
     game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
     game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
     game->players[3].x = PLAT_X-1; game->players[3].y = 0;
-    game->theme = rand() % NB_THEMES;
+
     game->plateau[0][0]= TILE_COUNT;
     game->plateau[PLAT_Y-1][PLAT_X-1]= TILE_COUNT+1;
     if (NB_JOUEURS == 4) {
@@ -53,6 +53,9 @@ void init_plato(Game * game) {
     for (int i=0; i<PLAT_Y; i++) {
         game->plateau[i][0] = game->plateau[i][PLAT_Y-1] = game->plateau[i][PLAT_Y/2 + rand_y] =0;
     }
+
+    game->theme = rand() % NB_THEMES;
+
 }
 
 
@@ -621,6 +624,7 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         get_data(sock, &received, buffer, 0, &quit);
         printf("[GAME] received data : %s\n",buffer);
         game->theme = buffer[0] - 'a';
+        printf("[GAME] theme : %d\n",game->theme);
     }
     //coordonées de base des joueurs :
     init_coord(game);
