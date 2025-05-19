@@ -980,8 +980,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             time_t turn_start = time(NULL);
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                    //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+                    show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence,turn_start);
+                    tour_graphique(game, i, &selected_competence, &next, &quit);
+
+                    // Vérification du timeout de 15 secondes
+                    if (difftime(time(NULL), turn_start) >= 15.0) {
+                        next = 1;  // Force la fin du tour
+                    }
+
                     rest(10);
                 }
                 tour(game, i, LAN_buffer); // le joueur joue
@@ -994,6 +1000,12 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
             }
+            if (game->nb_morts==NB_JOUEURS-1) {
+                quit =1;
+                game->poduim[game->nb_morts]= game->players[i];
+                game->nb_morts++;
+            }
+            if (quit) break;
         }
     }
     destroy_bitmap(panneau_bas_gauche);
