@@ -993,8 +993,68 @@ void show_graphique(Game game,
         // 4) Curseur
         stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
     }
+    // Affichage des PV des joueurs en haut à gauche
+    afficher_pv_joueurs(buffer, game);
+
     // 5) Envoi du buffer à l'écran
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+void afficher_pv_joueurs(BITMAP* buffer, Game game) {
+    const int start_x = 10;
+    const int start_y = 10;
+    const int line_height = 25;
+    const int bar_width_max = 150;
+    const int bar_height = 15;
+
+    for (int i = 0; i < NB_JOUEURS; i++) {
+        Perso* p = &game.players[i];
+
+        // Affichage du pseudo
+        textprintf_ex(buffer, font,
+                      start_x, start_y + i * line_height,
+                      makecol(255, 255, 255), -1,
+                      "%s", p->pseudo);
+
+        // Calcul ratio PV
+        float ratio = 0.0f;
+        if (p->classe.pv > 0) {
+            ratio = (float)p->pv_actuels / (float)p->classe.pv*10;
+            if (ratio < 0.0f) ratio = 0.0f;
+            if (ratio > 1.0f) ratio = 1.0f;
+        }
+
+        int bar_width = (int)(bar_width_max * ratio);
+        if (p->pv_actuels > 0 && bar_width < 1) {
+            bar_width = 1;
+        }
+
+        // TRACE console : affiche l’état des PV pour ce joueur
+        printf("Joueur %d (%s) : PV actuels = %d, PV max = %d, ratio = %.3f, largeur barre = %d\n",
+               i, p->pseudo, p->pv_actuels, p->classe.pv*10, ratio, bar_width);
+
+        // Dessin de la barre (rouge + verte + cadre)
+        rectfill(buffer,
+                 start_x + 120, start_y + i * line_height,
+                 start_x + 120 + bar_width_max, start_y + i * line_height + bar_height,
+                 makecol(100, 0, 0));
+
+        rectfill(buffer,
+                 start_x + 120, start_y + i * line_height,
+                 start_x + 120 + bar_width, start_y + i * line_height + bar_height,
+                 makecol(0, 200, 0));
+
+        rect(buffer,
+             start_x + 120, start_y + i * line_height,
+             start_x + 120 + bar_width_max, start_y + i * line_height + bar_height,
+             makecol(255, 255, 255));
+
+        // Affichage texte PV sur l’écran
+        textprintf_ex(buffer, font,
+                      start_x + 280, start_y + i * line_height,
+                      makecol(255, 255, 0), -1,
+                      "%d / %d", p->pv_actuels, p->classe.pv*10);
+    }
 }
 
 void next_cliqued(int * next) {

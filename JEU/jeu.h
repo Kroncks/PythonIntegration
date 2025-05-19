@@ -24,5 +24,6 @@ void dishtra(Game *game, int start_x, int start_y, int portee, int pas);
 void bouton_next(BITMAP* buffer, BITMAP* icon);
 void next_cliqued(int * next);
 int change_music(const char *filename);
+void afficher_pv_joueurs(BITMAP* buffer, Game game);
 
 #endif //JEU_H
