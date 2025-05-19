@@ -762,21 +762,112 @@ void detection_competence (Game * game, Perso player,int * num_competence) {
         update_portee(game, player, *num_competence);
     }
 }
-void barre_jeu(BITMAP* buffer, BITMAP* icon, t_classe classe, int selected_competence)
+void barre_jeu(BITMAP* buffer,
+               BITMAP* icon,
+               t_classe classe,
+               Perso* perso,
+               int selected_competence)
 {
     if (!icon) return;
+
+    // ----------------------------------------------------------------
+    // 1) Positionnement de l'encart
+    // ----------------------------------------------------------------
     const int pad = 10;
-    int x = pad;
-    int y = SCREEN_H - icon->h - pad;
-    draw_sprite(buffer, icon, x, y);
+    int x0 = pad;
+    int y0 = SCREEN_H - icon->h - pad;
+    draw_sprite(buffer, icon, x0, y0);
 
-    draw_sprite(buffer, classe.competences[0].sprite[2] , x+205, y+80);
-    draw_sprite(buffer, classe.competences[1].sprite[2] , x+298, y+80);
-    draw_sprite(buffer, classe.competences[2].sprite[2] , x+392, y+80);
-    draw_sprite(buffer, classe.competences[3].sprite[2] , x+485, y+80);
+    // ----------------------------------------------------------------
+    // 2) BARRE DE PV (vert sombre qui diminue)
+    // ----------------------------------------------------------------
+    const int pv_bar_x = x0 + 203;
+    const int pv_bar_y = y0 + 177;
+    const int pv_bar_w = 482;  // largeur fixe
+    const int pv_bar_h = 30;
 
-    draw_sprite(buffer, classe.sprite[8] , x-4, y+11);
+    // Récupération et clamp des PV
+    int maxPV = perso->classe.pv;
+    int curPV = perso->pv_actuels;
+    if (curPV < 0)     curPV = 0;
+    if (curPV > maxPV) curPV = maxPV;
+
+    // Calcul du ratio [0..1]
+    float pv_ratio = maxPV > 0
+                     ? (float)curPV / (float)maxPV
+                     : 0.0f;
+    // Conversion en largeur en pixels
+    int pv_w = (int)(pv_bar_w * pv_ratio + 0.5f);
+
+    // Dessin de la portion verte sombre
+    rectfill(buffer,
+             pv_bar_x,
+             pv_bar_y,
+             pv_bar_x + pv_w,
+             pv_bar_y + pv_bar_h,
+             makecol(0, 100, 0));
+
+
+    // ----------------------------------------------------------------
+    // 3) ICÔNES DE COMPÉTENCES
+    // ----------------------------------------------------------------
+    // Frames fixes : 205, 298, 392, 485
+    draw_sprite(buffer, classe.competences[0].sprite[2], x0 + 205, y0 + 80);
+    draw_sprite(buffer, classe.competences[1].sprite[2], x0 + 298, y0 + 80);
+    draw_sprite(buffer, classe.competences[2].sprite[2], x0 + 392, y0 + 80);
+    draw_sprite(buffer, classe.competences[3].sprite[2], x0 + 485, y0 + 80);
+
+
+    // ----------------------------------------------------------------
+    // 4) BARRES DE MOUVEMENT (PM) ET D’ACTION (PA)
+    // ----------------------------------------------------------------
+    int bar_left_x  = x0 + 24;
+    int bar_right_x = x0 + icon->w - 30;
+    int bar_total_w = bar_right_x - bar_left_x;
+    int bar_h       = 22;
+    int gap         = 5;
+    int pm_bar_y    = y0 + icon->h - 85;
+    int pa_bar_y    = pm_bar_y + bar_h + gap;
+
+    // Fond gris pour les deux barres
+    rectfill(buffer,
+             bar_left_x, pm_bar_y,
+             bar_right_x, pa_bar_y + bar_h,
+             makecol(80, 80, 80));
+
+    // -- Barre PM (bleue)
+    float pm_ratio = (classe.endurance > 0)
+                     ? (float)perso->pm_restant / (float)classe.endurance
+                     : 0.0f;
+    if (pm_ratio < 0.0f) pm_ratio = 0.0f;
+    if (pm_ratio > 1.0f) pm_ratio = 1.0f;
+    int pm_w = (int)(bar_total_w * pm_ratio + 0.5f);
+    rectfill(buffer,
+             bar_left_x, pm_bar_y,
+             bar_left_x + pm_w, pm_bar_y + bar_h,
+             makecol(0, 0, 200));
+
+    // -- Barre PA (rouge)
+    int maxPA = classe.mana * 10;
+    float pa_ratio = maxPA > 0
+                     ? (float)perso->p_attaque / (float)maxPA
+                     : 0.0f;
+    if (pa_ratio < 0.0f) pa_ratio = 0.0f;
+    if (pa_ratio > 1.0f) pa_ratio = 1.0f;
+    int pa_w = (int)(bar_total_w * pa_ratio + 0.5f);
+    rectfill(buffer,
+             bar_left_x, pa_bar_y,
+             bar_left_x + pa_w, pa_bar_y + bar_h,
+             makecol(200, 0, 0));
+
+
+    // ----------------------------------------------------------------
+    // 5) CADRE DE SÉLECTION DE COMPÉTENCE
+    // ----------------------------------------------------------------
+    draw_sprite(buffer, classe.sprite[8], x0 - 4, y0 + 11);
+    show_selected_comp(buffer, selected_competence);
 }
+
 
 void bouton_next(BITMAP* buffer, BITMAP* icon) {
     if (!icon) return;
@@ -852,7 +943,11 @@ void show_graphique(Game game,
     }
 
     // 3) Interface utilisateur (UI)
-    barre_jeu(buffer, panneau_bas_gauche, game.players[p_idx].classe, selected_competence);
+    barre_jeu(buffer,
+          panneau_bas_gauche,
+          game.players[p_idx].classe,
+          &game.players[p_idx],
+          selected_competence);
     show_selected_comp(buffer, selected_competence);
     bouton_next(buffer, next_button);
 
