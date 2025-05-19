@@ -1029,10 +1029,6 @@ void afficher_pv_joueurs(BITMAP* buffer, Game game) {
             bar_width = 1;
         }
 
-        // TRACE console : affiche l’état des PV pour ce joueur
-        printf("Joueur %d (%s) : PV actuels = %d, PV max = %d, ratio = %.3f, largeur barre = %d\n",
-               i, p->pseudo, p->pv_actuels, p->classe.pv*10, ratio, bar_width);
-
         // Dessin de la barre (rouge + verte + cadre)
         rectfill(buffer,
                  start_x + 120, start_y + i * line_height,
