@@ -582,6 +582,9 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
     }
 
+    for (int i=0; i<NB_JOUEURS; i++) {
+        init_player_classe(&game->players[i]);
+    }
 
     if ( num==0 ) {
         init_plato(game);
