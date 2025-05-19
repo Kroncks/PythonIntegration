@@ -383,22 +383,29 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
 
 
 void translation_to_iso(int* x, int* y) {
-    int origin_x = SCREEN_W / 2;
-    int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
+    // Origine écran de la carte isométrique
+    const int origin_x     = SCREEN_W/2;
+    const int origin_y     = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
+    const int click_offset = 14;  // on décale de 10px vers le bas
 
+    // 2) Calcul de la tuile sous la souris (avec le même décalage)
     float mx = mouse_x - origin_x;
-    float my = mouse_y - offset_y;
+    float my = mouse_y - (origin_y + click_offset);
 
-    float fx = (mx / (TILE_WIDTH / 2.0f) + my / (TILE_HEIGHT / 2.0f)) / 2.0f;
-    float fy = (my / (TILE_HEIGHT / 2.0f) - mx / (TILE_WIDTH / 2.0f)) / 2.0f;
+    float half_w = TILE_WIDTH  / 2.0f;
+    float half_h = TILE_HEIGHT / 2.0f;
 
-    int tx = (int)(fx + 0.5f);
-    int ty = (int)(fy + 0.5f);
+    // conversion inverse isométrique → cartésien
+    float fx = (mx/half_w + my/half_h) * 0.5f;
+    float fy = (my/half_h - mx/half_w) * 0.5f;
 
+    int tx = (int)floorf(fx);
+    int ty = (int)floorf(fy);
+
+    // 3) Vérification des bornes
     if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
         *x = tx;
         *y = ty;
-        printf("Click détecté : x = %d, y = %d\n", *x, *y);
     } else {
         *x = -1;
         *y = -1;
