@@ -1118,11 +1118,13 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
                     while (!next) {
+                        printf("waiting for data\n");
                         get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                         if(quit) break;
                         process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
                         show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
                     }
+                    if(quit) break;
                 }
             }
             if (game->nb_morts==NB_JOUEURS-1) {
