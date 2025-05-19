@@ -14,6 +14,7 @@ BITMAP* liste_story[12];
 static BITMAP* sprite_mort = NULL;
 int ANIMATION =0;
 
+int REPLAY =0;
 
 void init_tour(Game *game) {
     // Recharge pour chaque joueur :
@@ -548,7 +549,14 @@ void process_data(Game * game, int num, char * data, int * next) {
         *next = 1;
         return;
     }
-    action(game, &game->players[num], num_competence, action_x, action_y, num);
+    if (num_competence == 5) {
+        game->plateau[game->players[num].x][game->players[num].y] = 0; // vide la case
+        game->plateau[action_x][action_y] = TILE_COUNT + num;
+        game->players[num].x = action_x;
+        game->players[num].y = action_y;
+    } else {
+        action(game, &game->players[num], num_competence, action_x, action_y, num);
+    }
 }
 
 void init_nb_players() {
@@ -966,25 +974,25 @@ void show_graphique(Game game,
             */
         }
     }
+    if (REPLAY==0) {
+        // 3) Interface utilisateur (UI)
+        barre_jeu(buffer,
+              panneau_bas_gauche,
+              game.players[p_idx].classe,
+              &game.players[p_idx],
+              selected_competence);
+        show_selected_comp(buffer, selected_competence);
+        bouton_next(buffer, next_button);
 
-    // 3) Interface utilisateur (UI)
-    barre_jeu(buffer,
-          panneau_bas_gauche,
-          game.players[p_idx].classe,
-          &game.players[p_idx],
-          selected_competence);
-    show_selected_comp(buffer, selected_competence);
-    bouton_next(buffer, next_button);
+        // Barre de temps (blanche)
+        float longueur = 1.0f - difftime(time(NULL), turn_start) / 15.0f;
+        if (longueur > 0.0f) {
+            rectfill(buffer, 0, SCREEN_H - 10, SCREEN_W * longueur, SCREEN_H, makecol(255, 255, 255));
+        }
 
-    // Barre de temps (blanche)
-    float longueur = 1.0f - difftime(time(NULL), turn_start) / 15.0f;
-    if (longueur > 0.0f) {
-        rectfill(buffer, 0, SCREEN_H - 10, SCREEN_W * longueur, SCREEN_H, makecol(255, 255, 255));
+        // 4) Curseur
+        stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
     }
-
-    // 4) Curseur
-    stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
-
     // 5) Envoi du buffer à l'écran
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
@@ -1122,12 +1130,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 send(sock, game->last_action, strlen(game->last_action), 0);
 
             } else {
+                REPLAY =1;
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
                 printf("waiting for data\n");
                 get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
                 process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                REPLAY =0;
             }
             if (game->nb_morts==NB_JOUEURS-1) {
                 quit =1;
