@@ -582,6 +582,9 @@ void init_game(socket_t sock, Game * game, int num, Perso self) {
         }
     }
 
+    for (int i=0; i<NB_JOUEURS; i++) {
+        init_player_classe(&game->players[i]);
+    }
 
     if ( num==0 ) {
         init_plato(game);
@@ -940,21 +943,8 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Erreur lors de la création du buffer !");
         exit(EXIT_FAILURE);
     }
-    /*
-    game->map.background = load_bitmap("../DATA/GAME/MAP/BACKGROUND/2.bmp", NULL);
-    if (!game->map.background) {
-        allegro_message("Erreur lors du chargement de l'arrière-plan !");
-        exit(EXIT_FAILURE);
-    }
 
-    for(int i = 0; i < TILE_COUNT; i++) {
-        char path[100];
-        sprintf(path, "../DATA/GAME/MAP/TUILES/2/%d.bmp", i+1);
-        game->map.images[i] = charger_et_traiter_image(path, 64, 64);
-    }*/
     import_terrainJeu_Via_Fichier_texte(game);
-
-
 
 
     // Charger l'image du curseur
@@ -963,42 +953,17 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
     }
-
-    // Charger l'image du bouton next
-
-    BITMAP* next_button = charger_et_traiter_image(
-            "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
-            651*0.5,342*0.5
-        );
-
-
-    // Appliquer la transparence sur le curseur
     appliquer_transparence_curseur(curseur);
-
-    // Dimensions désirées du curseur (ex : 32x32)
-
-
-    // Redimensionner le curseur
-    BITMAP* curseur_redimensionne = create_bitmap(32, 32);
-    if (!curseur_redimensionne) {
-        allegro_message("Erreur lors de la création du curseur redimensionné !");
-        exit(EXIT_FAILURE);
-    }
-    stretch_blit(curseur, curseur_redimensionne, 0, 0, curseur->w, curseur->h, 0, 0, 32, 32);
-    curseur = curseur_redimensionne;
+    // … redimensionnement du curseur …
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
-            "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
-            1024*0.7,459*0.7
-        );
-
-    if (!sprite_mort) {
-        sprite_mort = load_bitmap("../Projet/Graphismes/Animations/Mort/1.bmp", NULL);
-        if (!sprite_mort) {
-            allegro_message("Erreur : impossible de charger le sprite de mort !");
-            exit(EXIT_FAILURE);
-        }
-    }
+        "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
+        1024*0.7, 459*0.7
+    );
+    BITMAP* next_button = charger_et_traiter_image(
+        "../Projet/Graphismes/Menus/Boutons/NEXT.bmp",
+        651*0.5, 342*0.5
+    );
 
 
     // ===
@@ -1018,8 +983,14 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             time_t turn_start = time(NULL);
             if (num == i) {
                 while (!next) {
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche, next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                    //tour_graphique(game, i, &next ); // verifie les actions du joueur et joue joue
+                    show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence,turn_start);
+                    tour_graphique(game, i, &selected_competence, &next, &quit);
+
+                    // Vérification du timeout de 15 secondes
+                    if (difftime(time(NULL), turn_start) >= 15.0) {
+                        next = 1;  // Force la fin du tour
+                    }
+
                     rest(10);
                 }
                 tour(game, i, LAN_buffer); // le joueur joue
@@ -1032,6 +1003,12 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
             }
+            if (game->nb_morts==NB_JOUEURS-1) {
+                quit =1;
+                game->poduim[game->nb_morts]= game->players[i];
+                game->nb_morts++;
+            }
+            if (quit) break;
         }
     }
     destroy_bitmap(panneau_bas_gauche);
