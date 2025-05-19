@@ -223,144 +223,36 @@ int found_player(Game game, int x, int y) {
     return -1;
 }
 
-bool est_case_valide_BFS(int x, int y, int map[PLAT_Y][PLAT_X]) {
-    return x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && map[y][x] == 0;
-}
+void update_portee(Game *game, Perso player, int num_competence) {
+    init_portee(game);
 
-bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur, Node map_path[PLAT_Y][PLAT_X], int* len_path) {
-//bool verif_bfs(Game game, int origin_x, int origin_y, int dest_x, int dest_y, int pm_joueur) {
+    int portee = (num_competence == 5)
+                 ? player.pm_restant
+                 : player.classe.competences[num_competence - 1].portee;
 
-    if (!est_case_valide_BFS(dest_x, dest_y, game.plateau)) return false;
+    printf("Portée : %d\n", portee);
 
-    int visited[PLAT_Y][PLAT_X] = {0};
-    Node prev[PLAT_Y][PLAT_X];
+    int x = player.x;
+    int y = player.y;
+    int pas = 0;
 
-    // Marquer obstacles
-    for (int y = 0; y < PLAT_Y; y++) {
-        for (int x = 0; x < PLAT_X; x++) {
-            if (game.plateau[y][x] != 0)
-                visited[y][x] = -1;
+    dishtra(game, x, y, portee, pas);
+
+    printf("Portée calculée :\n");
+    for (int i = 0; i < PLAT_X; i++) {
+        for (int j = 0; j < PLAT_Y; j++) {
+            printf("%d  ", game->portee[i][j]);
         }
+        printf("\n");
     }
-
-    // Marquer joueurs
-    for (int i = 0; i < 4; i++) {
-        if (game.players[i].x == origin_x && game.players[i].y == origin_y)
-            continue;
-        visited[game.players[i].y][game.players[i].x] = -1;
-    }
-
-    int queue_x[MAX_NODE], queue_y[MAX_NODE];
-    int front = 0, back = 0;
-    queue_x[back] = origin_x;
-    queue_y[back] = origin_y;
-    back++;
-    visited[origin_y][origin_x] = 1;
-
-    bool found = false;
-    int directions[4][2] = {{0,-1},{0,1},{-1,0},{1,0}};
-
-    while (front < back && !found) {
-        int ux = queue_x[front];
-        int uy = queue_y[front];
-        front++;
-
-        for (int i = 0; i < 4; i++) {
-            int vx = ux + directions[i][0];
-            int vy = uy + directions[i][1];
-
-            if (est_case_valide_BFS(vx, vy, game.plateau) && visited[vy][vx] == 0) {
-                visited[vy][vx] = 1;
-                prev[vy][vx].x = ux;
-                prev[vy][vx].y = uy;
-                queue_x[back] = vx;
-                queue_y[back] = vy;
-                back++;
-
-                if (vx == dest_x && vy == dest_y) {
-                    found = true;
-                    break;
-                }
-            }
+    printf("\nPlateau :\n");
+    for (int i = 0; i < PLAT_X; i++) {
+        for (int j = 0; j < PLAT_Y; j++) {
+            printf("%d  ", game->plateau[i][j]);
         }
+        printf("\n");
     }
-
-    if (!found) return false;
-
-    // Remonter le chemin
-    int len = 0;
-    int cx = dest_x, cy = dest_y;
-    //printf("%d , %d\n", cx, cy);
-    Node path_temp[PLAT_Y][PLAT_X]; // [y][x]
-    for (int i = 0; i < PLAT_Y; i++) {
-        for (int j = 0; j < PLAT_X; j++) {
-            path_temp[i][j].x = prev[i][j].x;
-            path_temp[i][j].y = prev[i][j].y;
-        }
-    }
-    while (!(cx == origin_x && cy == origin_y)) {
-        Node p = prev[cy][cx];
-        //printf("%d , %d\n", p.x, p.y);
-        cx = p.x;
-        cy = p.y;
-        len++;
-    }
-    //printf("\n\n");
-
-    for (int i = 0; i < PLAT_Y; i++) {
-        for (int j = 0; j < PLAT_X; j++) {
-            map_path[i][j].x = path_temp[i][j].x;
-            map_path[i][j].y = path_temp[i][j].y;
-        }
-    }
-
-    if (len <= pm_joueur) {
-        *len_path = len;
-        return true;
-    }
-    return false;
-}
-
-void inversion_chemin(Node map_path[PLAT_Y][PLAT_X], int len, Node path[len], int dest_x, int dest_y, int origin_x, int origin_y) {
-
-    int i=0;
-    int cx = dest_x, cy = dest_y;
-    path[0].x = origin_x;
-    path[0].y = origin_y;
-    path[len].x = cx;
-    path[len].y = cy;
-    printf("fin init inv\n");
-    while (!(cx == origin_x && cy == origin_y)) {
-        printf("ahhh\n");
-        Node p2 = map_path[cy][cx];
-        cx = p2.x;
-        cy = p2.y;
-        i++;
-        path[len-i-1]=p2;
-        printf("aled\n");
-    }
-    for (int j = 0; j < len+1; j++) {
-        printf("%d , %d\n", path[j].x, path[j].y);
-    }
-}
-
-bool can_move(Game game, const Perso self, const int x_dest, const int y_dest,Node map_path[PLAT_Y][PLAT_X],int* len_path) {
-    //printf("init_verif\n");
-    //La case cliquée se trouve-t-elle dans le plateau ?
-    if (x_dest < 0 || y_dest < 0) return false;
-    //printf("dans le plateau\n");
-    //La case cliquée est-elle sur un obstacle ?
-    if (game.plateau[x_dest][y_dest] !=0) return false;
-    //printf("pas d'obstacle\n");
-    //La case cliquée est-elle sur un joueur ?
-    if (found_player(game, x_dest, y_dest)!=-1) return false;
-    //printf("pas de joueur\n");
-    //Verification du déplacement avec un BFS
-    //printf("case dest valide\n");
-    if (!verif_bfs(game, self.x, self.y, x_dest, y_dest, self.pm_restant,map_path,len_path)) return false;
-    //printf("BFS true\n");
-    //Toutes les vérifications sont validées
-    return true;
+    printf("\n\n");
 }
 void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
     int origin_x = SCREEN_W/2;
@@ -369,220 +261,135 @@ void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
     *screen_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
     //if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H);
 }
-void deplacement(Game* game, Perso* self,
-                 const int x_dest,
-                 const int y_dest,
-                 Node map_path[PLAT_Y][PLAT_X],
-                 int len_path, int num_joueur)
-{
-    // 1) Origine logique
+void deplacement(Game *game, Perso *self, const int x_dest, const int y_dest, int num_joueur) {
     int origin_x = self->x;
     int origin_y = self->y;
 
-    // 2) Back-buffer
-    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) buffer = screen;
 
-    // 3) Reconstruction du chemin
-    int steps = len_path;
-    Node path[steps+1];
-    inversion_chemin(map_path, steps, path,
-                     x_dest, y_dest,
-                     origin_x, origin_y);
+    Coord path[PLAT_X * PLAT_Y];
+    int steps = get_path(game, x_dest, y_dest, path, PLAT_X * PLAT_Y);
 
-    // 4) Origine écran isométrique
-    const int originScrX = SCREEN_W/2;
-    const int originScrY = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
+    const int originScrX = SCREEN_W / 2;
+    const int originScrY = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
 
-    // 5) Parcours des segments
-    for (int s = 0; s < steps; s++) {
-        // a) Redessiner MAP + AUTRES joueurs
+    for (int s = 0; s < steps - 1; s++) {
         if (game->map.background) {
             stretch_blit(game->map.background, buffer,
-                         0,0,
-                         game->map.background->w, game->map.background->h,
-                         0,0,
-                         SCREEN_W, SCREEN_H);
+                         0, 0, game->map.background->w, game->map.background->h,
+                         0, 0, SCREEN_W, SCREEN_H);
         }
 
+        // Affichage du plateau
         for (int y = 0; y < PLAT_Y; y++) {
             for (int x = 0; x < PLAT_X; x++) {
                 int id = game->plateau[x][y];
-                int iso_x = (x - y)*(TILE_WIDTH/2) + originScrX;
-                int iso_y = (x + y)*(TILE_HEIGHT/2) + originScrY;
+                int iso_x = (x - y) * (TILE_WIDTH / 2) + originScrX;
+                int iso_y = (x + y) * (TILE_HEIGHT / 2) + originScrY;
 
-                if (iso_x + TILE_WIDTH  <= 0 || iso_x >= SCREEN_W ||
+                if (iso_x + TILE_WIDTH <= 0 || iso_x >= SCREEN_W ||
                     iso_y + TILE_HEIGHT <= 0 || iso_y >= SCREEN_H)
                     continue;
 
-                // tuile
-                draw_sprite(buffer,
-                            game->map.images[id < TILE_COUNT ? id : 0],
-                            iso_x, iso_y);
+                draw_sprite(buffer, game->map.images[id < TILE_COUNT ? id : 0], iso_x, iso_y);
 
-                // si case occupée et pas le self
                 if (id >= TILE_COUNT) {
                     int pidx = id - TILE_COUNT;
                     if (pidx != num_joueur) {
-                        Perso* pl = &game->players[pidx];
-                        BITMAP* spr = (pl->pv_actuels > 0)
-                            ? pl->classe.sprite[0]
-                            : sprite_mort;
-                        int oy = (spr == sprite_mort)
-                                 ? spr->h/2
-                                 : spr->h/3;
-                        draw_sprite(buffer,
-                                    spr,
-                                    iso_x,
-                                    iso_y - oy);
+                        Perso *pl = &game->players[pidx];
+                        BITMAP *spr = (pl->pv_actuels > 0) ? pl->classe.sprite[0] : sprite_mort;
+                        int oy = (spr == sprite_mort) ? spr->h / 2 : spr->h / 3;
+                        draw_sprite(buffer, spr, iso_x, iso_y - oy);
                     }
                 }
             }
         }
 
-        // b) Choix des frames selon la direction du segment
-        int dx = path[s+1].x - path[s].x;
-        int dy = path[s+1].y - path[s].y;
+        // Animation entre les cases
+        int dx = path[s + 1].x - path[s].x;
+        int dy = path[s + 1].y - path[s].y;
         int f0, f1;
-        if (dx > 0) {
-            // →  bas-droite  (frames 1 & 2)
-            f0 = 0; f1 = 1;
-        }
-        else if (dx < 0) {
-            // ←  haut-gauche (frames 3 & 4)
-            f0 = 2; f1 = 3;
-        }
-        else if (dy > 0) {
-            // ↓  bas-gauche (frames 5 & 6)
-            f0 = 4; f1 = 5;
-        }
-        else {
-            // ↑  haut-droite (frames 7 & 8)
-            f0 = 6; f1 = 7;
-        }
+        if (dx > 0)      { f0 = 0; f1 = 1; }
+        else if (dx < 0) { f0 = 2; f1 = 3; }
+        else if (dy > 0) { f0 = 4; f1 = 5; }
+        else             { f0 = 6; f1 = 7; }
 
-        // c) Animation 2 frames du self
+        int px = path[s].x, py = path[s].y;
+        int iso_x = (px - py) * (TILE_WIDTH / 2) + originScrX;
+        int iso_y = (px + py) * (TILE_HEIGHT / 2) + originScrY;
+
         for (int frame = 0; frame < 2; frame++) {
-            // (re)dessiner la frame courante du self
-            int px = path[s].x, py = path[s].y;
-            int iso_x = (px - py)*(TILE_WIDTH/2) + originScrX;
-            int iso_y = (px + py)*(TILE_HEIGHT/2) + originScrY;
-
-            BITMAP* spr = self->classe.sprite[
-                (frame == 0) ? f0 : f1
-            ];
-            draw_sprite(buffer,
-                        spr,
-                        iso_x,
-                        iso_y - spr->h/3);
-
-            // blit & pause
-            blit(buffer, screen,
-                 0,0,
-                 0,0,
-                 SCREEN_W, SCREEN_H);
+            BITMAP *spr = self->classe.sprite[(frame == 0) ? f0 : f1];
+            draw_sprite(buffer, spr, iso_x, iso_y - spr->h / 3);
+            blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
             rest(50);
         }
 
-        // d) Mise à jour de la position
-        self->x = path[s+1].x;
-        self->y = path[s+1].y;
+        self->x = path[s + 1].x;
+        self->y = path[s + 1].y;
     }
 
-    // 6) Position finale
     self->x = x_dest;
     self->y = y_dest;
-    self->pm_restant -= steps;
+    self->pm_restant -= (steps - 1);
 
-    // 7) Mettre à jour la map
     game->plateau[origin_x][origin_y] = 0;
-    game->plateau[x_dest][y_dest]     = TILE_COUNT + num_joueur;
+    game->plateau[x_dest][y_dest] = TILE_COUNT + num_joueur;
 
-    // 8) Libérer le buffer
     if (buffer != screen) destroy_bitmap(buffer);
 }
 
-void action(Game* game,
-            Perso* self,
-            const int num_competence,   // 1-based: 1–4 = sorts, 5 = déplacement
-            const int action_x,
-            const int action_y,
-            int num_joueur)
-{
-    // Valider num_competence
-    if (num_competence < 1 || num_competence > 5)
-        return;
 
-    printf("log action: compétence %d, cible (%d,%d)\n",
-           num_competence, action_x, action_y);
+// Fonction appelée sur clic pour exécuter une compétence ou un déplacement
+void action(Game *game, Perso *self, int num_competence, int action_x, int action_y, int num_joueur) {
+    if (num_competence < 1 || num_competence > 5) return;
+
+    printf("Action : compétence %d sur (%d, %d)\n", num_competence, action_x, action_y);
 
     if (num_competence == 5) {
-        // déplacement
-        int len_path;
-        Node map_path[PLAT_Y][PLAT_X];
-        // initialiser map_path à -1
-        for (int i = 0; i < PLAT_Y; i++) {
-            for (int j = 0; j < PLAT_X; j++) {
-                map_path[i][j].x = -1;
-                map_path[i][j].y = -1;
-            }
+        if (game->portee[action_y][action_x] == 1) {
+            deplacement(game, self, action_x, action_y, num_joueur);
+            update_portee(game, *self, num_competence);
+            // TODO : envoyer déplacement réseau
         }
-
-        printf("Début can_move\n");
-        if (can_move(*game, *self, action_x, action_y,
-                     map_path, &len_path))
-        {
-            printf("Début deplacement\n");
-            deplacement(game, self,
-                        action_x, action_y,
-                        map_path, len_path,
-                        num_joueur);
-            // TODO : envoyer déplacement over network
-        }
-    }
-    else {
-        // attaque ou sort : convertir 1-based → 0-based
+    } else {
         int idx = num_competence - 1;
-        // trouver l’indice du joueur ciblé
         int cible = found_player(*game, action_x, action_y);
         if (cible >= 0 && cible < NB_JOUEURS) {
             attack(game, self, &game->players[cible], idx);
-            printf("DEBUG: PV du joueur %d (cible) = %d\n",
-               cible,
-               game->players[cible].pv_actuels);
-            // **Nouvel appel** : vérifier et afficher la mort si PV ≤ 0
+            printf("PV du joueur %d (cible) : %d\n", cible, game->players[cible].pv_actuels);
             if (game->players[cible].pv_actuels <= 0) {
                 game->plateau[game->players[cible].y][game->players[cible].x] = 0;
-                int iso_x, iso_y;
-                //iso_to_screen(game->players[cible].x, game->players[cible].y, &iso_x, &iso_y );
-                //draw_sprite(screen, sprite_mort, iso_x, iso_y);
             }
-            // TODO : envoyer attaque over network
+            // TODO : envoyer attaque réseau
         }
     }
 }
 
-void translation_to_iso(int*x,int* y) {
-    int origin_x = SCREEN_W / 2;  // Utilise SCREEN_W et SCREEN_H
-    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
-    float x_fix =mouse_x-origin_x;
-    float y_fix =mouse_y-offset_y;
-    float hw=TILE_WIDTH/2.0f;
-    float hh=TILE_HEIGHT/2.0f;
-    float fx=(x_fix/hw+y_fix/hh) / 2.0f;
-    float fy =(y_fix/hh-x_fix/hw) / 2.0f;
-    int x_temp =(int)(fx-0.5f);
-    int y_temp =(int)(fy-0.5f);
-    if (y_temp>5) y_temp+=1;
-    if(x_temp>=0 && x_temp<PLAT_X && y_temp>=0 && y_temp<PLAT_Y) {
-        *x = x_temp;
-        *y = y_temp;
-        printf("x : %d\ny : %d\n", *x,*y);
-    }else {
-        *y=-1;
-        *x=-1;
+void translation_to_iso(int* x, int* y) {
+    int origin_x = SCREEN_W / 2;
+    int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
+
+    float mx = mouse_x - origin_x;
+    float my = mouse_y - offset_y;
+
+    float fx = (mx / (TILE_WIDTH / 2.0f) + my / (TILE_HEIGHT / 2.0f)) / 2.0f;
+    float fy = (my / (TILE_HEIGHT / 2.0f) - mx / (TILE_WIDTH / 2.0f)) / 2.0f;
+
+    int tx = (int)(fx + 0.5f);
+    int ty = (int)(fy + 0.5f);
+
+    if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
+        *x = tx;
+        *y = ty;
+        printf("Click détecté : x = %d, y = %d\n", *x, *y);
+    } else {
+        *x = -1;
+        *y = -1;
     }
 }
+
 
 int change_music(const char *filename)
 {
@@ -930,37 +737,7 @@ int get_path(Game *game, int x, int y, Coord path[], int max_len) {
 }
 
 
-void update_portee(Game * game, Perso player, int num_competence) {
-    init_portee(game);
-    int portee;
-    if (num_competence == 5 )
-        portee = player.pm_restant;
-    else
-        portee = player.classe.competences[num_competence-1].portee;
 
-    printf("portee : %d\n", portee);
-
-    int x = player.y;
-    int y = player.x;
-    int pas =0;
-    dishtra(game, x, y, portee, pas);
-
-
-    for (int i = 0; i < PLAT_X; i++) {
-        for (int j = 0; j < PLAT_Y; j++) {
-            printf("%d  ", game->portee[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    for (int i = 0; i < PLAT_X; i++) {
-        for (int j = 0; j < PLAT_Y; j++) {
-            printf("%d  ", game->plateau[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-}
 
 void detection_competence (Game * game, Perso player,int * num_competence) {
     const int pad = 10;
@@ -1023,92 +800,66 @@ void show_graphique(Game game,
     }
 
     // 2) Tuiles isométriques & personnages
-    const int origin_x = SCREEN_W/2;
-    const int offset_y = SCREEN_H/2 - TILE_HEIGHT * PLAT_Y / 2;
+    const int origin_x = SCREEN_W / 2;
+    const int offset_y = SCREEN_H / 2 - TILE_HEIGHT * PLAT_Y / 2;
 
     for (int y = 0; y < PLAT_Y; y++) {
         for (int x = 0; x < PLAT_X; x++) {
             int id = game.plateau[x][y];
-            int iso_x = (x - y) * (TILE_WIDTH/2) + origin_x;
-            int iso_y = (x + y) * (TILE_HEIGHT/2) + offset_y;
+            int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+            int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
 
-            // Si hors écran, on skip
-            if (iso_x + TILE_WIDTH <= 0 || iso_x >= SCREEN_W
-             || iso_y + TILE_HEIGHT <= 0 || iso_y >= SCREEN_H) {
+            // Si la tuile est hors de l'écran, on passe
+            if (iso_x + TILE_WIDTH <= 0 || iso_x >= SCREEN_W ||
+                iso_y + TILE_HEIGHT <= 0 || iso_y >= SCREEN_H) {
                 continue;
             }
 
             if (id < TILE_COUNT) {
-                // Case vide
-                draw_sprite(buffer,
-                            game.map.images[id],
-                            iso_x,
-                            iso_y);
-                afficher_portee(buffer, game,
-                                game.players[p_idx],
-                                x, y,
-                                iso_x, iso_y);
-            }/*else if (id > TILE_COUNT && game.players[p_idx].pv_actuels ==0) {
-                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
-                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
-                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
-                    draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    draw_sprite(buffer,
-                                    sprite_mort,
-                                    iso_x,
-                                    iso_y - sprite_mort->h/2);
-                }
-            }*/
+                // Case normale (sol, herbe, eau, etc.)
+                draw_sprite(buffer, game.map.images[id], iso_x, iso_y);
+                afficher_portee(buffer, game, game.players[p_idx], x, y, iso_x, iso_y);
+            }
             else {
-                int iso_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
-                int iso_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
-                if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H) {
-                    draw_sprite(buffer, game.map.images[0],iso_x, iso_y);
-                    afficher_portee(buffer,game, game.players[p_idx], x, y, iso_x,iso_y);
-                    draw_sprite(buffer, game.players[id-TILE_COUNT].classe.sprite[0],iso_x, iso_y-game.players[id-TILE_COUNT].classe.sprite[0]->h/3);
-                    }
+                // Case avec joueur
+                draw_sprite(buffer, game.map.images[0], iso_x, iso_y);
+                afficher_portee(buffer, game, game.players[p_idx], x, y, iso_x, iso_y);
+
+                Perso *perso = &game.players[id - TILE_COUNT];
+                draw_sprite(buffer,
+                            perso->classe.sprite[0],
+                            iso_x,
+                            iso_y - perso->classe.sprite[0]->h / 3);
             }
-                /*
-                for (int i=0; i<NB_JOUEURS;i++)
-                {
-                    Perso *pl = &game.players[i];
 
-                    if (pl->pv_actuels <= 0) {
-                        game.plateau[pl->x][pl->y] -= TILE_COUNT - i+1;
-
-                        draw_sprite(buffer,
-                                    sprite_mort,
-                                    iso_x,
-                                    iso_y - sprite_mort->h/2);
-                    }
-                }*/
-
+            /*
+            // Affichage des sprites de mort (code non utilisé actuellement)
+            for (int i = 0; i < NB_JOUEURS; i++) {
+                Perso *pl = &game.players[i];
+                if (pl->pv_actuels <= 0) {
+                    draw_sprite(buffer, sprite_mort, iso_x, iso_y - sprite_mort->h / 2);
+                }
             }
+            */
         }
+    }
 
-
-    // 3) UI en bas à gauche
-    barre_jeu(buffer,
-              panneau_bas_gauche,
-              game.players[p_idx].classe,
-              selected_competence);
+    // 3) Interface utilisateur (UI)
+    barre_jeu(buffer, panneau_bas_gauche, game.players[p_idx].classe, selected_competence);
     show_selected_comp(buffer, selected_competence);
     bouton_next(buffer, next_button);
-    // Barre de temps
-    float longueur = 1-difftime(time(NULL), turn_start)/15.0;
-    rectfill(buffer, 0, SCREEN_H, SCREEN_W*longueur, SCREEN_H-10, makecol(255, 255, 255));
+
+    // Barre de temps (blanche)
+    float longueur = 1.0f - difftime(time(NULL), turn_start) / 15.0f;
+    if (longueur > 0.0f) {
+        rectfill(buffer, 0, SCREEN_H - 10, SCREEN_W * longueur, SCREEN_H, makecol(255, 255, 255));
+    }
 
     // 4) Curseur
-    stretch_sprite(buffer,
-                   curseur,
-                   mouse_x, mouse_y,
-                   32, 32);
+    stretch_sprite(buffer, curseur, mouse_x, mouse_y, 32, 32);
 
-    // 5) Envoi à l'écran
-    blit(buffer, screen,
-         0, 0,
-         0, 0,
-         SCREEN_W, SCREEN_H);
+    // 5) Envoi du buffer à l'écran
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 void next_cliqued(int * next) {
