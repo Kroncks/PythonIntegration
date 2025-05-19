@@ -356,7 +356,8 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
             deplacement(game, self, action_x, action_y, num_joueur);
             update_portee(game, *self, num_competence);
             // mise en buffer de la donnee a envoyer (olalalala)
-            sprintf(game->last_action, "%c %c %c",num_competence+'a', action_x+'a', action_y+'a');
+            sprintf(game->last_action, "%d %d %d",num_competence, action_x, action_y);
+            game->last_action[strlen(game->last_action)] = '\0';
             printf("last_action : %s\n", game->last_action);
         }
     } else {
@@ -369,7 +370,8 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
                 game->plateau[game->players[cible].y][game->players[cible].x] = 0;
             }
             // mise en buffer de la donnee a envoyer (olalalala)
-            sprintf(game->last_action, "%c %c %c",num_competence+'a', action_x+'a', action_y+'a');
+            sprintf(game->last_action, "%d %d %d",num_competence, action_x, action_y);
+            game->last_action[strlen(game->last_action)] = '\0';
             printf("last_action : %s\n", game->last_action);
         }
     }
@@ -527,12 +529,14 @@ void tour(Game * game, int num, char * data) {
     if (data != NULL) sprintf(data, "%d %d", game->players[num].x, game->players[num].y);
 }
 
-void process_data(Game * game, int num, char * data) {
+void process_data(Game * game, int num, char * data, int * next) {
     int num_competence, action_x, action_y;
     sscanf(data, "%d %d %d", &num_competence, &action_x, &action_y);
     if (num_competence == -1) {
-
+        *next = 1;
+        return;
     }
+    printf(" JOUE player %d : %d (%d,%d)\n");
     action(game, &game->players[num], num_competence, action_x, action_y, num);
 }
 
@@ -1033,7 +1037,7 @@ void jouer(socket_t sock, Game * game, int num) {
             } else {
                 get_data(sock, &received, buffer,i, &quit); // on attends de recevoir les données
                 if(quit) break;
-                process_data(game, i, buffer); // on traite les données des autres joueurs
+                //process_data(game, i, buffer); // on traite les données des autres joueurs
                 show(*game,n_turns,num);
             }
         }
@@ -1111,10 +1115,12 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             } else {
                 while (!next) {
                     show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                    get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
-                    if(quit) break;
-                    process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                    while (!next) {
+                        get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
+                        if(quit) break;
+                        process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
+                        show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                    }
                 }
             }
             if (game->nb_morts==NB_JOUEURS-1) {
