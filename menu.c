@@ -488,6 +488,38 @@ void menu_fin(Game * game) {
     clear_keybuf();
 }
 
+void launch_LAN() {
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur lors de la création du buffer !");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP* fond = load_bitmap("../Projet/Graphismes/Menus/Background/3.bmp", NULL);
+    if (!fond) {
+        allegro_message("Erreur lors du chargement de l'arrière-plan !");
+        exit(EXIT_FAILURE);
+    }
+
+    stretch_blit(fond, buffer, 0, 0, fond->w, fond->h, 0, 0, SCREEN_W, SCREEN_H);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+    while (1) {
+        // clavier
+        if (keypressed()) {
+            int keycode = readkey();
+            int k = keycode >> 8;
+            char ch = keycode & 0xFF;
+            if (k == KEY_ENTER) {
+                break;
+            }
+        }
+    }
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(fond);
+    clear_keybuf();
+}
+
 void menu_waiting() {
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
     if (!buffer) {
