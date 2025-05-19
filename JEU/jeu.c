@@ -23,6 +23,7 @@ void init_tour(Game *game) {
         game->players[i].p_attaque  = game->players[i].classe.mana * 10;
         game->players[i].pm_restant = game->players[i].classe.endurance;
     }
+    game->last_action[0]="\0";
 }
 
 void init_coord(Game * game) {
@@ -354,7 +355,9 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
         if (game->portee[action_y][action_x] == 1) {
             deplacement(game, self, action_x, action_y, num_joueur);
             update_portee(game, *self, num_competence);
-            // TODO : envoyer déplacement réseau
+            // mise en buffer de la donnee a envoyer (olalalala)
+            sprintf(game->last_action, "%c %c %c",num_competence+'a', action_x+'a', action_y+'a');
+            printf("last_action : %s\n", game->last_action);
         }
     } else {
         int idx = num_competence - 1;
@@ -365,7 +368,9 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
             if (game->players[cible].pv_actuels <= 0) {
                 game->plateau[game->players[cible].y][game->players[cible].x] = 0;
             }
-            // TODO : envoyer attaque réseau
+            // mise en buffer de la donnee a envoyer (olalalala)
+            sprintf(game->last_action, "%c %c %c",num_competence+'a', action_x+'a', action_y+'a');
+            printf("last_action : %s\n", game->last_action);
         }
     }
 }
@@ -523,7 +528,12 @@ void tour(Game * game, int num, char * data) {
 }
 
 void process_data(Game * game, int num, char * data) {
-    sscanf(data, "%d %d", &game->players[num].x, &game->players[num].y);
+    int num_competence, action_x, action_y;
+    sscanf(data, "%d %d %d", &num_competence, &action_x, &action_y);
+    if (num_competence == -1) {
+
+    }
+    action(game, &game->players[num], num_competence, action_x, action_y, num);
 }
 
 void init_nb_players() {
@@ -1076,6 +1086,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
             init_portee(game);
             init_tour(game);
             time_t turn_start = time(NULL);
+            next = 0;
             if (num == i) {
                 while (!next) {
                     show_graphique(*game, n_turns, i, buffer, curseur, panneau_bas_gauche, next_button, selected_competence,turn_start);
@@ -1087,16 +1098,24 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                     }
 
                     rest(10);
+
+                    if (game->last_action[0] != '\0') {
+                        strcpy(LAN_buffer, game->last_action);
+                        send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
+                        printf("[Game] Data sent\n");
+                    }
                 }
-                tour(game, i, LAN_buffer); // le joueur joue
+                strcpy(LAN_buffer, "FIN_TOUR\0");
                 send(sock, LAN_buffer, strlen(LAN_buffer), 0); // les données sont envoyées
                 printf("[Game] Data sent\n");
             } else {
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
-                get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
-                if(quit) break;
-                process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
-                show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                while (!next) {
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                    get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
+                    if(quit) break;
+                    process_data(game, i, LAN_buffer); // on traite les données des autres joueurs
+                    show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
+                }
             }
             if (game->nb_morts==NB_JOUEURS-1) {
                 quit =1;

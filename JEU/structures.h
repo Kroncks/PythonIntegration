@@ -91,6 +91,7 @@ typedef struct {
     Client client;
     Map map;
     int theme;
+    char last_action[50];
 }Game;
 
 
