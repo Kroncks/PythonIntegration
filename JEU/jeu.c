@@ -32,14 +32,16 @@ void init_tour(Game *game) {
 void init_coord(Game * game) {
     game->players[0].x = game->players[0].y = 0;
     game->players[1].x = PLAT_X-1; game->players[1].y = PLAT_Y-1;
-    game->players[2].x = 0; game->players[2].y = PLAT_Y-1;
-    game->players[3].x = PLAT_X-1; game->players[3].y = 0;
+
+    game->players[2].x = PLAT_X-1; game->players[2].y = 0;
+    game->players[3].x = 0; game->players[3].y = PLAT_Y-1;
 
     game->plateau[0][0]= TILE_COUNT;
     game->plateau[PLAT_Y-1][PLAT_X-1]= TILE_COUNT+1;
+
     if (NB_JOUEURS == 4) {
-        game->plateau[PLAT_Y-1][0]= TILE_COUNT+2;
-        game->plateau[0][PLAT_X-1]= TILE_COUNT+3;
+        game->plateau[PLAT_X-1][0]= TILE_COUNT+2;
+        game->plateau[0][PLAT_Y-1]= TILE_COUNT+3;
     }
 }
 
