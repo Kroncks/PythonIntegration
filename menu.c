@@ -281,7 +281,7 @@ Perso init_player_graphique(int num) {
         rest(10);
     }
 
-    // --- Libération des ressources ---
+    // Libérer ressources
     destroy_bitmap(buffer);
     destroy_bitmap(fond);
     destroy_bitmap(curseur_redimensionne);

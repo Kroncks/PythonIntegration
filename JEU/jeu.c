@@ -149,7 +149,7 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     const int origin_x = SCREEN_W/2;
     const int offset_y = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
 
-    // --- Sort de statut : animation sur soi ---
+    // Sort de statut
     if (spell->type_stat == 'N') {
         int atk_x = (attaquant->x - attaquant->y)*(TILE_WIDTH/2) + origin_x;
         int atk_y = (attaquant->x + attaquant->y)*(TILE_HEIGHT/2) + offset_y;
@@ -169,7 +169,7 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     int dy = abs(attaquant->y - defenseur->y);
     //if (dx + dy > spell->portee) return;
 
-    // --- Attaque classique : animation sur la cible ---
+    // Attaque classique
     int iso_x = (defenseur->x - defenseur->y)*(TILE_WIDTH/2) + origin_x;
     int iso_y = (defenseur->x + defenseur->y)*(TILE_HEIGHT/2) + offset_y;
     for (int f = 0; f < 3; f++) {
@@ -790,17 +790,13 @@ void barre_jeu(BITMAP* buffer,
 {
     if (!icon) return;
 
-    // ----------------------------------------------------------------
     // 1) Positionnement de l'encart
-    // ----------------------------------------------------------------
     const int pad = 10;
     int x0 = pad;
     int y0 = SCREEN_H - icon->h - pad;
     draw_sprite(buffer, icon, x0, y0);
 
-    // ----------------------------------------------------------------
     // 2) BARRE DE PV (vert sombre qui diminue)
-    // ----------------------------------------------------------------
     const int pv_bar_x = x0 + 203;
     const int pv_bar_y = y0 + 177;
     const int pv_bar_w = 482;  // largeur fixe
@@ -827,10 +823,7 @@ void barre_jeu(BITMAP* buffer,
              pv_bar_y + pv_bar_h,
              makecol(0, 100, 0));
 
-
-    // ----------------------------------------------------------------
     // 3) ICÔNES DE COMPÉTENCES
-    // ----------------------------------------------------------------
     // Frames fixes : 205, 298, 392, 485
     draw_sprite(buffer, classe.competences[0].sprite[2], x0 + 205, y0 + 80);
     draw_sprite(buffer, classe.competences[1].sprite[2], x0 + 298, y0 + 80);
@@ -838,9 +831,7 @@ void barre_jeu(BITMAP* buffer,
     draw_sprite(buffer, classe.competences[3].sprite[2], x0 + 485, y0 + 80);
 
 
-    // ----------------------------------------------------------------
     // 4) BARRES DE MOUVEMENT (PM) ET D’ACTION (PA)
-    // ----------------------------------------------------------------
     int bar_left_x  = x0 + 24;
     int bar_right_x = x0 + icon->w - 30;
     int bar_total_w = bar_right_x - bar_left_x;
@@ -855,7 +846,7 @@ void barre_jeu(BITMAP* buffer,
              bar_right_x, pa_bar_y + bar_h,
              makecol(80, 80, 80));
 
-    // -- Barre PM (bleue)
+    // Barre PM (bleue)
     float pm_ratio = (classe.endurance > 0)
                      ? (float)perso->pm_restant / (float)classe.endurance
                      : 0.0f;
@@ -867,7 +858,7 @@ void barre_jeu(BITMAP* buffer,
              bar_left_x + pm_w, pm_bar_y + bar_h,
              makecol(0, 0, 200));
 
-    // -- Barre PA (rouge)
+    // Barre PA (rouge)
     int maxPA = classe.mana * 10;
     float pa_ratio = maxPA > 0
                      ? (float)perso->p_attaque / (float)maxPA
@@ -880,10 +871,7 @@ void barre_jeu(BITMAP* buffer,
              bar_left_x + pa_w, pa_bar_y + bar_h,
              makecol(200, 0, 0));
 
-
-    // ----------------------------------------------------------------
     // 5) CADRE DE SÉLECTION DE COMPÉTENCE
-    // ----------------------------------------------------------------
     draw_sprite(buffer, classe.sprite[8], x0 - 4, y0 + 11);
     show_selected_comp(buffer, selected_competence);
 }
@@ -904,7 +892,7 @@ void afficher_pv_joueurs(BITMAP* buffer, Game game) {
                       makecol(255, 255, 255), -1,
                       "%s", p->pseudo);
 
-        // --- calcul des PV et ratio ---
+        // calcul des PV et ratio
         int maxPV = p->classe.pv * 10;
         int curPV = p->pv_actuels;
 
@@ -920,7 +908,7 @@ void afficher_pv_joueurs(BITMAP* buffer, Game game) {
         // largeur en pixels (avec arrondi)
         int pv_w = (int)(bar_width_max * pv_ratio + 0.5f);
 
-        // --- dessin de la barre rouge (fond) ---
+        // dessin de la barre rouge (fond)
         rectfill(buffer,
                  start_x + 120,
                  start_y + i * line_height,
@@ -928,7 +916,7 @@ void afficher_pv_joueurs(BITMAP* buffer, Game game) {
                  start_y + i * line_height + bar_height,
                  makecol(100, 0, 0));
 
-        // --- dessin de la portion verte (PV restants) ---
+        // dessin de la portion verte (PV restants)
         if (pv_w > 0) {
             rectfill(buffer,
                      start_x + 120,
@@ -938,7 +926,7 @@ void afficher_pv_joueurs(BITMAP* buffer, Game game) {
                      makecol(0, 200, 0));
         }
 
-        // --- cadre blanc ---
+        // cadre blanc
         rect(buffer,
              start_x + 120,
              start_y + i * line_height,
@@ -963,15 +951,7 @@ void bouton_next(BITMAP* buffer, BITMAP* icon) {
 }
 
 
-void show_graphique(Game game,
-                    int n_turns,
-                    int p_idx,             // index du joueur courant (pour l'UI)
-                    BITMAP* buffer,
-                    BITMAP* curseur,
-                    BITMAP* panneau_bas_gauche,
-                    BITMAP* next_button,
-                    int selected_competence,
-                    time_t turn_start)
+void show_graphique(Game game, int n_turns, int p_idx, BITMAP* buffer, BITMAP* curseur, BITMAP* panneau_bas_gauche, BITMAP* next_button, int selected_competence, time_t turn_start)
 {
     // 1) Fond
     if (game.map.background) {
@@ -1138,7 +1118,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         exit(EXIT_FAILURE);
     }
     appliquer_transparence_curseur(curseur);
-    // … redimensionnement du curseur …
+    // redimensionnement du curseur
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
         "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
@@ -1149,15 +1129,13 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
         651*0.5, 342*0.5
     );
 
-
-    // ===
     long int received;
     char LAN_buffer[BUFFER_SIZE] = {0};
     int quit = 0;
     int n_turns = 0;
     int next = 0;
     int selected_competence=-1;
-    show(*game, 0, num); // log
+    show(*game, 0, num);
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
@@ -1173,7 +1151,7 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
 
                     // Vérification du timeout de 15 secondes
                     if (difftime(time(NULL), turn_start) >= 15.0) {
-                        next = 1;  // Force la fin du tour
+                        next = 1;
                     }
                     rest(10);
 
@@ -1189,9 +1167,9 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
                 REPLAY =1;
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
                 printf("waiting for data\n");
-                get_data(sock, &received, LAN_buffer,i, &quit); // on attends de recevoir les données
+                get_data(sock, &received, LAN_buffer,i, &quit);
                 if(quit) break;
-                process_data(game, i, LAN_buffer, &next); // on traite les données des autres joueurs
+                process_data(game, i, LAN_buffer, &next);
                 show_graphique(*game,n_turns,i, buffer, curseur,panneau_bas_gauche,next_button, selected_competence,turn_start); // affiche l'ecrant de jeu
                 REPLAY =0;
             }
@@ -1209,9 +1187,6 @@ void jouer_graphique(socket_t sock, Game * game, int num) {
     clear_keybuf();
 }
 
-// ---- local
-
-
 void jouer_local(Game * game) {
     int quit = 0;
     int n_turns = 0;
@@ -1219,13 +1194,11 @@ void jouer_local(Game * game) {
     while (!quit) {
         for (int i=0; i<NB_JOUEURS; i++) {
             n_turns++;
-            tour(game, i, NULL ); // le joueur joue
+            tour(game, i, NULL );
             show(*game,n_turns,i);
         }
     }
 }
-
-
 
 
 
@@ -1249,14 +1222,14 @@ void jouer_local_graphique(Game * game) {
 
     import_terrainJeu_Via_Fichier_texte(game);
 
-    // Charger et traiter le curseur…
+    // Charger et traiter le curseu
     curseur = load_bitmap("../DATA/curseur.bmp", NULL);
     if (!curseur) {
         allegro_message("Impossible de charger l'image du curseur !");
         exit(EXIT_FAILURE);
     }
     appliquer_transparence_curseur(curseur);
-    // … redimensionnement du curseur …
+    // redimensionnement du curseur
 
     BITMAP* panneau_bas_gauche = charger_et_traiter_image(
         "../Projet/Graphismes/Interface/BarreDeJeu/1.bmp",
@@ -1280,7 +1253,7 @@ void jouer_local_graphique(Game * game) {
             init_tour(game);
             init_portee(game);
             if (game->players[i].pv_actuels == 0) next = 1;
-            // ----- Début du chronométrage du tour -----
+            // Début du chronométrage du tour
             time_t turn_start = time(NULL);
 
             while (!next) {
@@ -1289,7 +1262,7 @@ void jouer_local_graphique(Game * game) {
 
                 // Vérification du timeout de 15 secondes
                 if (difftime(time(NULL), turn_start) >= 15.0) {
-                    next = 1;  // Force la fin du tour
+                    next = 1;
                 }
 
                 rest(10);
