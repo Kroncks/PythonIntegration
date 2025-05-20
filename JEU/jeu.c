@@ -397,7 +397,7 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
 
     if (num_competence == 5) {
         if (game->portee[action_y][action_x] == 1) {
-            deplacement(game, self, action_x, action_y, num_joueur);
+            deplacement(game, self, action_y, action_x, num_joueur);
             update_portee(game, *self, num_competence);
             // mise en buffer de la donnee a envoyer (olalalala)
             sprintf(game->last_action, "%d %d %d",num_competence, action_x, action_y);
@@ -1069,9 +1069,10 @@ void tour_graphique(Game * game, int i, int * competence,  int * next, int * qui
     if (mouse_b & 1) {
         next_cliqued(next);
 
-        translation_to_iso(&x, &y);
+        translation_to_iso(&y, &x);
         if (x != -1 && y != -1) {
             action(game, &game->players[i], *competence, x, y, i);
+            printf("%d : %d , %d\n",i, game->players[i].x, game->players[i].y);
         } else {
 
         detection_competence(game,game->players[i], competence);
