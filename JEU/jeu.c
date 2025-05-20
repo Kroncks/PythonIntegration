@@ -167,7 +167,7 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     // 5) Sinon on vérifie la portée et on calcule les dégâts
     int dx = abs(attaquant->x - defenseur->x);
     int dy = abs(attaquant->y - defenseur->y);
-    //if (dx + dy > spell->portee) return;
+    if (dx + dy > spell->portee) return;
 
     // Attaque classique
     int iso_x = (defenseur->x - defenseur->y)*(TILE_WIDTH/2) + origin_x;
@@ -216,7 +216,7 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
 
 
 
-void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
+void dishtra(Game *game, int start_x, int start_y, int portee, int pas, int num_competences) {
     typedef struct { int x, y, dist; } Node;
     Node queue[PLAT_X * PLAT_Y];
     int front = 0, rear = 0;
@@ -237,7 +237,7 @@ void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
             int ny = curr.y + dy[i];
 
             if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
-            if (game->plateau[nx][ny] != 0) continue;
+            if (game->plateau[nx][ny] != 0 || (num_competences != 5 && game->plateau[nx][ny] > TILE_COUNT)) continue;
             if (game->portee[nx][ny]) continue;
 
             game->portee[nx][ny] = 1;
@@ -267,13 +267,11 @@ int get_path(Game *game, int x, int y, Coord path[], int max_len) {
 
 void update_portee(Game *game, Perso player, int num_competence) {
     init_portee(game);
-    int portee = (num_competence == 5)
-        ? player.pm_restant
-        : player.classe.competences[num_competence - 1].portee;
+    int portee = (num_competence == 5)? player.pm_restant : player.classe.competences[num_competence - 1].portee;
 
     int x = player.x;
     int y = player.y;
-    dishtra(game, x, y, portee, 0);
+    dishtra(game, x, y, portee, 0, num_competence);
 }
 
 void afficher_portee(BITMAP * buffer, Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
