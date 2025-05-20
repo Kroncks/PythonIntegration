@@ -617,14 +617,9 @@ void process_data(Game * game, int num, char * data, int * next) {
         *next = 1;
         return;
     }
-    if (num_competence == 5) {
-        game->plateau[game->players[num].x][game->players[num].y] = 0; // vide la case
-        game->plateau[action_x][action_y] = TILE_COUNT + num;
-        game->players[num].x = action_x;
-        game->players[num].y = action_y;
-    } else {
-        action(game, &game->players[num], num_competence, action_x, action_y, num);
-    }
+
+    action(game, &game->players[num], num_competence, action_x, action_y, num);
+
 }
 
 void init_nb_players() {
