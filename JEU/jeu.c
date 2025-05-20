@@ -237,12 +237,19 @@ void dishtra(Game *game, int start_x, int start_y, int portee, int pas, int num_
             int ny = curr.y + dy[i];
 
             if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
-            if (game->plateau[nx][ny] != 0 || (num_competences != 5 && game->plateau[nx][ny] > TILE_COUNT)) continue;
             if (game->portee[nx][ny]) continue;
 
-            game->portee[nx][ny] = 1;
-            game->prev[nx][ny] = (Coord){curr.x, curr.y};
-            queue[rear++] = (Node){nx, ny, curr.dist + 1};
+            if (game->plateau[nx][ny] == 0) {
+                // Case vide
+                game->portee[nx][ny] = 1;
+                game->prev[nx][ny] = (Coord){curr.x, curr.y};
+                queue[rear++] = (Node){nx, ny, curr.dist + 1};
+            } else if (game->plateau[nx][ny] >= TILE_COUNT && num_competences != 5) {
+                // Joueur
+                game->portee[nx][ny] = 1;
+                game->prev[nx][ny] = (Coord){curr.x, curr.y};
+                queue[rear++] = (Node){nx, ny, curr.dist + 1};
+            }
         }
     }
 }
