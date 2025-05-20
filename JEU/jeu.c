@@ -82,149 +82,15 @@ void dessiner_losange(BITMAP* buffer, int cx, int cy, int w, int h, int fill_col
     }
 }
 
-
-
-// ====================================================================================
-
-
-
-void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
-    typedef struct { int x, y, dist; } Node;
-    Node queue[PLAT_X * PLAT_Y];
-    int front = 0, rear = 0;
-
-    game->portee[start_x][start_y] = 1;
-    game->prev[start_x][start_y] = (Coord){-1, -1};
-    queue[rear++] = (Node){start_x, start_y, 0};
-
-    while (front < rear) {
-        Node curr = queue[front++];
-        if (curr.dist >= portee) continue;
-
-        int dx[4] = {1, -1, 0, 0};
-        int dy[4] = {0, 0, 1, -1};
-
-        for (int i = 0; i < 4; i++) {
-            int nx = curr.x + dx[i];
-            int ny = curr.y + dy[i];
-
-            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
-            if (game->plateau[nx][ny] != 0) continue;
-            if (game->portee[nx][ny]) continue;
-
-            game->portee[nx][ny] = 1;
-            game->prev[nx][ny] = (Coord){curr.x, curr.y};
-            queue[rear++] = (Node){nx, ny, curr.dist + 1};
+int found_player(Game game, int x, int y) {
+    for (int i=0; i<NB_JOUEURS; i++) {
+        if (x == game.players[i].x && y == game.players[i].y) {
+            return i;
         }
     }
+    return -1;
 }
 
-
-int get_path(Game *game, int x, int y, Coord path[], int max_len) {
-    int len = 0;
-    while (x != -1 && y != -1 && len < max_len) {
-        path[len++] = (Coord){x, y};
-        Coord p = game->prev[x][y];
-        x = p.x;
-        y = p.y;
-    }
-    for (int i = 0; i < len / 2; i++) {
-        Coord tmp = path[i];
-        path[i] = path[len - 1 - i];
-        path[len - 1 - i] = tmp;
-    }
-    return len;
-}
-
-
-void update_portee(Game *game, Perso player, int num_competence) {
-    init_portee(game);
-    int portee = (num_competence == 5)
-        ? player.pm_restant
-        : player.classe.competences[num_competence - 1].portee;
-
-    int x = player.x;
-    int y = player.y;
-    dishtra(game, x, y, portee, 0);
-}
-
-void afficher_portee(BITMAP * buffer, Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
-    if (x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && game.portee[x][y] == 1) {
-        dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
-    }
-}
-
-void translation_to_iso(int* x, int* y) {
-    const int origin_x = SCREEN_W/2;
-    const int origin_y = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
-    const int click_offset = 14;
-
-    float mx = mouse_x - origin_x;
-    float my = mouse_y - (origin_y + click_offset);
-    float half_w = TILE_WIDTH  / 2.0f;
-    float half_h = TILE_HEIGHT / 2.0f;
-
-    float fx = (mx/half_w + my/half_h) * 0.5f;
-    float fy = (my/half_h - mx/half_w) * 0.5f;
-
-    int tx = (int)floorf(fx);
-    int ty = (int)floorf(fy);
-
-    if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
-        *x = tx;
-        *y = ty;
-    } else {
-        *x = -1;
-        *y = -1;
-    }
-}
-
-
-
-// ====================================================================================
-
-void show_selected_comp(BITMAP* buffer, int selected_competence) {
-    //printf("selected_competence = %d\n", selected_competence);
-    const int pad = 10;
-    int x = pad;
-    int y = SCREEN_H-pad-(int)(442*0.7);
-    /*
-    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return 0;
-    if (x < 400*0.7 && x > 280*0.7) num_competence = 1;
-    if (x < 530*0.7 && x > 410*0.7) num_competence = 2;
-    if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
-    if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
-    if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
-    */
-    switch (selected_competence) {
-        case 1:
-            for (int i=0; i<5; i++) {
-                rect(buffer, x+280*0.7+i, y+45+i, x+400*0.7-i, y+100+45-i, makecol(255,255,0));
-            } break;
-        case 2:
-            for (int i=0; i<5; i++) {
-                rect(buffer, x+410*0.7+i, y+45+i, x+530*0.7-i, y+100+45-i, makecol(255,255,0));
-            }break;
-        case 3:
-            for (int i=0; i<5; i++) {
-                rect(buffer, x+545*0.7+i, y+45+i, x+660*0.7-i, y+100+45-i, makecol(255,255,0));
-            }break;
-        case 4:
-            for (int i=0; i<5; i++) {
-                rect(buffer, x+675*0.7+i, y+45+i, x+800*0.7-i, y+100+45-i, makecol(255,255,0));
-            }break;
-        case 5:
-            for (int i=0; i<5; i++) {
-                rect(buffer, x+810*0.7+i, y+45+i, x+985*0.7-i, y+100+45-i, makecol(255,255,0));
-            }break;
-        default: return;
-    }
-}
-
-void viderBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
 
 void attack_statut(Perso* self, int idx) {
     // Sécurité : idx dans [0..3]
@@ -343,23 +209,106 @@ void attack(Game * game, Perso* attaquant, Perso* defenseur, int idx) {
     }
 }
 
-int found_player(Game game, int x, int y) {
-    for (int i=0; i<NB_JOUEURS; i++) {
-        if (x == game.players[i].x && y == game.players[i].y) {
-            return i;
+
+// ====================================================================================
+
+
+
+void dishtra(Game *game, int start_x, int start_y, int portee, int pas) {
+    typedef struct { int x, y, dist; } Node;
+    Node queue[PLAT_X * PLAT_Y];
+    int front = 0, rear = 0;
+
+    game->portee[start_x][start_y] = 1;
+    game->prev[start_x][start_y] = (Coord){-1, -1};
+    queue[rear++] = (Node){start_x, start_y, 0};
+
+    while (front < rear) {
+        Node curr = queue[front++];
+        if (curr.dist >= portee) continue;
+
+        int dx[4] = {1, -1, 0, 0};
+        int dy[4] = {0, 0, 1, -1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = curr.x + dx[i];
+            int ny = curr.y + dy[i];
+
+            if (nx < 0 || ny < 0 || nx >= PLAT_X || ny >= PLAT_Y) continue;
+            if (game->plateau[nx][ny] != 0) continue;
+            if (game->portee[nx][ny]) continue;
+
+            game->portee[nx][ny] = 1;
+            game->prev[nx][ny] = (Coord){curr.x, curr.y};
+            queue[rear++] = (Node){nx, ny, curr.dist + 1};
         }
     }
-    return -1;
 }
 
 
-void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
-    int origin_x = SCREEN_W/2;
-    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
-    *screen_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
-    *screen_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
-    //if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H);
+int get_path(Game *game, int x, int y, Coord path[], int max_len) {
+    int len = 0;
+    while (x != -1 && y != -1 && len < max_len) {
+        path[len++] = (Coord){x, y};
+        Coord p = game->prev[x][y];
+        x = p.x;
+        y = p.y;
+    }
+    for (int i = 0; i < len / 2; i++) {
+        Coord tmp = path[i];
+        path[i] = path[len - 1 - i];
+        path[len - 1 - i] = tmp;
+    }
+    return len;
 }
+
+
+void update_portee(Game *game, Perso player, int num_competence) {
+    init_portee(game);
+    int portee = (num_competence == 5)
+        ? player.pm_restant
+        : player.classe.competences[num_competence - 1].portee;
+
+    int x = player.x;
+    int y = player.y;
+    dishtra(game, x, y, portee, 0);
+}
+
+void afficher_portee(BITMAP * buffer, Game game, Perso joueur, int x, int y, int iso_x, int iso_y) {
+    if (x >= 0 && x < PLAT_X && y >= 0 && y < PLAT_Y && game.portee[x][y] == 1) {
+        dessiner_losange(buffer, iso_x+32, iso_y+16+20, TILE_WIDTH, TILE_HEIGHT, makecol(255,255,0), makecol(255,255,255));
+    }
+}
+
+void translation_to_iso(int* x, int* y) {
+    const int origin_x = SCREEN_W/2;
+    const int origin_y = SCREEN_H/2 - TILE_HEIGHT*PLAT_Y/2;
+    const int click_offset = 14;
+
+    float mx = mouse_x - origin_x;
+    float my = mouse_y - (origin_y + click_offset);
+    float half_w = TILE_WIDTH  / 2.0f;
+    float half_h = TILE_HEIGHT / 2.0f;
+
+    float fx = (mx/half_w + my/half_h) * 0.5f;
+    float fy = (my/half_h - mx/half_w) * 0.5f;
+
+    int tx = (int)floorf(fx);
+    int ty = (int)floorf(fy);
+
+    if (tx >= 0 && tx < PLAT_X && ty >= 0 && ty < PLAT_Y) {
+        *x = tx;
+        *y = ty;
+    } else {
+        *x = -1;
+        *y = -1;
+    }
+}
+
+
+// ========================================
+
+
 void deplacement(Game *game, Perso *self, const int x_dest, const int y_dest, int num_joueur) {
     int origin_x = self->x;
     int origin_y = self->y;
@@ -470,6 +419,62 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
             printf("saving last_action : %s\n", game->last_action);
         }
     }
+}
+
+
+// ====================================================================================
+
+void show_selected_comp(BITMAP* buffer, int selected_competence) {
+    //printf("selected_competence = %d\n", selected_competence);
+    const int pad = 10;
+    int x = pad;
+    int y = SCREEN_H-pad-(int)(442*0.7);
+    /*
+    if (x > 985*0.7 || x < 280*0.7 || y > -500 || y < -600) return 0;
+    if (x < 400*0.7 && x > 280*0.7) num_competence = 1;
+    if (x < 530*0.7 && x > 410*0.7) num_competence = 2;
+    if (x < 660*0.7 && x > 545*0.7) num_competence = 3;
+    if (x < 800*0.7 && x > 675*0.7) num_competence = 4;
+    if (x < 985*0.7 && x > 810*0.7) num_competence = 5;
+    */
+    switch (selected_competence) {
+        case 1:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+280*0.7+i, y+45+i, x+400*0.7-i, y+100+45-i, makecol(255,255,0));
+            } break;
+        case 2:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+410*0.7+i, y+45+i, x+530*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 3:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+545*0.7+i, y+45+i, x+660*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 4:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+675*0.7+i, y+45+i, x+800*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        case 5:
+            for (int i=0; i<5; i++) {
+                rect(buffer, x+810*0.7+i, y+45+i, x+985*0.7-i, y+100+45-i, makecol(255,255,0));
+            }break;
+        default: return;
+    }
+}
+
+void viderBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+
+
+void iso_to_screen(int x, int y, int *screen_x, int *screen_y) {
+    int origin_x = SCREEN_W/2;
+    int offset_y = SCREEN_H / 2 - TILE_HEIGHT  * PLAT_Y / 2;
+    *screen_x = (x - y) * (TILE_WIDTH / 2) + origin_x;
+    *screen_y = (x + y) * (TILE_HEIGHT / 2) + offset_y;
+    //if (iso_x + TILE_WIDTH > 0 && iso_x < SCREEN_W && iso_y + TILE_HEIGHT > 0 && iso_y < SCREEN_H);
 }
 
 
