@@ -759,10 +759,6 @@ void show(Game game, int n_turns, int num) {
 }
 Coord prev[PLAT_Y][PLAT_X]; // pour reconstruire le chemin
 
-
-
-
-
 void detection_competence (Game * game, Perso player,int * num_competence) {
     const int pad = 10;
     int x = mouse_x-pad;
@@ -885,6 +881,71 @@ void barre_jeu(BITMAP* buffer,
     show_selected_comp(buffer, selected_competence);
 }
 
+void afficher_pv_joueurs(BITMAP* buffer, Game game) {
+    const int start_x       = 10;
+    const int start_y       = 10;
+    const int line_height   = 25;
+    const int bar_width_max = 150;
+    const int bar_height    = 15;
+
+    for (int i = 0; i < NB_JOUEURS; i++) {
+        Perso* p = &game.players[i];
+
+        // Affichage du pseudo
+        textprintf_ex(buffer, font,
+                      start_x, start_y + i * line_height,
+                      makecol(255, 255, 255), -1,
+                      "%s", p->pseudo);
+
+        // --- calcul des PV et ratio ---
+        int maxPV = p->classe.pv * 10;
+        int curPV = p->pv_actuels;
+
+        // clamp entre 0 et maxPV
+        if (curPV < 0)     curPV = 0;
+        if (curPV > maxPV) curPV = maxPV;
+
+        // ratio [0..1]
+        float pv_ratio = (maxPV > 0)
+                        ? (float)curPV / (float)maxPV
+                        : 0.0f;
+
+        // largeur en pixels (avec arrondi)
+        int pv_w = (int)(bar_width_max * pv_ratio + 0.5f);
+
+        // --- dessin de la barre rouge (fond) ---
+        rectfill(buffer,
+                 start_x + 120,
+                 start_y + i * line_height,
+                 start_x + 120 + bar_width_max,
+                 start_y + i * line_height + bar_height,
+                 makecol(100, 0, 0));
+
+        // --- dessin de la portion verte (PV restants) ---
+        if (pv_w > 0) {
+            rectfill(buffer,
+                     start_x + 120,
+                     start_y + i * line_height,
+                     start_x + 120 + pv_w,
+                     start_y + i * line_height + bar_height,
+                     makecol(0, 200, 0));
+        }
+
+        // --- cadre blanc ---
+        rect(buffer,
+             start_x + 120,
+             start_y + i * line_height,
+             start_x + 120 + bar_width_max,
+             start_y + i * line_height + bar_height,
+             makecol(255, 255, 255));
+
+        // Affichage texte PV
+        textprintf_ex(buffer, font,
+                      start_x + 280, start_y + i * line_height,
+                      makecol(255, 255, 0), -1,
+                      "%d / %d", curPV, maxPV);
+    }
+}
 
 void bouton_next(BITMAP* buffer, BITMAP* icon) {
     if (!icon) return;
@@ -984,71 +1045,7 @@ void show_graphique(Game game,
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
-void afficher_pv_joueurs(BITMAP* buffer, Game game) {
-    const int start_x       = 10;
-    const int start_y       = 10;
-    const int line_height   = 25;
-    const int bar_width_max = 150;
-    const int bar_height    = 15;
 
-    for (int i = 0; i < NB_JOUEURS; i++) {
-        Perso* p = &game.players[i];
-
-        // Affichage du pseudo
-        textprintf_ex(buffer, font,
-                      start_x, start_y + i * line_height,
-                      makecol(255, 255, 255), -1,
-                      "%s", p->pseudo);
-
-        // --- calcul des PV et ratio ---
-        int maxPV = p->classe.pv * 10;
-        int curPV = p->pv_actuels;
-
-        // clamp entre 0 et maxPV
-        if (curPV < 0)     curPV = 0;
-        if (curPV > maxPV) curPV = maxPV;
-
-        // ratio [0..1]
-        float pv_ratio = (maxPV > 0)
-                        ? (float)curPV / (float)maxPV
-                        : 0.0f;
-
-        // largeur en pixels (avec arrondi)
-        int pv_w = (int)(bar_width_max * pv_ratio + 0.5f);
-
-        // --- dessin de la barre rouge (fond) ---
-        rectfill(buffer,
-                 start_x + 120,
-                 start_y + i * line_height,
-                 start_x + 120 + bar_width_max,
-                 start_y + i * line_height + bar_height,
-                 makecol(100, 0, 0));
-
-        // --- dessin de la portion verte (PV restants) ---
-        if (pv_w > 0) {
-            rectfill(buffer,
-                     start_x + 120,
-                     start_y + i * line_height,
-                     start_x + 120 + pv_w,
-                     start_y + i * line_height + bar_height,
-                     makecol(0, 200, 0));
-        }
-
-        // --- cadre blanc ---
-        rect(buffer,
-             start_x + 120,
-             start_y + i * line_height,
-             start_x + 120 + bar_width_max,
-             start_y + i * line_height + bar_height,
-             makecol(255, 255, 255));
-
-        // Affichage texte PV
-        textprintf_ex(buffer, font,
-                      start_x + 280, start_y + i * line_height,
-                      makecol(255, 255, 0), -1,
-                      "%d / %d", curPV, maxPV);
-    }
-}
 void next_cliqued(int * next) {
     const int pad = 10;
     int x = SCREEN_W - 651*0.5 - pad;
