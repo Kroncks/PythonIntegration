@@ -408,7 +408,7 @@ void action(Game *game, Perso *self, int num_competence, int action_x, int actio
         }
     } else {
         int idx = num_competence - 1;
-        int cible = found_player(*game, action_x, action_y);
+        int cible = found_player(*game, action_y, action_x);
         if (cible >= 0 && cible < NB_JOUEURS) {
             attack(game, self, &game->players[cible], idx);
             printf("PV du joueur %d (cible) : %d\n", cible, game->players[cible].pv_actuels);
