@@ -1,3 +1,5 @@
+# ECE ARENA
+
 ECE ARENA est un jeu de combat en arène au tour par tour, développé dans le cadre de nôtre projet d'informatique du deuxième semèstre. 
 Le jeu permet à 2 ou 4 joueurs de s’affronter soit en local, soit via un réseau LAN.
 
